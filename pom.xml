@@ -12,10 +12,10 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
   <build>
     <finalName>${project.name}</finalName>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -25,46 +25,38 @@
           <target>21</target>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
-          <compilerArgs>
-            <arg>-Xlint:unchecked</arg>
-          </compilerArgs>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-	<version>3.2.2</version>
+        <version>3.2.2</version>
         <configuration>
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>com.cavetale.setup.Main</mainClass>
+              <mainClass>com.cavetale.manager.Manager</mainClass>
             </manifest>
           </archive>
         </configuration>
       </plugin>
     </plugins>
-
   </build>
-  <repositories>
 
-    <!-- Cavetale Repo -->
+  <repositories>
     <repository>
       <id>cavetale</id>
       <url>https://cavetale.com/jenkins/plugin/repository/everything/</url>
     </repository>
-
   </repositories>
+
   <dependencies>
-
-    <!-- Lombok -->
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.32</version>
-      <scope>provided</scope>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>24.0.0</version>
+        <scope>compile</scope>
     </dependency>
-
   </dependencies>
 </project>
