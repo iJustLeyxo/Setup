@@ -69,7 +69,7 @@ public enum Command {
             try {
                 Plugin.get(origin);
             } catch (Plugin.NotAPluginException e) {
-                Console.log(Type.REQUESTED, Style.WARN, e.getMessage());
+                Console.log(Type.WARN, e.getMessage() + "\n");
             } catch (Plugin.PluginNotFoundException ignored) {}
             Console.log(Type.REQUESTED, Style.LINK, origin.getName() + " will be linked\n");
             if (!Console.confirm("Continue linking")) return;
