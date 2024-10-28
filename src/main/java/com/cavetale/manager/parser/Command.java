@@ -158,6 +158,9 @@ public enum Command {
         }
     };
 
+    // TODO: Accept eula option
+    // TODO: Run command
+
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
