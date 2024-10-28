@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.Set;
 
 /**
@@ -231,7 +232,7 @@ public enum Plugin implements Provider {
 
     public static Plugin get(@NotNull File file) throws NotAPluginException, PluginNotFoundException {
         String ref = file.getName().toLowerCase();
-        if (!file.isFile() || !ref.endsWith(".jar")) throw new NotAPluginException(file);
+        if (!file.getPath().endsWith(".jar")) throw new NotAPluginException(file);
         int verStart = ref.indexOf("-");
         if (verStart < 0) verStart = ref.length() - 1;
         int extStart = ref.indexOf(".");
