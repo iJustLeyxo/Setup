@@ -56,7 +56,7 @@ public enum Command {
         }
     },
 
-    LINK("Link any .jar to the plugins directory") {
+    LINK("Link any jar archive path to the plugins directory") {
         @Override
         public
         void run(@NotNull Result result) {
