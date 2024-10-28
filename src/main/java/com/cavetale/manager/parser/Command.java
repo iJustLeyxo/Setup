@@ -171,7 +171,7 @@ public enum Command {
     public abstract void run(@NotNull Result result);
 
     public void help(@NotNull Result result) {
-        Console.log(Type.REQUESTED, Style.HELP, this.refs[0] + ": " + this.info);
+        Console.log(Type.REQUESTED, Style.HELP, this.refs[0] + ": " + this.info + "\n");
     }
 
     public static @NotNull Command get(@NotNull String ref) throws NotFoundException {
