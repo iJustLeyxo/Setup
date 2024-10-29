@@ -17,7 +17,7 @@ import java.util.Set;
  * Server software, used to register downloadable server software
  */
 public enum Software {
-    PAPER("https://api.papermc.io/v2/projects/paper/versions/1.21/builds/127/downloads/paper-1.21-127.jar", "127",
+    PAPER("https://api.papermc.io/v2/projects/paper/versions/1.21/builds/127/downloads/paper-1.21-128.jar", "128",
             "Paper", "PaperMC"); // TODO: Download newest version using Paper API
 
     public final @NotNull String[] refs;
