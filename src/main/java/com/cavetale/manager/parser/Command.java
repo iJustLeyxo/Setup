@@ -70,7 +70,7 @@ public enum Command {
                 Plugin.get(origin);
             } catch (Plugin.NotAPluginException e) {
                 Console.log(Type.WARN, e.getMessage() + "\n");
-            } catch (Plugin.PluginNotFoundException ignored) {}
+            } catch (Plugin.PluginNotFoundException ignored) {} // TODO: Add back unknown plugin warning
             Console.log(Type.REQUESTED, Style.LINK, origin.getName() + " will be linked\n");
             if (!Console.confirm("Continue linking")) return;
             Console.log(Type.INFO, "Linking " + origin.getName());
