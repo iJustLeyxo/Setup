@@ -105,6 +105,8 @@ public enum Command {
         }
     },
 
+    // TODO: Search / find command to find plugins, categories, servers and software
+
     STATUS("View installation status", "info", "verify", "check") {
         @Override
         public
