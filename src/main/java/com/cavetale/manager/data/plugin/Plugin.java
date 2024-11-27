@@ -25,7 +25,7 @@ public enum Plugin implements Provider {
     // TODO: Adventure
     AdviceAnimals("com.winthier.adviceanimals", "0.1-SNAPSHOT", Category.DEPRECATED),
     AFK("com.cavetale.afk", "0.1-SNAPSHOT", Category.GLOBAL),
-    AntiPopup(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/b7a08d9/AntiPopup-9.2.jar"), "9.2", Category.GLOBAL),
+    AntiPopup(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/499358a/AntiPopup-10.jar"), "10", Category.GLOBAL),
     Area("com.cavetale.area", "0.1-SNAPSHOT", Category.GLOBAL),
     ArmorStandEditor("io.github.rypofalem.armorstandeditor", "1.17-25", Category.GLOBAL),
     Auction("com.cavetale.auction", "0.1-SNAPSHOT", Category.GLOBAL),
@@ -93,7 +93,7 @@ public enum Plugin implements Provider {
     Money("com.cavetale.money", "0.1-SNAPSHOT", Category.CORE),
     Mytems("com.cavetale.mytems", "0.1-SNAPSHOT", Category.CORE),
     // TODO: NBTDump
-    OpenInv(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/download/5.1.1/OpenInv.jar"), "5.1.1", Category.GLOBAL),
+    OpenInv(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/download/5.1.3/OpenInv.jar"), "5.1.3", Category.GLOBAL),
     Overboard("com.cavetale.overboard", "0.1-SNAPSHOT", Category.MINI_GAME),
     Perm("com.winthier.perm", "0.1-SNAPSHOT", Category.CORE),
     Photos("com.winthier.photos", "0.1-SNAPSHOT", Category.BUILD),
@@ -153,7 +153,7 @@ public enum Plugin implements Provider {
     // TODO: Waterfall
     // TODO: Windicator
     WinTag("com.cavetale.wintag", "0.1-SNAPSHOT", Category.BUILD),
-    WorldEdit(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/5613179/download"), "7.3.6", Category.GLOBAL),
+    WorldEdit(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/5935693/download"), "7.3.9", Category.GLOBAL),
     WorldMarker("com.cavetale.worldmarker", "0.1-SNAPSHOT", Category.CORE),
     Worlds("com.winthier.worlds", "0.1-SNAPSHOT", Category.GLOBAL),
     Xmas("com.cavetale.xmas", "0.1-SNAPSHOT", Category.SEASONAL);
