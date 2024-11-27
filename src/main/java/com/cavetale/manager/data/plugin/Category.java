@@ -55,7 +55,7 @@ public enum Category implements Provider {
         return this.ref;
     }
 
-    public static Category get(@NotNull String ref) throws NotFoundException {
+    public static @NotNull Category get(@NotNull String ref) throws NotFoundException {
         for (Category c : values()) {
             if (c.ref.equalsIgnoreCase(ref)) return c;
         }

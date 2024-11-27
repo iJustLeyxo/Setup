@@ -6,6 +6,7 @@ import com.cavetale.manager.parser.container.Container;
 import com.cavetale.manager.parser.container.NotAContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Type;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -20,7 +21,8 @@ public final class Parser {
      * @return A parsing result
      * @throws InputException When an invalid input was found
      */
-    public static @NotNull Result parse(String[] args) throws InputException {
+    @Contract("_ -> new")
+    public static @NotNull Result parse(@NotNull String @NotNull [] args) throws InputException {
         Console.log(Type.DEBUG, "Parsing input\n");
         Set<Command> commands = new LinkedHashSet<>();
         Map<Flag, NotAContainer> flags = new HashMap<>();

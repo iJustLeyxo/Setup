@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.Set;
 
 public enum Command {
@@ -56,7 +57,7 @@ public enum Command {
         }
     },
 
-    LINK("Link any .jar to the plugins directory") {
+    LINK("Link any jar archive path to the plugins directory") {
         @Override
         public
         void run(@NotNull Result result) {
@@ -69,8 +70,8 @@ public enum Command {
             try {
                 Plugin.get(origin);
             } catch (Plugin.NotAPluginException e) {
-                Console.log(Type.REQUESTED, Style.WARN, e.getMessage());
-            } catch (Plugin.PluginNotFoundException ignored) {}
+                Console.log(Type.WARN, e.getMessage() + "\n");
+            } catch (Plugin.PluginNotFoundException ignored) {} // TODO: Add back unknown plugin warning
             Console.log(Type.REQUESTED, Style.LINK, origin.getName() + " will be linked\n");
             if (!Console.confirm("Continue linking")) return;
             Console.log(Type.INFO, "Linking " + origin.getName());
@@ -105,6 +106,8 @@ public enum Command {
         }
     },
 
+    // TODO: Search / find command to find plugins, categories, servers and software
+
     STATUS("View installation status", "info", "verify", "check") {
         @Override
         public
@@ -117,9 +120,9 @@ public enum Command {
     UNINSTALL("Uninstall plugins, server software and files", "remove", "delete") {
         @Override
         public void run(@NotNull Result result) {
-            Set<Plugin> plugins = result.plugIndexer().getSelected();
+            Set<Plugin> plugins = new HashSet<>(result.plugIndexer().getSelected());
             plugins.remove(null);
-            Set<Software> software = result.softwareIndexer().getSelected();
+            Set<Software> software = new HashSet<>(result.softwareIndexer().getSelected());
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
@@ -158,10 +161,13 @@ public enum Command {
         }
     };
 
+    // TODO: Accept eula option
+    // TODO: Run command
+
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
-    Command(@NotNull String info, @NotNull String... refs) {
+    Command(@NotNull String info, @NotNull String @NotNull ... refs) {
         this.refs = new String[refs.length + 1];
         this.refs[0] = this.name().toLowerCase();
         System.arraycopy(refs, 0, this.refs, 1, refs.length);
@@ -171,7 +177,7 @@ public enum Command {
     public abstract void run(@NotNull Result result);
 
     public void help(@NotNull Result result) {
-        Console.log(Type.REQUESTED, Style.HELP, this.refs[0] + ": " + this.info);
+        Console.log(Type.REQUESTED, Style.HELP, this.refs[0] + ": " + this.info + "\n");
     }
 
     public static @NotNull Command get(@NotNull String ref) throws NotFoundException {

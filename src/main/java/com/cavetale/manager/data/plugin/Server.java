@@ -28,14 +28,14 @@ public enum Server implements Provider {
     public final @NotNull String info;
     public final @NotNull Provider[] providers;
 
-    Server(@NotNull String info, @NotNull Provider... providers) {
+    Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
         this.ref = this.name().toLowerCase();
         this.info = info;
         this.providers = providers;
     }
 
     @Override
-    public Set<Plugin> plugins() {
+    public @NotNull Set<Plugin> plugins() {
         Set<Plugin> plugins = new HashSet<>();
         for (Provider p : providers) {
             plugins.addAll(p.plugins());

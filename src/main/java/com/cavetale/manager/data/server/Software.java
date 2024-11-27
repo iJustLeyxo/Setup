@@ -17,13 +17,13 @@ import java.util.Set;
  * Server software, used to register downloadable server software
  */
 public enum Software {
-    PAPER("https://api.papermc.io/v2/projects/paper/versions/1.21/builds/127/downloads/paper-1.21-127.jar", "127",
+    PAPER("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/66/downloads/paper-1.21.3-66.jar", "1.21-3-66",
             "Paper", "PaperMC"); // TODO: Download newest version using Paper API
 
     public final @NotNull String[] refs;
     public final @NotNull Source source;
 
-    Software(@NotNull String uri, @NotNull String version, @NotNull String ref, @NotNull String... aliases) {
+    Software(@NotNull String uri, @NotNull String version, @NotNull String ref, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
         this.refs[0] = ref;
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);

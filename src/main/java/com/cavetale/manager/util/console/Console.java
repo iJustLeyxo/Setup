@@ -131,7 +131,7 @@ public final class Console {
      * Get new input arguments from console
      * @return user input argument
      */
-    public static @NotNull String[] in() {
+    public static @NotNull String @NotNull [] in() {
         Console.sep();
         Console.log(Type.PROMPT, "> ");
         Console.log(Type.PROMPT, Style.INPUT);
