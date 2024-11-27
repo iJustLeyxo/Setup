@@ -8,7 +8,9 @@ import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.IOException;
@@ -212,8 +214,9 @@ public enum Plugin implements Provider {
         }
     }
 
+    @Contract(value = " -> new", pure = true)
     @Override
-    public Set<Plugin> plugins() {
+    public @NotNull @Unmodifiable Set<Plugin> plugins() {
         return Set.of(this);
     }
 
@@ -222,7 +225,7 @@ public enum Plugin implements Provider {
         return this.name();
     }
 
-    public static Plugin get(@NotNull String ref) throws PluginNotFoundException {
+    public static @NotNull Plugin get(@NotNull String ref) throws PluginNotFoundException {
         String lowRef = ref.toLowerCase();
         for (Plugin p : Plugin.values()) {
             if (lowRef.equalsIgnoreCase(p.name())) return p;
@@ -230,7 +233,7 @@ public enum Plugin implements Provider {
         throw new PluginNotFoundException(ref);
     }
 
-    public static Plugin get(@NotNull File file) throws NotAPluginException, PluginNotFoundException {
+    public static @NotNull Plugin get(@NotNull File file) throws NotAPluginException, PluginNotFoundException {
         String ref = file.getName().toLowerCase();
         if (!file.getPath().endsWith(".jar")) throw new NotAPluginException(file);
         int verStart = ref.indexOf("-");

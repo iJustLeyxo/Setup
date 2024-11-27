@@ -47,7 +47,7 @@ public final class SoftwareIndexer {
         return new HashSet<>();
     }
 
-    private Map<Software, Set<File>> gatherInstalls() {
+    private @NotNull Map<Software, Set<File>> gatherInstalls() {
         Map<Software, Set<File>> installs = new HashMap<>();
         File folder = new File(".");
         File[] files = folder.listFiles();
@@ -70,7 +70,7 @@ public final class SoftwareIndexer {
         return installs;
     }
 
-    public Set<Software> getAll(@Nullable Boolean installed, @Nullable Boolean selected) {
+    public @NotNull Set<Software> getAll(@Nullable Boolean installed, @Nullable Boolean selected) {
         Set<Software> software = new HashSet<>();
         for (Map.Entry<Software, Index> e : this.index.entrySet()) {
             Index i = e.getValue();

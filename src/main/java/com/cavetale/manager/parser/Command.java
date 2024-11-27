@@ -167,7 +167,7 @@ public enum Command {
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
-    Command(@NotNull String info, @NotNull String... refs) {
+    Command(@NotNull String info, @NotNull String @NotNull ... refs) {
         this.refs = new String[refs.length + 1];
         this.refs[0] = this.name().toLowerCase();
         System.arraycopy(refs, 0, this.refs, 1, refs.length);

@@ -29,7 +29,7 @@ public enum Style {
 
     public final @NotNull String xCodes;
 
-    Style(@NotNull XCode... codes) {
+    Style(@NotNull XCode @NotNull ... codes) {
         StringBuilder s = new StringBuilder();
         for (XCode c : codes) {
             s.append(c);
