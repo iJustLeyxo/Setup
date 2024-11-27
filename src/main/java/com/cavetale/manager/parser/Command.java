@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.Set;
 
 public enum Command {
@@ -119,9 +120,9 @@ public enum Command {
     UNINSTALL("Uninstall plugins, server software and files", "remove", "delete") {
         @Override
         public void run(@NotNull Result result) {
-            Set<Plugin> plugins = result.plugIndexer().getSelected();
+            Set<Plugin> plugins = new HashSet<>(result.plugIndexer().getSelected());
             plugins.remove(null);
-            Set<Software> software = result.softwareIndexer().getSelected();
+            Set<Software> software = new HashSet<>(result.softwareIndexer().getSelected());
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
