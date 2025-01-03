@@ -7,7 +7,10 @@ import com.cavetale.manager.util.console.Type;
 import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Plugin categories, used to group plugins by purpose / usage
@@ -22,27 +25,28 @@ public enum Category implements Provider {
     Home("Plugins for home servers"),
     Hub("Plugins for hub servers"),
     Mine("Plugins for mine servers"),
-    MiniGame("minigame", "Plugins for mini game servers"),
+    MiniGame("Plugins for mini game servers"),
     Seasonal("Seasonal event plugins"),
     Survival("Plugins for survival servers"),
     Util("Optional utility plugins"),
     WorldGen("World generation plugins");
 
-    public final @NotNull String info;
+    private final @NotNull String info;
+    private final @NotNull Plugin[] plugins;
 
     Category(@NotNull String info) {
         this.info = info;
-    }
-
-    Category(@NotNull String ref, @NotNull String info) {
-        this.info = info;
+        List<Plugin> plugins = new LinkedList<>();
+        for (Plugin p : Plugin.values()) for (Category c : p.categories()) if (this == c) {
+            plugins.add(p);
+            break;
+        }
+        this.plugins = plugins.toArray(new Plugin[]{});
     }
 
     @Override
-    public Set<Plugin> plugins() {
-        Set<Plugin> result = new HashSet<>();
-        for (Plugin p : Plugin.values()) if (Arrays.asList(p.categories).contains(this)) result.add(p);
-        return result;
+    public Plugin[] plugins() {
+        return this.plugins;
     }
 
     @Override

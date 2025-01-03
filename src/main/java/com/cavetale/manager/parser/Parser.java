@@ -1,7 +1,5 @@
 package com.cavetale.manager.parser;
 
-import com.cavetale.manager.data.plugin.PlugIndexer;
-import com.cavetale.manager.data.server.SoftwareIndexer;
 import com.cavetale.manager.parser.container.Container;
 import com.cavetale.manager.parser.container.DummyContainer;
 import com.cavetale.manager.util.console.Console;
@@ -22,7 +20,7 @@ public final class Parser {
      * @throws InputException When an invalid input was found
      */
     @Contract("_ -> new")
-    public static @NotNull Result parse(@NotNull String @NotNull [] args) throws InputException {
+    public static @NotNull Tokens parse(@NotNull String @NotNull [] args) throws InputException {
         Console.log(Type.DEBUG, "Parsing input\n");
         Set<Command> commands = new LinkedHashSet<>();
         Map<Flag, DummyContainer> flags = new HashMap<>();
@@ -50,6 +48,6 @@ public final class Parser {
         }
         Tokens tokens = new Tokens(commands, flags);
         Console.log(Type.DEBUG, "Finished parsing done\n");
-        return new Result(tokens, new PlugIndexer(tokens), new SoftwareIndexer(tokens));
+        return tokens;
     }
 }

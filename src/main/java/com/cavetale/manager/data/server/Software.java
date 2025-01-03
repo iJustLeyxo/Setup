@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,20 +22,43 @@ public enum Software {
     PAPER("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/66/downloads/paper-1.21.3-66.jar", "1.21.3-66",
             "Paper", "PaperMC"); // TODO: Download newest version using Paper API
 
-    public final @NotNull String[] refs;
-    public final @NotNull Source source;
+    private final @NotNull Source source;
+    private final @NotNull String[] refs;
+
+    private boolean selected = false;
+    private final @NotNull List<String> installations = new LinkedList<>();
 
     Software(@NotNull String uri, @NotNull String version, @NotNull String ref, @NotNull String @NotNull ... aliases) {
+        this.source = new Source.Other(Util.uriOf(uri), version);
         this.refs = new String[aliases.length + 1];
         this.refs[0] = ref;
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
-        this.source = new Source.Other(Util.uriOf(uri), version);
+    }
+
+    public void setSelected(boolean value) {
+        this.selected = value;
+    }
+
+    public boolean isSelected() {
+        return this.selected;
+    }
+
+    public void clearInstallations() {
+        this.installations.clear();
+    }
+
+    public void addInstallation(@NotNull String file) {
+        this.installations.add(file);
+    }
+
+    public boolean isInstalled() {
+        return !this.installations.isEmpty();
     }
 
     public void install() {
         Console.log(Type.INFO, "Installing " + this.refs[0] + " software");
         File file = new File(this.refs[0] + "-" + source.version + ".jar");
-        if (SoftwareIndexer.active.getInstalled().containsKey(this)) {
+        if (this.isInstalled()) {
             if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
                 Console.log(Type.WARN, "Installing " + this.name() + " software skipped (already installed)\n");
             }
@@ -55,17 +80,15 @@ public enum Software {
     }
 
     public void uninstall() {
-        Set<File> files = SoftwareIndexer.active.installed.get(this);
-        if (files == null) return;
         File folder = new File(".");
-        for (File f : files) {
-            Console.log(Type.INFO, "Uninstalling " + f.getName() + " software");
-            if (new File(folder, f.getName()).delete()) {
+        for (String f : this.installations) {
+            Console.log(Type.INFO, "Uninstalling " + f + " software");
+            if (new File(folder, f).delete()) {
                 Console.log(Type.INFO, Style.DONE, " done\n");
                 continue;
             }
             if (!Console.log(Type.INFO, Style.ERR, " failed\n")) {
-                Console.log(Type.ERR, "Uninstalling " + f.getName() + " software failed\n");
+                Console.log(Type.ERR, "Uninstalling " + f + " software failed\n");
             }
         }
     }

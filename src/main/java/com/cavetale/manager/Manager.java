@@ -1,5 +1,7 @@
 package com.cavetale.manager;
 
+import com.cavetale.manager.data.plugin.Plugins;
+import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.parser.*;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -19,24 +21,27 @@ public final class Manager {
 
     public static void main(String[] args) {
         System.out.println();
+        Console.log(Type.WARN, Style.WARN, new Exception("TestException"));
 
         while (interactive) { // Cycle of inputs respective command executions
             if (args != null && args.length > 0) interactive = false;
             else args = Console.in();
             try {
-                Result result = Parser.parse(args);
-                boolean changed = result.tokens().analyse();
-                if (result.tokens().commands().isEmpty()) {
+                Tokens tokens = Parser.parse(args);
+                boolean changed = tokens.analyse();
+                if (tokens.commands().isEmpty()) {
                     if (!changed) Console.log(Type.WARN, "Nothing to do. Try typing \"help\".\n");
                 } else {
-                    Console.log(Type.DEBUG, "Running " + result.tokens().commands().size() + " command(s)\n");
-                    for (Command cmd : result.tokens().commands()) {
+                    Plugins.reload(tokens);
+                    Softwares.reload(tokens);
+                    Console.log(Type.DEBUG, "Running " + tokens.commands().size() + " command(s)\n");
+                    for (Command cmd : tokens.commands()) {
                         Console.log(Type.DEBUG, "Running " + cmd.refs[0] + " command\n");
-                        if (result.tokens().flags().containsKey(Flag.help)) {
-                            cmd.help(result);
+                        if (tokens.flags().containsKey(Flag.help)) {
+                            cmd.help(tokens);
                             continue;
                         }
-                        cmd.run(result);
+                        cmd.run(tokens);
                         Console.log(Type.DEBUG, "Finished running " + cmd.refs[0] + " command\n");
                     }
                     Console.log(Type.DEBUG, "Finished running command(s)\n");
@@ -44,9 +49,7 @@ public final class Manager {
             } catch (InputException e) {
                 Console.log(Type.ERR, e.getMessage() + "\n");
                 if (Console.logs(Type.DEBUG)) {
-                    Console.sep();
-                    Console.log(Type.DEBUG, Style.ERR);
-                    e.printStackTrace();
+                    Console.log(Type.DEBUG, Style.ERR, e);
                 }
                 if (!interactive) System.exit(1);
             }

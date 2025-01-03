@@ -24,19 +24,19 @@ public enum Server implements Provider {
     Event("Plugins for event servers", Server.Base, Plugin.Worlds),
     Classic("Plugins for classic servers", Server.Base, Category.Survival, Category.Build);
 
-    public final @NotNull String info;
-    public final @NotNull Provider[] providers;
+    private final @NotNull String info;
+    private final @NotNull Plugin[] plugins;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
         this.info = info;
-        this.providers = providers;
+        Set<Plugin> plugins = new HashSet<>();
+        for (Provider p : providers) if (this != p) Collections.addAll(plugins, p.plugins());
+        this.plugins = plugins.toArray(new Plugin[]{});
     }
 
     @Override
-    public @NotNull Set<Plugin> plugins() {
-        Set<Plugin> plugins = new HashSet<>();
-        for (Provider p : providers) plugins.addAll(p.plugins());
-        return plugins;
+    public @NotNull Plugin[] plugins() {
+        return this.plugins;
     }
 
     public static @NotNull Server get(@NotNull String ref) throws NotFoundException {

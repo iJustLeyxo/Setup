@@ -3,8 +3,10 @@ package com.cavetale.manager.parser;
 import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.plugin.Category;
 import com.cavetale.manager.data.plugin.Plugin;
+import com.cavetale.manager.data.plugin.Plugins;
 import com.cavetale.manager.data.plugin.Server;
 import com.cavetale.manager.data.server.Software;
+import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.parser.container.CategoryContainer;
 import com.cavetale.manager.parser.container.PathContainer;
 import com.cavetale.manager.parser.container.ServerContainer;
@@ -17,28 +19,29 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public enum Command {
     EXIT("Exit interactive mode", "quit", "q", "stop") {
         @Override
-        public void run(@NotNull Result result) {
+        public void run(@NotNull Tokens tokens) {
             Manager.exit();
         }
     },
 
     HELP("Show usage help") {
         @Override
-        public void run(@NotNull Result result) {
+        public void run(@NotNull Tokens tokens) {
             Manager.help();
         }
     },
 
     INSTALL("Install plugins and server software", "add") {
         @Override
-        public void run(@NotNull Result result) {
-            Set<Plugin> plugins = result.plugIndexer().getSelected();
-            Set<Software> software = result.softwareIndexer().getSelected();
+        public void run(@NotNull Tokens tokens) {
+            List<Plugin> plugins = Plugins.selected();
+            List<Software> software = Softwares.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
@@ -56,8 +59,8 @@ public enum Command {
     LINK("Link any jar archive path to the plugins directory") {
         @Override
         public
-        void run(@NotNull Result result) {
-            PathContainer patCon = (PathContainer) result.tokens().flags().get(Flag.path);
+        void run(@NotNull Tokens tokens) {
+            PathContainer patCon = (PathContainer) tokens.flags().get(Flag.path);
             if (patCon == null || patCon.isEmpty() || patCon.get().isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "No path specified\n");
                 return;
@@ -93,14 +96,14 @@ public enum Command {
 
     LIST("List plugins, categories, servers and server software", "show", "resolve") {
         @Override
-        public void run(@NotNull Result result) {
-            if (!result.plugIndexer().getSelected().isEmpty()) result.plugIndexer().listSelected();
-            boolean all = result.tokens().flags().containsKey(Flag.all);
-            CategoryContainer catCon = (CategoryContainer) result.tokens().flags().get(Flag.category);
+        public void run(@NotNull Tokens tokens) {
+            if (!Plugins.selected().isEmpty()) Plugins.listSelected();
+            boolean all = tokens.flags().containsKey(Flag.all);
+            CategoryContainer catCon = (CategoryContainer) tokens.flags().get(Flag.category);
             if (all || catCon != null && catCon.isEmpty()) Category.list();
-            ServerContainer serCon = (ServerContainer) result.tokens().flags().get(Flag.server);
+            ServerContainer serCon = (ServerContainer) tokens.flags().get(Flag.server);
             if (all || serCon != null && serCon.isEmpty()) Server.list();
-            if (!result.softwareIndexer().getSelected().isEmpty()) result.softwareIndexer().listSelected();
+            if (!Softwares.selected().isEmpty()) Softwares.listSelected();
         }
     },
 
@@ -109,23 +112,21 @@ public enum Command {
     STATUS("View installation status", "info", "verify", "check") {
         @Override
         public
-        void run(@NotNull Result result) {
-            result.plugIndexer().summarize();
-            result.softwareIndexer().summarize();
+        void run(@NotNull Tokens tokens) {
+            Plugins.summarize();
+            Softwares.summarize();
         }
     },
 
     UNINSTALL("Uninstall plugins, server software and files", "remove", "delete") {
         @Override
-        public void run(@NotNull Result result) {
-            Set<Plugin> plugins = new HashSet<>(result.plugIndexer().getSelected());
-            plugins.remove(null);
-            Set<Software> software = new HashSet<>(result.softwareIndexer().getSelected());
+        public void run(@NotNull Tokens tokens) {
+            List<Plugin> plugins = Plugins.selected();
+            List<Software> software = Softwares.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
             }
-            software.remove(null);
             Console.log(Type.REQUESTED, Style.UNINSTALL,
                     plugins.size() + " plugins and " + software.size() + " software to uninstall\n");
             if (!Console.confirm("Continue removal")) return;
@@ -136,9 +137,9 @@ public enum Command {
 
     UPDATE("Update plugins and software", "upgrade") {
         @Override
-        public void run(@NotNull Result result) {
-            Set<Plugin> plugins = result.plugIndexer().getSelected();
-            Set<Software> software = result.softwareIndexer().getSelected();
+        public void run(@NotNull Tokens tokens) {
+            List<Plugin> plugins = Plugins.selected();
+            List<Software> software = Softwares.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
@@ -164,9 +165,9 @@ public enum Command {
         this.info = info;
     }
 
-    public abstract void run(@NotNull Result result);
+    public abstract void run(@NotNull Tokens result);
 
-    public void help(@NotNull Result result) {
+    public void help(@NotNull Tokens result) {
         Console.log(Type.REQUESTED, Style.HELP, this.refs[0] + ": " + this.info + "\n");
     }
 

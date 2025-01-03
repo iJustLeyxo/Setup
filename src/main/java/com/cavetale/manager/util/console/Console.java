@@ -97,6 +97,32 @@ public final class Console {
     }
 
     /**
+     * Logs an exception to console
+     * @param type Type of message to log
+     * @param style Style of message to log
+     * @param t Exception to log
+     * @return {@code true} if the exception was logged and not held back due to verbosity
+     */
+    public static boolean log(@NotNull Type type, @NotNull Style style, @NotNull Throwable t) {
+        if (!Console.logs(type)) return false;
+        Console.sep();
+        Console.log(type, style);
+        Console.logR(t);
+        return true;
+    }
+
+    private static void logR(@NotNull Throwable t) {
+        System.out.println(XCode.BOLD + t.getClass().getSimpleName() + ": " + XCode.RESET + t.getMessage());
+        for (StackTraceElement e : t.getStackTrace()) {
+            System.out.println("\t" + e.getModuleName() + "<" + e.getModuleVersion() + "> / " + e.getFileName() + ": " + e.getClassName() + "." + e.getMethodName() + " #" + e.getLineNumber());
+        }
+        if (t.getCause() != null) {
+            System.out.print("Caused by ");
+            Console.logR(t.getCause());
+        }
+    }
+
+    /**
      * @param detail The detail to test for logging
      * @return {@code true} if the detail level gets logged and not held back due to verbosity
      */

@@ -8,20 +8,20 @@ import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * List of available plugins
  */
 public enum Plugin implements Provider {
     // TODO: Adventure
+    @Deprecated
     AdviceAnimals("com.winthier.adviceanimals", "0.1-SNAPSHOT", Category.Deprecated),
     AFK("com.cavetale.afk", "0.1-SNAPSHOT", Category.Global),
     AntiPopup(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/499358a/AntiPopup-10.jar"), "10", Category.Global),
@@ -39,12 +39,14 @@ public enum Plugin implements Provider {
     Chair("com.cavetale.chair", "0.1-SNAPSHOT", Category.Build),
     Chat("com.winthier.chat", "0.1-SNAPSHOT", Category.Core),
     // TODO: Chess
+    @Deprecated
     Christmas("com.cavetale.christmas", "0.1-SNAPSHOT", Category.Deprecated),
     Colorfall("io.github.feydk.colorfall", "0.1-SNAPSHOT", Category.MiniGame),
     Connect("com.winthier.connect", "0.1-SNAPSHOT", Category.Core),
     // TODO: ConnectCore
     Core("com.cavetale.core", "0.1-SNAPSHOT", Category.Core),
     Countdown("com.winthier.countdown", "0.1", Category.Global),
+    @Deprecated
     CraftBay("com.winthier.craftbay", "2.26-SNAPSHOT", Category.Deprecated),
     Creative("com.winthier.creative", "0.1-SNAPSHOT", Category.Creative),
     CullMob("com.cavetale.cullmob", "0.1-SNAPSHOT", Category.Home),
@@ -65,12 +67,14 @@ public enum Plugin implements Provider {
     Fly("com.cavetale.fly", "0.1-SNAPSHOT", Category.Global),
     FreeHat("com.cavetale.freehat", "0.1-SNAPSHOT", Category.Build),
     GoldenTicket("com.cavetale.goldenticket", "0.1-SNAPSHOT", Category.Survival),
+    @Deprecated
     Halloween("com.cavetale.halloween", "0.1-SNAPSHOT", Category.Deprecated),
     HideAndSeek("com.cavetale.hideandseek", "0.1-SNAPSHOT", Category.MiniGame),
     Home("com.cavetale.home", "0.1-SNAPSHOT", Category.Global),
     HopperFilter("com.winthier.hopperfilter", "0.1-SNAPSHOT", Category.Survival),
     HotSwap("com.cavetale.hotswap", "0.1-SNAPSHOT", Category.Global),
     Inventory("com.cavetale.inventory", "0.1-SNAPSHOT", Category.Global),
+    @Deprecated
     InvisibleItemFrames("com.cavetale.invisibleitemframes", "0.1-SNAPSHOT", Category.Deprecated),
     ItemStore("com.winthier.itemstore", "0.1-SNAPSHOT", Category.Global),
     KeepInventory("com.winthier.keepinventory", "0.1-SNAPSHOT", Category.Survival),
@@ -78,6 +82,7 @@ public enum Plugin implements Provider {
     // TODO: KingOfTheRing
     Kit("com.winthier.kit", "0.1", Category.Global),
     // TODO: LastLog
+    @Deprecated
     LinkPortal("com.winthier.linkportal", "0.1-SNAPSHOT", Category.Deprecated),
     MagicMap("com.cavetale.magicmap", "0.1-SNAPSHOT", Category.Global),
     Mail("com.winthier.mail", "0.1-SNAPSHOT", Category.Global),
@@ -106,6 +111,7 @@ public enum Plugin implements Provider {
     ProtocolLib("com.comphenix.protocol", "4.7.1-SNAPSHOT", Category.Util), // TODO: External download
     PVPArena("com.cavetale.pvparena", "0.1-SNAPSHOT", Category.MiniGame),
     // TODO: Quidditch
+    @Deprecated
     Quiz("com.winthier.quiz", "0.1-SNAPSHOT", Category.Deprecated),
     Race("com.cavetale.race", "0.1-SNAPSHOT", Category.MiniGame),
     Raid("com.cavetale.raid", "0.1-SNAPSHOT", Category.MiniGame),
@@ -116,6 +122,7 @@ public enum Plugin implements Provider {
     ResourcePack("com.cavetale.resourcepack", "0.1-SNAPSHOT", Category.Global),
     Rules("com.winthier.rules", "0.1-SNAPSHOT", Category.Global),
     Server("com.cavetale.server", "0.1-SNAPSHOT", Category.Global),
+    @Deprecated
     ServerStatus("com.cavetale.serverstatus", "0.1-SNAPSHOT", Category.Deprecated),
     Shop("com.winthier.shop", "0.1-SNAPSHOT", Category.Survival),
     Shutdown("com.winthier.shutdown", "0.1-SNAPSHOT", Category.Global),
@@ -158,27 +165,68 @@ public enum Plugin implements Provider {
     Xmas("com.cavetale.xmas", "0.1-SNAPSHOT", Category.Seasonal);
 
     private final @NotNull Source source;
-    public final @NotNull Category[] categories;
+    private final @NotNull Category[] categories;
+    private final @NotNull Plugin[] plugins;
+
+    private boolean selected = false;
+    private final @NotNull List<String> installations = new LinkedList<>();
 
     Plugin(@NotNull URI uri, @NotNull String version, @NotNull Category... categories) {
         this.source = new Source.Other(uri, version);
         this.categories = categories;
+        this.plugins = new Plugin[]{this};
     }
 
     Plugin(@NotNull String groupId, @NotNull String version, @NotNull Category... categories) {
         this.source = new Source.Jenkins(this.name(), groupId, this.name().toLowerCase(), version);
         this.categories = categories;
+        this.plugins = new Plugin[]{this};
     }
 
     Plugin(@NotNull String groupId, @NotNull String artifactId, @NotNull String version,
            @NotNull Category... categories) {
         this.source = new Source.Jenkins(this.name(), groupId, artifactId, version);
         this.categories = categories;
+        this.plugins = new Plugin[]{this};
+    }
+
+    @Override
+    public @NotNull Plugin[] plugins() {
+        return this.plugins;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return this.name();
+    }
+
+    public void setSelected(boolean value) {
+        this.selected = value;
+    }
+
+    public boolean isSelected() {
+        return this.selected;
+    }
+
+    public void clearInstallations() {
+        this.installations.clear();
+    }
+
+    public void addInstallation(@NotNull String file) {
+        this.installations.add(file);
+    }
+
+    public boolean isInstalled() {
+        return !this.installations.isEmpty();
+    }
+
+    public @NotNull Category[] categories() {
+        return this.categories;
     }
 
     public void install() {
         Console.log(Type.INFO, "Installing " + this.name() + " plugin");
-        if (PlugIndexer.active.getInstalled().containsKey(this)) {
+        if (this.isInstalled()) {
             if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
                 Console.log(Type.WARN, "Installing " + this.name() + " plugin skipped (already installed)\n");
             }
@@ -201,40 +249,27 @@ public enum Plugin implements Provider {
     }
 
     public void uninstall() {
-        Set<File> files = PlugIndexer.active.installed.get(this);
-        if (files == null) return;
         File folder = new File("plugins/");
-        for (File f : files) {
-            Console.log(Type.INFO, Style.DEBUG, "Uninstalling " + f.getName());
-            if (new File(folder, f.getName()).delete()) {
+        for (String file : this.installations) {
+            Console.log(Type.INFO, Style.DEBUG, "Uninstalling " + file);
+            if (new File(folder, file).delete()) {
                 Console.log(Type.INFO, Style.DONE, " done\n");
                 continue;
             }
             if (!Console.log(Type.DEBUG, Style.ERR, " failed\n")) {
-                Console.log(Type.ERR, "Uninstalling " + f.getName() + " plugin failed\n");
+                Console.log(Type.ERR, "Uninstalling " + file + " plugin failed\n");
             }
         }
     }
 
-    @Contract(value = " -> new", pure = true)
-    @Override
-    public @NotNull @Unmodifiable Set<Plugin> plugins() {
-        return Set.of(this);
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return this.name();
-    }
-
-    public static @NotNull Plugin get(@NotNull String ref) throws PluginNotFoundException {
+    public static @NotNull Plugin get(@NotNull String ref) throws Plugin.PluginNotFoundException {
         for (Plugin p : Plugin.values()) if (p.name().equalsIgnoreCase(ref)) return p;
-        throw new PluginNotFoundException(ref);
+        throw new Plugin.PluginNotFoundException(ref);
     }
 
-    public static @NotNull Plugin get(@NotNull File file) throws NotAPluginException, PluginNotFoundException {
+    public static @NotNull Plugin get(@NotNull File file) throws Plugin.NotAPluginException, Plugin.PluginNotFoundException {
         String ref = file.getName().toLowerCase();
-        if (!file.getPath().endsWith(".jar")) throw new NotAPluginException(file);
+        if (!file.getPath().endsWith(".jar")) throw new Plugin.NotAPluginException(file);
         int verStart = ref.indexOf("-");
         if (verStart < 0) verStart = ref.length() - 1;
         int extStart = ref.indexOf(".");
@@ -242,7 +277,7 @@ public enum Plugin implements Provider {
         int endStart = Math.min(verStart, extStart);
         ref = ref.substring(0, endStart);
         for (Plugin p : Plugin.values()) if (ref.equalsIgnoreCase(p.name())) return p;
-        throw new PluginNotFoundException(ref);
+        throw new Plugin.PluginNotFoundException(ref);
     }
 
     public static class PluginNotFoundException extends InputException {
