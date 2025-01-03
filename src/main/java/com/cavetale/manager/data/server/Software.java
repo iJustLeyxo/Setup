@@ -34,16 +34,18 @@ public enum Software {
         Console.log(Type.INFO, "Installing " + this.refs[0] + " software");
         File file = new File(this.refs[0] + "-" + source.version + ".jar");
         if (SoftwareIndexer.active.getInstalled().containsKey(this)) {
-            if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n"))
+            if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
                 Console.log(Type.WARN, "Installing " + this.name() + " software skipped (already installed)\n");
+            }
             return;
         }
         try {
             Util.download(this.source.uri, file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n"))
+            if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
                 Console.log(Type.ERR, "Installing " + this.refs[0] + " software failed (" + e.getMessage() + ")\n");
+            }
         }
     }
 
@@ -62,8 +64,9 @@ public enum Software {
                 Console.log(Type.INFO, Style.DONE, " done\n");
                 continue;
             }
-            if (!Console.log(Type.INFO, Style.ERR, " failed\n"))
+            if (!Console.log(Type.INFO, Style.ERR, " failed\n")) {
                 Console.log(Type.ERR, "Uninstalling " + f.getName() + " software failed\n");
+            }
         }
     }
 
@@ -73,12 +76,7 @@ public enum Software {
     }
 
     public static @NotNull Software get(@NotNull String ref) throws SoftwareNotFoundException {
-        String lowRef = ref.toLowerCase();
-        for (Software s : Software.values()) {
-            for (String r : s.refs) {
-                if (lowRef.equalsIgnoreCase(r)) return s;
-            }
-        }
+        for (Software s : Software.values()) for (String r : s.refs) if (r.equals(ref)) return s;
         throw new SoftwareNotFoundException(ref);
     }
 
@@ -91,11 +89,7 @@ public enum Software {
         if (extStart < 0) extStart = ref.length() - 1;
         int endStart = Math.min(verStart, extStart);
         ref = ref.substring(0, endStart);
-        for (Software s : Software.values()) {
-            for (String r : s.refs) {
-                if (ref.equalsIgnoreCase(r)) return s;
-            }
-        }
+        for (Software s : Software.values()) for (String r : s.refs) if (ref.equalsIgnoreCase(r)) return s;
         throw new SoftwareNotFoundException(ref);
     }
 

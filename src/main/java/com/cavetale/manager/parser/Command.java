@@ -48,12 +48,8 @@ public enum Command {
             if (!Console.confirm("Continue installation")) return;
             File folder = new File("plugins/");
             folder.mkdir();
-            for (Plugin p : plugins) {
-                p.install();
-            }
-            for (Software s : software) {
-                s.install();
-            }
+            for (Plugin p : plugins) p.install();
+            for (Software s : software) s.install();
         }
     },
 
@@ -61,7 +57,7 @@ public enum Command {
         @Override
         public
         void run(@NotNull Result result) {
-            PathContainer patCon = (PathContainer) result.tokens().flags().get(Flag.PATH);
+            PathContainer patCon = (PathContainer) result.tokens().flags().get(Flag.path);
             if (patCon == null || patCon.isEmpty() || patCon.get().isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "No path specified\n");
                 return;
@@ -79,16 +75,18 @@ public enum Command {
             folder.mkdir();
             File link = new File(folder, origin.getName());
             if (link.exists()) {
-                if (!Console.log(Type.INFO, Style.ERR, " failed (already exists)\n"))
+                if (!Console.log(Type.INFO, Style.ERR, " failed (already exists)\n")) {
                     Console.log(Type.ERR, "Linking " + this.name() + " plugin failed (already exists)\n");
+                }
                 return;
             }
             try {
                 Files.createSymbolicLink(link.toPath(), origin.toPath());
                 Console.log(Type.INFO, Style.DONE, " done\n");
             } catch (IOException e) {
-                if (!Console.log(Type.INFO, Style.ERR, " failed\n"))
+                if (!Console.log(Type.INFO, Style.ERR, " failed\n")) {
                     Console.log(Type.ERR, "Linking " + origin.getName() + " failed\n");
+                }
             }
         }
     },
@@ -97,10 +95,10 @@ public enum Command {
         @Override
         public void run(@NotNull Result result) {
             if (!result.plugIndexer().getSelected().isEmpty()) result.plugIndexer().listSelected();
-            boolean all = result.tokens().flags().containsKey(Flag.ALL);
-            CategoryContainer catCon = (CategoryContainer) result.tokens().flags().get(Flag.CATEGORY);
+            boolean all = result.tokens().flags().containsKey(Flag.all);
+            CategoryContainer catCon = (CategoryContainer) result.tokens().flags().get(Flag.category);
             if (all || catCon != null && catCon.isEmpty()) Category.list();
-            ServerContainer serCon = (ServerContainer) result.tokens().flags().get(Flag.SERVER);
+            ServerContainer serCon = (ServerContainer) result.tokens().flags().get(Flag.server);
             if (all || serCon != null && serCon.isEmpty()) Server.list();
             if (!result.softwareIndexer().getSelected().isEmpty()) result.softwareIndexer().listSelected();
         }
@@ -131,12 +129,8 @@ public enum Command {
             Console.log(Type.REQUESTED, Style.UNINSTALL,
                     plugins.size() + " plugins and " + software.size() + " software to uninstall\n");
             if (!Console.confirm("Continue removal")) return;
-            for (Plugin p : plugins) {
-                p.uninstall();
-            }
-            for (Software s : software) {
-                s.uninstall();
-            }
+            for (Plugin p : plugins) p.uninstall();
+            for (Software s : software) s.uninstall();
         }
     },
 
@@ -152,12 +146,8 @@ public enum Command {
             Console.log(Type.REQUESTED, Style.UPDATE,
                     plugins.size() + " plugins and " + software.size() + " software to update\n");
             if (!Console.confirm("Continue update")) return;
-            for (Plugin p : plugins) {
-                p.update();
-            }
-            for (Software s  : software) {
-                s.update();
-            }
+            for (Plugin p : plugins) p.update();
+            for (Software s  : software) s.update();
         }
     };
 
@@ -181,11 +171,7 @@ public enum Command {
     }
 
     public static @NotNull Command get(@NotNull String ref) throws NotFoundException {
-        for (Command c : Command.values()) {
-            for (String r : c.refs) {
-                if (r.equalsIgnoreCase(ref)) return c;
-            }
-        }
+        for (Command c : Command.values()) for (String r : c.refs) if (r.equals(ref)) return c;
         throw new NotFoundException(ref);
     }
 

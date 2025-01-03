@@ -13,52 +13,45 @@ import java.util.*;
  * Plugin categories, used to group plugins by purpose / usage
  */
 public enum Category implements Provider {
-    GLOBAL("Global plugins"),
-    BUILD("Plugins for build servers"),
-    CORE("Essential plugins"),
-    CREATIVE("Plugins for creative servers"),
-    DEPRECATED("Deprecated plugins"),
-    EVENT("Plugins for events without a dedicated server"),
-    HOME("Plugins for home servers"),
-    HUB("Plugins for hub servers"),
-    MINE("Plugins for mine servers"),
-    MINI_GAME("minigame", "Plugins for mini game servers"),
-    SEASONAL("Seasonal event plugins"),
-    SURVIVAL("Plugins for survival servers"),
-    UTIL("Optional utility plugins"),
-    WORLD_GEN("worldgen", "World generation plugins");
+    Global("Global plugins"),
+    Build("Plugins for build servers"),
+    Core("Essential plugins"),
+    Creative("Plugins for creative servers"),
+    Deprecated("Deprecated plugins"),
+    Event("Plugins for events without a dedicated server"),
+    Home("Plugins for home servers"),
+    Hub("Plugins for hub servers"),
+    Mine("Plugins for mine servers"),
+    MiniGame("minigame", "Plugins for mini game servers"),
+    Seasonal("Seasonal event plugins"),
+    Survival("Plugins for survival servers"),
+    Util("Optional utility plugins"),
+    WorldGen("World generation plugins");
 
-    public final @NotNull String ref;
     public final @NotNull String info;
 
     Category(@NotNull String info) {
-        this.ref = this.name().toLowerCase();
         this.info = info;
     }
 
     Category(@NotNull String ref, @NotNull String info) {
-        this.ref = ref;
         this.info = info;
     }
 
     @Override
     public Set<Plugin> plugins() {
         Set<Plugin> result = new HashSet<>();
-        for (Plugin p : Plugin.values()) {
-            if (Arrays.asList(p.categories).contains(this)) result.add(p);
-        }
+        for (Plugin p : Plugin.values()) if (Arrays.asList(p.categories).contains(this)) result.add(p);
         return result;
     }
 
     @Override
     public @NotNull String toString() {
-        return this.ref;
+        return this.name();
     }
 
     public static @NotNull Category get(@NotNull String ref) throws NotFoundException {
-        for (Category c : values()) {
-            if (c.ref.equalsIgnoreCase(ref)) return c;
-        }
+        for (Category c : values()) if (c.name().equalsIgnoreCase(ref)) return c;
         throw new NotFoundException(ref);
     }
 
@@ -72,9 +65,7 @@ public enum Category implements Provider {
                 "-------------------------------------------\n");
         ArrayList<Category> categories = new ArrayList<>(List.of(Category.values()));
         Collections.sort(categories);
-        for (Category c : categories) {
-            Console.logF(Type.REQUESTED, Style.CATEGORY, "%-16s | %-68s\n", c.ref, c.info);
-        }
+        for (Category c : categories) Console.logF(Type.REQUESTED, Style.CATEGORY, "%-16s | %-68s\n", c.name(), c.info);
     }
 
     public static final class NotFoundException extends InputException {

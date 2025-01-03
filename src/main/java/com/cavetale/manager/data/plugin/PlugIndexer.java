@@ -41,25 +41,21 @@ public final class PlugIndexer {
 
     private @NotNull Set<Plugin> gatherSelected(@NotNull Tokens tokens) {
         Set<Plugin> selected = new HashSet<>();
-        PluginContainer pluCon = (PluginContainer) tokens.flags().get(Flag.PLUGIN);
-        if (tokens.flags().containsKey(Flag.ALL)) return Set.of(Plugin.values());
+        PluginContainer pluCon = (PluginContainer) tokens.flags().get(Flag.plugin);
+        if (tokens.flags().containsKey(Flag.all)) return Set.of(Plugin.values());
         if (pluCon != null) {
             if (pluCon.isEmpty()) return Set.of(Plugin.values());
             selected.addAll(pluCon.get());
         }
-        CategoryContainer catCon = (CategoryContainer) tokens.flags().get(Flag.CATEGORY);
+        CategoryContainer catCon = (CategoryContainer) tokens.flags().get(Flag.category);
         if (catCon != null) {
             Set<Category> cats = catCon.isEmpty() ? Set.of(Category.values()) : catCon.get();
-            for (Category cat : cats) {
-                selected.addAll(cat.plugins());
-            }
+            for (Category cat : cats) selected.addAll(cat.plugins());
         }
-        ServerContainer serCon = (ServerContainer) tokens.flags().get(Flag.SERVER);
+        ServerContainer serCon = (ServerContainer) tokens.flags().get(Flag.server);
         if (serCon != null) {
             Set<Server> servers = serCon.isEmpty() ? Set.of(Server.values()) : serCon.get();
-            for (Server ser : servers) {
-                selected.addAll(ser.plugins());
-            }
+            for (Server ser : servers) selected.addAll(ser.plugins());
         }
         return selected;
     }
@@ -77,11 +73,8 @@ public final class PlugIndexer {
                 continue;
             } catch (Plugin.PluginNotFoundException ignored) {}
             File i = new File(f.getName());
-            if (!installs.containsKey(p)) {
-                installs.put(p, new HashSet<>(Set.of(i)));
-            } else {
-                installs.get(p).add(i);
-            }
+            if (!installs.containsKey(p)) installs.put(p, new HashSet<>(Set.of(i)));
+            else installs.get(p).add(i);
         }
         return installs;
     }
@@ -91,7 +84,9 @@ public final class PlugIndexer {
         for (Map.Entry<Plugin, Index> e : this.index.entrySet()) {
             Index i = e.getValue();
             if ((installed == null || installed == !i.installs.isEmpty()) &&
-                    (selected == null || selected == i.isSelected)) plugins.add(e.getKey());
+                    (selected == null || selected == i.isSelected)) {
+                plugins.add(e.getKey());
+            }
         }
         return plugins;
     }
@@ -111,11 +106,9 @@ public final class PlugIndexer {
     }
 
     public void summarize() {
-        if (!this.getSelected().isEmpty()) {
-            this.summarizeSelected();
-        } else if (!this.getInstalled().isEmpty()) {
-            this.summarizeInstalled();
-        } else {
+        if (!this.getSelected().isEmpty()) this.summarizeSelected();
+        else if (!this.getInstalled().isEmpty()) this.summarizeInstalled();
+        else {
             Console.sep();
             Console.log(Type.REQUESTED, Style.INFO, "No plugins selected or installed\n");
         }

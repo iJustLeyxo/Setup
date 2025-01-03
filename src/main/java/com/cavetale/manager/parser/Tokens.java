@@ -1,7 +1,7 @@
 package com.cavetale.manager.parser;
 
 import com.cavetale.manager.Manager;
-import com.cavetale.manager.parser.container.NotAContainer;
+import com.cavetale.manager.parser.container.DummyContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Detail;
 import com.cavetale.manager.util.console.Style;
@@ -16,7 +16,7 @@ import java.util.Set;
  * @param commands Detected commands
  * @param flags Detected flags and flag options / arguments
  */
-public record Tokens (@NotNull Set<Command> commands, @NotNull Map<Flag, NotAContainer> flags) {
+public record Tokens (@NotNull Set<Command> commands, @NotNull Map<Flag, DummyContainer> flags) {
     /**
      * Analyse the parsed tokens for some basic flags
      * @return {@code true} if something of significance has been found
@@ -24,17 +24,17 @@ public record Tokens (@NotNull Set<Command> commands, @NotNull Map<Flag, NotACon
     public boolean analyse() {
         Console.log(Type.DEBUG, "Analysing tokens");
         StringBuilder s = new StringBuilder();
-        if (this.flags().containsKey(Flag.VERBOSE)) {
+        if (this.flags().containsKey(Flag.verbose)) {
             Console.detail = Detail.HIGH;
             s.append("Verbose mode activated\n");
-        } else if (this.flags().containsKey(Flag.DEFAULT)) {
+        } else if (this.flags().containsKey(Flag.normal)) {
             Console.detail = Detail.STD;
             s.append("Default verbosity mode activated\n");
-        } else if (this.flags().containsKey(Flag.QUIET)) {
+        } else if (this.flags().containsKey(Flag.quiet)) {
             Console.detail = Detail.LOW;
             s.append("Quiet mode activated\n");
         }
-        if (this.flags().containsKey(Flag.INTERACTIVE) && !Manager.interactive) {
+        if (this.flags().containsKey(Flag.interactive) && !Manager.interactive) {
             Manager.interactive = true;
             s.append("Interactive mode activated\n");
         }

@@ -21,11 +21,8 @@ public final class Manager {
         System.out.println();
 
         while (interactive) { // Cycle of inputs respective command executions
-            if (args != null && args.length > 0) {
-                interactive = false;
-            } else {
-                args = Console.in();
-            }
+            if (args != null && args.length > 0) interactive = false;
+            else args = Console.in();
             try {
                 Result result = Parser.parse(args);
                 boolean changed = result.tokens().analyse();
@@ -35,7 +32,7 @@ public final class Manager {
                     Console.log(Type.DEBUG, "Running " + result.tokens().commands().size() + " command(s)\n");
                     for (Command cmd : result.tokens().commands()) {
                         Console.log(Type.DEBUG, "Running " + cmd.refs[0] + " command\n");
-                        if (result.tokens().flags().containsKey(Flag.HELP)) {
+                        if (result.tokens().flags().containsKey(Flag.help)) {
                             cmd.help(result);
                             continue;
                         }
@@ -93,7 +90,7 @@ public final class Manager {
         Collections.sort(flags);
         for (Flag f : flags) {
             Console.logF(Type.REQUESTED, Style.HELP, "%2s %-13s | %-32s | %-33s\n", "-" + f.shortRef,
-                    "--" + f.longRef, f.info, Objects.requireNonNullElse(f.usage, ""));
+                    "--" + f.name(), f.info, Objects.requireNonNullElse(f.usage, ""));
         }
     }
 }

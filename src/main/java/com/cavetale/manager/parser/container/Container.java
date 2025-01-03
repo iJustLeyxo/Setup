@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
  * Container of an element of a generic type
  * @param <T> Type of the contents
  */
-public abstract class Container<T> extends NotAContainer {
+public abstract class Container<T> extends DummyContainer {
     protected @Nullable T contents;
 
     public Container(@Nullable T contents) {

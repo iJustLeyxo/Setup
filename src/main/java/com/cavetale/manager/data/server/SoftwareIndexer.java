@@ -38,8 +38,8 @@ public final class SoftwareIndexer {
      * Resolve installed and selected software
      */
     private Set<Software> gatherSelected(@NotNull Tokens tokens) {
-        SoftwareContainer softCon = (SoftwareContainer) tokens.flags().get(Flag.SOFTWARE);
-        if (tokens.flags().containsKey(Flag.ALL)) return Set.of(Software.values());
+        SoftwareContainer softCon = (SoftwareContainer) tokens.flags().get(Flag.software);
+        if (tokens.flags().containsKey(Flag.all)) return Set.of(Software.values());
         if (softCon != null) {
             if (softCon.isEmpty()) return Set.of(Software.values());
             return Set.of(softCon.get().toArray(new Software[0]));
@@ -61,11 +61,8 @@ public final class SoftwareIndexer {
                 continue;
             } catch (Software.SoftwareNotFoundException ignored) {}
             File i = new File(f.getName());
-            if (!installs.containsKey(s)) {
-                installs.put(s, new HashSet<>(Set.of(i)));
-            } else {
-                installs.get(s).add(i);
-            }
+            if (!installs.containsKey(s)) installs.put(s, new HashSet<>(Set.of(i)));
+            else installs.get(s).add(i);
         }
         return installs;
     }
@@ -75,7 +72,9 @@ public final class SoftwareIndexer {
         for (Map.Entry<Software, Index> e : this.index.entrySet()) {
             Index i = e.getValue();
             if ((installed == null || installed == !i.installs.isEmpty()) &&
-                    (selected == null || selected == i.isSelected)) software.add(e.getKey());
+                    (selected == null || selected == i.isSelected)) {
+                software.add(e.getKey());
+            }
         }
         return software;
     }
@@ -95,11 +94,9 @@ public final class SoftwareIndexer {
     }
 
     public void summarize() {
-        if (!this.selected.isEmpty()) {
-            this.summarizeSelected(); // Compare selected to installed software
-        } else if (!this.getInstalled().isEmpty()) {
-            this.summarizeInstalled(); // Show installed software if nothing is selected
-        } else {
+        if (!this.selected.isEmpty()) this.summarizeSelected(); // Compare selected to installed software
+        else if (!this.getInstalled().isEmpty()) this.summarizeInstalled(); // Show installed software if nothing is selected
+        else {
             Console.sep();
             Console.log(Type.REQUESTED, Style.INFO, "No software selected or installed\n");
         }
