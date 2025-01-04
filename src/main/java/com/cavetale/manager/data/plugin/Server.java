@@ -9,34 +9,93 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static com.cavetale.manager.data.plugin.Category.Base;
+import static com.cavetale.manager.data.plugin.Category.Survival;
+
 /**
  * Servers, used to group plugins by installed server
  */
 public enum Server implements Provider {
-    Base("Plugins for all servers", Category.Core, Category.Global),
-    Void("Plugins for void servers", Server.Base),
-    Hub("Plugins for hub servers", Server.Base, Category.Survival, Category.Build, Category.Hub,
-            Plugin.Structure, Plugin.ExtremeGrassGrowing, Plugin.KingOfTheLadder, Plugin.RedLightGreenLight),
-    Build("Plugins for build servers", Server.Base, Category.Survival, Category.Build, Category.Home),
-    Mine("Plugins for mine servers", Server.Base, Category.Survival, Category.Build, Category.Mine),
-    Creative("Plugins for creative servers", Server.Base, Category.Creative, Category.Build,
+    Build("Plugins for build servers", Base, Survival, Category.Build, Category.Home),
+    Classic("Plugins for classic servers", Base, Survival, Category.Build),
+    Creative("Plugins for creative servers", Base, Category.Creative, Category.Build,
             Plugin.Enemy, Plugin.Festival, Plugin.Pictionary, Plugin.Race, Plugin.Resident),
-    Event("Plugins for event servers", Server.Base, Plugin.Worlds),
-    Classic("Plugins for classic servers", Server.Base, Category.Survival, Category.Build);
+    Event("Plugins for event servers", Base, Plugin.Worlds),
+    Hub("Plugins for hub servers", Base, Survival, Category.Build, Category.Hub,
+            Plugin.Structure, Plugin.ExtremeGrassGrowing, Plugin.KingOfTheLadder, Plugin.RedLightGreenLight),
+    Mine("Plugins for mine servers", Base, Survival, Category.Build, Category.Mine),
+    Void("Plugins for void servers", Base);
 
     private final @NotNull String info;
+    private final @NotNull Server[] servers;
+    private final @NotNull Category[] categories;
     private final @NotNull Plugin[] plugins;
+
+    private boolean selected = false;
+    private boolean installed = false;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
         this.info = info;
-        Set<Plugin> plugins = new HashSet<>();
-        for (Provider p : providers) if (this != p) Collections.addAll(plugins, p.plugins());
-        this.plugins = plugins.toArray(new Plugin[]{});
+        Set<Server> servers = new HashSet<>();
+        Set<Category> categories = new HashSet<>();
+        for (Provider p : providers) {
+            if (p instanceof Server s) servers.add(s);
+            else if (p instanceof Category c) categories.add(c);
+        }
+        this.servers = servers.toArray(new Server[]{});
+        this.categories = categories.toArray(new Category[]{});
+
+        int len = 0; // Copy plugins
+        for (Provider child : providers) len += child.plugins().length;
+        this.plugins = new Plugin[len];
+        len = 0;
+        for (Provider child : providers) {
+            System.arraycopy(child.plugins(), 0, this.plugins, len, child.plugins().length);
+            len += child.plugins().length;
+        }
+    }
+
+    public @NotNull Server[] servers() {
+        return this.servers;
+    }
+
+    public @NotNull Category[] categories() {
+        return this.categories;
     }
 
     @Override
     public @NotNull Plugin[] plugins() {
         return this.plugins;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return this.selected;
+    }
+
+    public void setInstalled() {
+        this.installed = true;
+
+        for (Plugin p : this.plugins) {
+            if (!p.isInstalled()) {
+                this.installed = false;
+                return;
+            }
+        }
+
+        for (Category c : this.categories) {
+            if (!c.isInstalled()) {
+                this.installed = false;
+                return;
+            }
+        }
+    }
+
+    public boolean isInstalled() {
+        return this.installed;
     }
 
     public static @NotNull Server get(@NotNull String ref) throws NotFoundException {

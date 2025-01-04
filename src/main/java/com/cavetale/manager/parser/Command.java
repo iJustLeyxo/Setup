@@ -1,10 +1,7 @@
 package com.cavetale.manager.parser;
 
 import com.cavetale.manager.Manager;
-import com.cavetale.manager.data.plugin.Category;
-import com.cavetale.manager.data.plugin.Plugin;
-import com.cavetale.manager.data.plugin.Plugins;
-import com.cavetale.manager.data.plugin.Server;
+import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Software;
 import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.parser.container.CategoryContainer;
@@ -45,7 +42,7 @@ public enum Command {
                 return;
             }
             Console.log(Type.REQUESTED, Style.INSTALL,
-                    plugins.size() + " plugins and " + software.size() + " software to install\n");
+                    plugins.size() + " plugin(s) and " + software.size() + " software to install\n");
             if (!Console.confirm("Continue installation")) return;
             for (Plugin p : plugins) p.install();
             for (Software s : software) s.install();
@@ -57,7 +54,7 @@ public enum Command {
         public
         void run(@NotNull Tokens tokens) {
             PathContainer patCon = (PathContainer) tokens.flags().get(Flag.path);
-            if (patCon == null || patCon.isEmpty() || patCon.get().isEmpty()) {
+            if (patCon == null || patCon.isEmpty() || patCon.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "No path specified\n");
                 return;
             }
@@ -93,13 +90,52 @@ public enum Command {
     List("List plugins, categories, servers and server software", "Show", "Resolve") {
         @Override
         public void run(@NotNull Tokens tokens) {
-            if (!Plugins.selected().isEmpty()) Plugins.listSelected();
-            boolean all = tokens.flags().containsKey(Flag.all);
-            CategoryContainer catCon = (CategoryContainer) tokens.flags().get(Flag.category);
-            if (all || catCon != null && catCon.isEmpty()) Category.list();
-            ServerContainer serCon = (ServerContainer) tokens.flags().get(Flag.server);
-            if (all || serCon != null && serCon.isEmpty()) Server.list();
-            if (!Softwares.selected().isEmpty()) Softwares.listSelected();
+            if (tokens.flags().containsKey(Flag.installed)) {
+                if (tokens.flags().containsKey(Flag.all)) {
+                    Plugins.listInstalled();
+                    Categories.listInstalled();
+                    Servers.listInstalled();
+                    Softwares.listInstalled();
+                } else {
+                    boolean selected = false;
+                    if (tokens.flags().containsKey(Flag.plugin)) {
+                        Plugins.listInstalled();
+                        selected = true;
+                    }
+                    if (tokens.flags().containsKey(Flag.category)) {
+                        Categories.listInstalled();
+                        selected = true;
+                    }
+                    if (tokens.flags().containsKey(Flag.server)) {
+                        Servers.listInstalled();
+                        selected = true;
+                    }
+                    if (tokens.flags().containsKey(Flag.software)) {
+                        Softwares.listInstalled();
+                        selected = true;
+                    }
+                    if (!selected) Plugins.listInstalled();
+                }
+            } else {
+                if (tokens.flags().containsKey(Flag.all) || (!tokens.flags().containsKey(Flag.plugin) && !tokens.flags().containsKey(Flag.category) && !tokens.flags().containsKey(Flag.server) && !tokens.flags().containsKey(Flag.software))) {
+                    Plugins.list();
+                    Categories.list();
+                    Servers.list();
+                    Softwares.list();
+                } else if (Plugins.selected().isEmpty() && Categories.selected().isEmpty() && Servers.selected().isEmpty() && Softwares.selected().isEmpty()) {
+                    if (tokens.flags().containsKey(Flag.plugin)) Plugins.list();
+                    if (tokens.flags().containsKey(Flag.category)) Categories.list();
+                    if (tokens.flags().containsKey(Flag.server)) Servers.list();
+                    if (tokens.flags().containsKey(Flag.software)) Softwares.list();
+                } else {
+                    if (tokens.flags().containsKey(Flag.plugin) || tokens.flags().containsKey(Flag.category) || tokens.flags().containsKey(Flag.server)) {
+                        Plugins.listSelected();
+                        if (tokens.flags().containsKey(Flag.category)) Categories.listSelected();
+                        if (tokens.flags().containsKey(Flag.server)) Servers.listSelected();
+                    }
+                    if (tokens.flags().containsKey(Flag.software)) Softwares.listSelected();
+                }
+            }
         }
     },
 
@@ -124,7 +160,7 @@ public enum Command {
                 return;
             }
             Console.log(Type.REQUESTED, Style.UNINSTALL,
-                    plugins.size() + " plugins and " + software.size() + " software to uninstall\n");
+                    plugins.size() + " plugin(s) and " + software.size() + " software to uninstall\n");
             if (!Console.confirm("Continue removal")) return;
             for (Plugin p : plugins) p.uninstall();
             for (Software s : software) s.uninstall();
@@ -136,12 +172,16 @@ public enum Command {
         public void run(@NotNull Tokens tokens) {
             List<Plugin> plugins = Plugins.selected();
             List<Software> software = Softwares.selected();
+            if (plugins.isEmpty() && software.isEmpty()) { // Auto select installed if nothing specified
+                plugins = Plugins.installed();
+                software = Softwares.installed();
+            }
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
             }
             Console.log(Type.REQUESTED, Style.UPDATE,
-                    plugins.size() + " plugins and " + software.size() + " software to update\n");
+                    plugins.size() + " plugin(s) and " + software.size() + " software to update\n");
             if (!Console.confirm("Continue update")) return;
             for (Plugin p : plugins) p.update();
             for (Software s  : software) s.update();

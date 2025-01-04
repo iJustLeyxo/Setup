@@ -38,8 +38,8 @@ public enum Software {
         return this.refs[0];
     }
 
-    public void setSelected(boolean value) {
-        this.selected = value;
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public boolean isSelected() {

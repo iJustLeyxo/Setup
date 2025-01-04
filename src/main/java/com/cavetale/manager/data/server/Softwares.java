@@ -1,11 +1,13 @@
 package com.cavetale.manager.data.server;
 
+import com.cavetale.manager.data.plugin.Servers;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.Tokens;
 import com.cavetale.manager.parser.container.SoftwareContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
+import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,28 +21,24 @@ public final class Softwares {
     private static final @NotNull List<Software> installed = new LinkedList<>();
     private static final @NotNull List<String> unknown = new LinkedList<>();
 
-    public static void reload(@NotNull Tokens tokens) {
-        Softwares.reloadSelected(tokens);
-        Softwares.reloadInstallations();
-    }
-
-    private static void reloadSelected(@NotNull Tokens tokens) {
+    public static void reloadSelected(@NotNull Tokens tokens) {
         Console.log(Type.DEBUG, "Reloading selected software");
-        Softwares.selected.clear();
-        SoftwareContainer softwares = (SoftwareContainer) tokens.flags().get(Flag.software);
-        if (tokens.flags().containsKey(Flag.all) || (softwares != null && softwares.isEmpty())) { // Select all
-            for (Software s : Software.values()) s.setSelected(true);
-            return;
-        }
-
         for (Software s : Software.values()) s.setSelected(false); // Reset selections
+        Softwares.selected.clear();
 
-        if (softwares != null) for (Software s : softwares.get()) s.setSelected(true); // Select by software
+        SoftwareContainer softwares = (SoftwareContainer) tokens.flags().get(Flag.software);
+        if (tokens.flags().containsKey(Flag.installed)) {
+            for (Software s : Softwares.installed) s.setSelected(true);
+        } else if (tokens.flags().containsKey(Flag.all) || (softwares != null && softwares.isEmpty())) { // Select all
+            for (Software s : Software.values()) s.setSelected(true);
+        } else if (softwares != null) {
+            for (Software s : softwares.get()) s.setSelected(true); // Select by software
+        }
 
         for (Software s : Software.values()) if (s.isSelected()) Softwares.selected.add(s); // Update selection
     }
 
-    private static void reloadInstallations() {
+    public static void reloadInstallations() {
         Console.log(Type.DEBUG, "Reloading installed software");
         for (Software s : Software.values()) s.clearInstallations(); // Reset installations
         Softwares.installed.clear();
@@ -91,7 +89,7 @@ public final class Softwares {
         else if (!Softwares.installed().isEmpty()) Softwares.summarizeInstalled(); // Show installed software if nothing is selected
         else {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.INFO, "No software selected or installed\n");
+            Console.log(Type.REQUESTED, Style.SOFTWARE, XCode.BOLD + "No software selected or installed\n");
         }
     }
 
@@ -99,24 +97,24 @@ public final class Softwares {
         Console.sep();
         List<Software> selected = Softwares.selected;
         Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
-                " software(s) selected", 4, 21, selected.toArray());
+                " software selected", 4, 21, selected.toArray());
         selected = Softwares.get(true, true);
         if (!selected.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
-                    " software(s) installed", 4, 21, selected.toArray());
+                    " software installed", 4, 21, selected.toArray());
         }
         selected = Softwares.get(true, false);
         if (!selected.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
-                    " software(s) superfluous", 4, 21, selected.toArray());
+                    " software superfluous", 4, 21, selected.toArray());
         }
         selected = Softwares.get(false, true);
         if (!selected.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
-                    " software(s) missing", 4, 21, selected.toArray());
+                    " software missing", 4, 21, selected.toArray());
         }
     }
 
@@ -125,17 +123,39 @@ public final class Softwares {
         List<Software> installed = Softwares.installed;
         installed.remove(null);
         Console.logL(Type.REQUESTED, Style.SOFTWARE, installed.size() +
-                " software(s) installed", 4, 21, installed.toArray());
+                " software installed", 4, 21, installed.toArray());
         List<String> unknown = Softwares.unknown; // Always show unknown software
         if (!unknown.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
-                    " software(s) unknown", 4, 21, unknown.toArray());
+                    " software unknown", 4, 21, unknown.toArray());
         }
     }
 
     public static void listSelected() {
+        if (Softwares.selected.isEmpty()) {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.SOFTWARE, XCode.BOLD + "No software selected\n");
+            return;
+        }
+
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, "Server software", 4, 21, Softwares.selected.toArray());
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Softwares.selected.size() + " software selected", 4, 21, Softwares.selected.toArray());
+    }
+
+    public static void listInstalled() {
+        if (Softwares.installed.isEmpty()) {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.SOFTWARE, XCode.BOLD + "No software installed\n");
+            return;
+        }
+
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Softwares.installed.size() + " software installed", 4, 21, Softwares.installed.toArray());
+    }
+
+    public static void list() {
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.values().length + " software available", 4, 21, (Object[]) Software.values());
     }
 }

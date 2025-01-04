@@ -1,6 +1,9 @@
 package com.cavetale.manager;
 
+import com.cavetale.manager.data.plugin.Categories;
+import com.cavetale.manager.data.plugin.Category;
 import com.cavetale.manager.data.plugin.Plugins;
+import com.cavetale.manager.data.plugin.Servers;
 import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.parser.*;
 import com.cavetale.manager.util.console.Console;
@@ -31,8 +34,15 @@ public final class Manager {
                 if (tokens.commands().isEmpty()) {
                     if (!changed) Console.log(Type.WARN, "Nothing to do. Try typing \"help\".\n");
                 } else {
-                    Plugins.reload(tokens);
-                    Softwares.reload(tokens);
+                    Plugins.reloadInstallations();
+                    Categories.reloadInstallations();
+                    Servers.reloadInstallations();
+                    Softwares.reloadInstallations();
+                    Softwares.reloadSelected(tokens);
+                    Servers.reloadSelected(tokens);
+                    Categories.reloadSelected(tokens);
+                    Plugins.reloadSelected(tokens);
+
                     Console.log(Type.DEBUG, "Running " + tokens.commands().size() + " command(s)\n");
                     for (Command cmd : tokens.commands()) {
                         Console.log(Type.DEBUG, "Running " + cmd.refs[0] + " command\n");

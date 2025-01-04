@@ -18,6 +18,7 @@ public enum Flag {
     normal("Normal console output"),
     force("Force execution"),
     help("Show command help"),
+    installed('I', "Select installed"),
     interactive("Enter command prompt mode"),
     path('P', "Specify a file path", "-P <path>") {
         @Override
@@ -58,6 +59,12 @@ public enum Flag {
 
     Flag(@NotNull String info) {
         this.shortRef = this.name().charAt(0);
+        this.info = info;
+        this.usage = null;
+    }
+
+    Flag(@NotNull Character shotRef, @NotNull String info) {
+        this.shortRef = shotRef;
         this.info = info;
         this.usage = null;
     }

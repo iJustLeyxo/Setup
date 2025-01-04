@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -169,6 +170,7 @@ public enum Plugin implements Provider {
     private final @NotNull Plugin[] plugins;
 
     private boolean selected = false;
+    private boolean installed = false;
     private final @NotNull List<String> installations = new LinkedList<>();
 
     Plugin(@NotNull URI uri, @NotNull String version) {
@@ -196,8 +198,8 @@ public enum Plugin implements Provider {
         return this.name();
     }
 
-    public void setSelected(boolean value) {
-        this.selected = value;
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public boolean isSelected() {
@@ -205,15 +207,17 @@ public enum Plugin implements Provider {
     }
 
     public void clearInstallations() {
+        this.installed = false;
         this.installations.clear();
     }
 
     public void addInstallation(@NotNull String file) {
+        this.installed = true;
         this.installations.add(file);
     }
 
     public boolean isInstalled() {
-        return !this.installations.isEmpty();
+        return this.installed;
     }
 
     public void install() {
@@ -237,12 +241,18 @@ public enum Plugin implements Provider {
     }
 
     public void update() {
-        Console.log(Type.INFO, "Updating " + this.name() + " plugin"); // Uninstall plugin
-        File folder = Plugins.FOLDER;
-        for (String file : this.installations) {
-            if (new File(folder, file).delete()) continue;
-            if (!Console.log(Type.DEBUG, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to delete " + file + "\n");
+        Console.log(Type.INFO, "Updating " + this.name() + " plugin");
+
+        File folder = Plugins.FOLDER; // Uninstall plugin
+        for (String fileName : this.installations) {
+            File file = new File(folder, fileName);
+            if (!Files.isSymbolicLink(file.toPath())) {
+                if (file.delete()) continue;
+                if (!Console.log(Type.DEBUG, Style.ERR, " failed - failed to delete " + file + "\n")) {
+                    Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to delete " + file + "\n");
+                }
+            } else if (!Console.log(Type.DEBUG, Style.ERR, " failed - skipped " + file + " (linked)\n")) {
+                Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - skipped " + file + " (linked)\n");
             }
             return;
         }
@@ -251,7 +261,7 @@ public enum Plugin implements Provider {
         try { // Install plugin
             String file = this.name() + "-" + this.source.version + ".jar";
             Util.download(this.source.uri, new File(Plugins.FOLDER, file));
-            this.installations.add(file);
+            this.addInstallation(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
@@ -262,17 +272,20 @@ public enum Plugin implements Provider {
 
     public void uninstall() {
         File folder = Plugins.FOLDER;
-        for (String file : this.installations) {
-            Console.log(Type.INFO, Style.DEBUG, "Uninstalling " + file);
-            if (new File(folder, file).delete()) {
-                Console.log(Type.INFO, Style.DONE, " done\n");
-                continue;
-            }
-            if (!Console.log(Type.DEBUG, Style.ERR, " failed\n")) {
-                Console.log(Type.ERR, "Uninstalling " + file + " plugin failed\n");
+        for (String fileName : this.installations) {
+            Console.log(Type.INFO, "Uninstalling " + fileName);
+            File file = new File(folder, fileName);
+            if (!Files.isSymbolicLink(file.toPath())) {
+                if (file.delete()) {
+                    this.installations.remove(fileName);
+                    Console.log(Type.INFO, Style.DONE, " done\n");
+                } else if (!Console.log(Type.DEBUG, Style.ERR, " failed\n")) {
+                    Console.log(Type.ERR, "Uninstalling " + file + " plugin failed\n");
+                }
+            } else if (!Console.log(Type.DEBUG, Style.WARN, " skipped (linked)\n")) {
+                Console.log(Type.WARN, "Uninstalling " + file + " plugin skipped (linked)\n");
             }
         }
-        this.installations.clear();
     }
 
     public static @NotNull Plugin get(@NotNull String ref) throws Plugin.PluginNotFoundException {

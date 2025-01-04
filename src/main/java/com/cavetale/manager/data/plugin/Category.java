@@ -38,14 +38,32 @@ public enum Category implements Provider {
             GoldenTicket, HopperFilter, KeepInventory, MassStorage, PocketMob, Poster, Resident,
             Resource, Shop, Skills, Structure),
     Util("Optional utility plugins", MapLoad, Miniverse, ProtocolLib),
-    WorldGen("World generation plugins", Caves, Decorator);
+    WorldGen("World generation plugins", Caves, Decorator),
+
+    Base("Basic plugins for all servers", Global, Core);
 
     private final @NotNull String info;
     private final @NotNull Plugin[] plugins;
 
+    private boolean selected = false;
+    private boolean installed = false;
+
     Category(@NotNull String info, @NotNull Plugin @NotNull ... plugins) {
         this.info = info;
         this.plugins = plugins;
+    }
+
+    Category(@NotNull String info, @NotNull Category @NotNull ... children) {
+        this.info = info;
+
+        int len = 0; // Copy plugins
+        for (Category child : children) len += child.plugins().length;
+        this.plugins = new Plugin[len];
+        len = 0;
+        for (Category child : children) {
+            System.arraycopy(child.plugins, 0, this.plugins, len, child.plugins.length);
+            len += child.plugins.length;
+        }
     }
 
     @Override
@@ -56,6 +74,29 @@ public enum Category implements Provider {
     @Override
     public @NotNull String toString() {
         return this.name();
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return this.selected;
+    }
+
+    public void setInstalled() {
+        this.installed = true;
+
+        for (Plugin p : this.plugins) {
+            if (!p.isInstalled()) {
+                this.installed = false;
+                return;
+            }
+        }
+    }
+
+    public boolean isInstalled() {
+        return this.installed;
     }
 
     public static @NotNull Category get(@NotNull String ref) throws NotFoundException {

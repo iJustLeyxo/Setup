@@ -1,5 +1,6 @@
 package com.cavetale.manager.data.plugin;
 
+import com.cavetale.manager.data.Source;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.Tokens;
 import com.cavetale.manager.parser.container.CategoryContainer;
@@ -8,10 +9,12 @@ import com.cavetale.manager.parser.container.ServerContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
+import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,34 +25,28 @@ public final class Plugins {
     private static final @NotNull List<Plugin> installed = new LinkedList<>();
     private static final @NotNull List<String> unknown = new LinkedList<>();
 
-    public static void reload(@NotNull Tokens tokens) {
-        Plugins.reloadSelected(tokens);
-        Plugins.reloadInstallations();
-    }
-
-    private static void reloadSelected(@NotNull Tokens tokens) {
+    public static void reloadSelected(@NotNull Tokens tokens) {
         Console.log(Type.DEBUG, "Reloading selected plugins");
-        Plugins.selected.clear();
-        PluginContainer plugins = (PluginContainer) tokens.flags().get(Flag.plugin);
-        if (tokens.flags().containsKey(Flag.all) || (plugins != null && plugins.isEmpty())) { // Select all
-            for (Plugin p : Plugin.values()) p.setSelected(true);
-            return;
-        }
-
         for (Plugin p : Plugin.values()) p.setSelected(false); // Reset selections
+        Plugins.selected.clear();
 
-        if (plugins != null) for (Plugin p : plugins.get()) p.setSelected(true); // Select by plugin
+        PluginContainer plugins = (PluginContainer) tokens.flags().get(Flag.plugin);
+        if (tokens.flags().containsKey(Flag.installed)) {
+            for (Plugin p : Plugins.installed) p.setSelected(true);
+        } else if (tokens.flags().containsKey(Flag.all) || (plugins != null && plugins.isEmpty())) { // Select all
+            for (Plugin p : Plugin.values()) p.setSelected(true);
+        } else {
+            if (plugins != null) for (Plugin p : plugins.get()) p.setSelected(true); // Select by plugin
 
-        CategoryContainer categories = (CategoryContainer) tokens.flags().get(Flag.category); // Select by category
-        if (categories != null) for (Category c : categories.get()) for (Plugin p : c.plugins()) p.setSelected(true);
+            for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.setSelected(true); // Select by category
 
-        ServerContainer servers = (ServerContainer) tokens.flags().get(Flag.server); // Select by server
-        if (servers != null) for (Server s : servers.get()) for (Plugin p : s.plugins()) p.setSelected(true);
+            for (Server s : Server.values()) if (s.isSelected()) for (Plugin p : s.plugins()) p.setSelected(true); // Select by server
+        }
 
         for (Plugin p : Plugin.values()) if (p.isSelected()) Plugins.selected.add(p); // Update selection
     }
 
-    private static void reloadInstallations() {
+    public static void reloadInstallations() {
         Console.log(Type.DEBUG, "Reloading installed plugins");
         for (Plugin p : Plugin.values()) p.clearInstallations(); // Reset installations
         Plugins.installed.clear();
@@ -99,7 +96,7 @@ public final class Plugins {
         else if (!Plugins.installed.isEmpty()) Plugins.summarizeInstalled();
         else {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.INFO, "No plugins selected or installed\n");
+            Console.log(Type.REQUESTED, Style.PLUGIN, XCode.BOLD + "No plugins selected or installed\n");
         }
     }
 
@@ -107,24 +104,24 @@ public final class Plugins {
         Console.sep();
         List<Plugin> selected = Plugins.selected;
         Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
-                " plugins(s) selected", 4, 21, selected.toArray());
+                " plugin(s) selected", 4, 21, selected.toArray());
         selected = Plugins.get(true, true);
         if (!selected.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
-                    " plugins(s) installed", 4, 21, selected.toArray());
+                    " plugin(s) installed", 4, 21, selected.toArray());
         }
         selected = Plugins.get(true, false);
         if (!selected.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
-                    " plugins(s) superfluous", 4, 21, selected.toArray());
+                    " plugin(s) superfluous", 4, 21, selected.toArray());
         }
         selected = Plugins.get(false, true);
         if (!selected.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
-                    " plugins(s) missing", 4, 21, selected.toArray());
+                    " plugin(s) missing", 4, 21, selected.toArray());
         }
     }
 
@@ -133,17 +130,39 @@ public final class Plugins {
         installed.remove(null);
         Console.sep();
         Console.logL(Type.REQUESTED, Style.INSTALL, installed.size() +
-                " plugins(s) installed", 4, 21, installed.toArray());
+                " plugin(s) installed", 4, 21, installed.toArray());
         List<String> unknown = Plugins.unknown;
         if (!unknown.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
-                    " plugins(s) unknown", 4, 21, unknown.toArray());
+                    " plugin(s) unknown", 4, 21, unknown.toArray());
         }
     }
 
     public static void listSelected() {
+        if (Plugins.selected.isEmpty()) {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.PLUGIN, XCode.BOLD + "No plugins selected\n");
+            return;
+        }
+
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.PLUGIN, "Plugins", 4, 21, Plugins.selected.toArray());
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugins.selected.size() + " plugin(s) selected", 4, 21, Plugins.selected.toArray());
+    }
+
+    public static void listInstalled() {
+        if (Plugins.installed.isEmpty()) {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.PLUGIN, XCode.BOLD + "No plugins installed\n");
+            return;
+        }
+
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugins.installed.size() + " plugin(s) installed", 4, 21, Plugins.installed.toArray());
+    }
+
+    public static void list() {
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.values().length + " plugin(s) available", 4, 21, (Object[]) Plugin.values());
     }
 }
