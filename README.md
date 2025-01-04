@@ -1,4 +1,4 @@
-### CaveMan
+### Setup
 Cavetale installation manager for plugins and server software on test servers
 
 ##### Usage, commands and flags
@@ -47,3 +47,6 @@ Flag             | Info                             | Usage
 
 ##### Adding plugins, categories, servers and software
 - Simply add a new entry to the respective enum with the data of your new entry
+
+##### Compiling
+- Package using `mvn clean package`
