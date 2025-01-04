@@ -60,6 +60,10 @@ public enum Software {
         return !this.installations.isEmpty();
     }
 
+    public @NotNull List<String> installations() {
+        return this.installations;
+    }
+
     public void install() {
         Console.log(Type.INFO, "Installing " + this.name() + " software");
         if (this.isInstalled()) {
