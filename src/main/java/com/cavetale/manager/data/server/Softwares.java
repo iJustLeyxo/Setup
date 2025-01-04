@@ -13,6 +13,8 @@ import java.io.File;
 import java.util.*;
 
 public final class Softwares {
+    public static final @NotNull File FOLDER = new File("./");
+
     private static final @NotNull List<Software> selected = new LinkedList<>();
     private static final @NotNull List<Software> installed = new LinkedList<>();
     private static final @NotNull List<String> unknown = new LinkedList<>();
@@ -40,8 +42,8 @@ public final class Softwares {
         for (Software s : Software.values()) s.clearInstallations(); // Reset installations
         Softwares.installed.clear();
         Softwares.unknown.clear();
-        File folder = new File("."); // Scan installations
-        File[] files = folder.listFiles();
+        // Scan installations
+        File[] files = Softwares.FOLDER.listFiles();
         if (files == null) return;
         for (File f : files) {
             if (f.getName().startsWith("Setup")) continue;

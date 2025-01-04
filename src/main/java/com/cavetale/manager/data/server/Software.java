@@ -35,6 +35,11 @@ public enum Software {
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
     }
 
+    @Override
+    public @NotNull String toString() {
+        return this.refs[0];
+    }
+
     public void setSelected(boolean value) {
         this.selected = value;
     }
@@ -56,8 +61,7 @@ public enum Software {
     }
 
     public void install() {
-        Console.log(Type.INFO, "Installing " + this.refs[0] + " software");
-        File file = new File(this.refs[0] + "-" + source.version + ".jar");
+        Console.log(Type.INFO, "Installing " + this.name() + " software");
         if (this.isInstalled()) {
             if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
                 Console.log(Type.WARN, "Installing " + this.name() + " software skipped (already installed)\n");
@@ -65,11 +69,13 @@ public enum Software {
             return;
         }
         try {
-            Util.download(this.source.uri, file);
+            String file = this.name() + "-" + source.version + ".jar";
+            Util.download(this.source.uri, new File(Softwares.FOLDER, file));
+            this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Installing " + this.refs[0] + " software failed (" + e.getMessage() + ")\n");
+                Console.log(Type.ERR, "Installing " + this.name() + " software failed (" + e.getMessage() + ")\n");
             }
         }
     }
@@ -80,7 +86,7 @@ public enum Software {
     }
 
     public void uninstall() {
-        File folder = new File(".");
+        File folder = Softwares.FOLDER;
         for (String f : this.installations) {
             Console.log(Type.INFO, "Uninstalling " + f + " software");
             if (new File(folder, f).delete()) {
@@ -91,11 +97,7 @@ public enum Software {
                 Console.log(Type.ERR, "Uninstalling " + f + " software failed\n");
             }
         }
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return this.refs[0];
+        this.installations.clear();
     }
 
     public static @NotNull Software get(@NotNull String ref) throws SoftwareNotFoundException {

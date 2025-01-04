@@ -16,6 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class Plugins {
+    public static final @NotNull File FOLDER = new File("./plugins/");
+
     private static final @NotNull List<Plugin> selected = new LinkedList<>();
     private static final @NotNull List<Plugin> installed = new LinkedList<>();
     private static final @NotNull List<String> unknown = new LinkedList<>();

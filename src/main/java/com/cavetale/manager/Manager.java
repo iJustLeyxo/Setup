@@ -21,7 +21,6 @@ public final class Manager {
 
     public static void main(String[] args) {
         System.out.println();
-        Console.log(Type.WARN, Style.WARN, new Exception("TestException"));
 
         while (interactive) { // Cycle of inputs respective command executions
             if (args != null && args.length > 0) interactive = false;
@@ -49,7 +48,7 @@ public final class Manager {
             } catch (InputException e) {
                 Console.log(Type.ERR, e.getMessage() + "\n");
                 if (Console.logs(Type.DEBUG)) {
-                    Console.log(Type.DEBUG, Style.ERR, e);
+                    Console.log(Type.DEBUG, e);
                 }
                 if (!interactive) System.exit(1);
             }

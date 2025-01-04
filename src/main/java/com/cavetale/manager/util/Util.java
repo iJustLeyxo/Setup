@@ -30,6 +30,7 @@ public final class Util {
      * @throws IOException If the download failed
      */
     public static void download(URI uri, File target) throws IOException {
+        target.getParentFile().mkdirs();
         if (target.exists()) throw new RuntimeException(target.getPath() + " already exists.");
         ReadableByteChannel byteChannel = Channels.newChannel(uri.toURL().openStream());
         try (FileOutputStream outputStream = new FileOutputStream(target)) {

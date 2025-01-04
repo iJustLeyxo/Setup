@@ -78,6 +78,15 @@ public final class Console {
     }
 
     /**
+     * Logs a type to console
+     * @param type Type and style to log
+     * @return {@code true} if the style was logged and not held back due to verbosity
+     */
+    public static boolean log(@NotNull Type type) {
+        return Console.log(type, type.style, "");
+    }
+
+    /**
      * Logs a style to console
      * @param type Type of style to log
      * @param style Style to override the default style of the specified type
@@ -99,22 +108,31 @@ public final class Console {
     /**
      * Logs an exception to console
      * @param type Type of message to log
-     * @param style Style of message to log
      * @param t Exception to log
      * @return {@code true} if the exception was logged and not held back due to verbosity
      */
-    public static boolean log(@NotNull Type type, @NotNull Style style, @NotNull Throwable t) {
+    public static boolean log(@NotNull Type type, @NotNull Throwable t) {
         if (!Console.logs(type)) return false;
         Console.sep();
-        Console.log(type, style);
+        Console.log(type);
         Console.logR(t);
+        Console.sep();
         return true;
     }
 
     private static void logR(@NotNull Throwable t) {
-        System.out.println(XCode.BOLD + t.getClass().getSimpleName() + ": " + XCode.RESET + t.getMessage());
+        if (t instanceof Error) Console.log(Type.ERR);
+        else Console.log(Type.WARN);
+        System.out.println(XCode.BOLD + t.getClass().getSimpleName() + ": " + XCode.WEIGHT_OFF + t.getMessage());
         for (StackTraceElement e : t.getStackTrace()) {
-            System.out.println("\t" + e.getModuleName() + "<" + e.getModuleVersion() + "> / " + e.getFileName() + ": " + e.getClassName() + "." + e.getMethodName() + " #" + e.getLineNumber());
+            StringBuilder b = new StringBuilder("\t");
+            String moduleName = e.getModuleName();
+            if (moduleName != null) b.append(moduleName);
+            String moduleVersion = e.getModuleVersion();
+            if (moduleVersion != null) b.append(" <" + moduleVersion + ">");
+            if (moduleName != null || moduleVersion != null) b.append(" /");
+            b.append(e.getFileName()).append(": ").append(e.getClassName()).append(".").append(e.getMethodName()).append("() #").append(e.getLineNumber());
+            System.out.printf(b.toString());
         }
         if (t.getCause() != null) {
             System.out.print("Caused by ");

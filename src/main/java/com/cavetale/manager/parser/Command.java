@@ -18,26 +18,24 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public enum Command {
-    EXIT("Exit interactive mode", "quit", "q", "stop") {
+    Exit("Exit interactive mode", "E", "Quit", "Q", "Stop") {
         @Override
         public void run(@NotNull Tokens tokens) {
             Manager.exit();
         }
     },
 
-    HELP("Show usage help") {
+    Help("Show usage help") {
         @Override
         public void run(@NotNull Tokens tokens) {
             Manager.help();
         }
     },
 
-    INSTALL("Install plugins and server software", "add") {
+    Install("Install plugins and server software", "Add") {
         @Override
         public void run(@NotNull Tokens tokens) {
             List<Plugin> plugins = Plugins.selected();
@@ -49,14 +47,12 @@ public enum Command {
             Console.log(Type.REQUESTED, Style.INSTALL,
                     plugins.size() + " plugins and " + software.size() + " software to install\n");
             if (!Console.confirm("Continue installation")) return;
-            File folder = new File("plugins/");
-            folder.mkdir();
             for (Plugin p : plugins) p.install();
             for (Software s : software) s.install();
         }
     },
 
-    LINK("Link any jar archive path to the plugins directory") {
+    Link("Link any jar archive path to the plugins directory") {
         @Override
         public
         void run(@NotNull Tokens tokens) {
@@ -74,8 +70,8 @@ public enum Command {
             Console.log(Type.REQUESTED, Style.LINK, origin.getName() + " will be linked\n");
             if (!Console.confirm("Continue linking")) return;
             Console.log(Type.INFO, "Linking " + origin.getName());
-            File folder = new File("plugins/");
-            folder.mkdir();
+            File folder = Plugins.FOLDER;
+            folder.mkdirs();
             File link = new File(folder, origin.getName());
             if (link.exists()) {
                 if (!Console.log(Type.INFO, Style.ERR, " failed (already exists)\n")) {
@@ -94,7 +90,7 @@ public enum Command {
         }
     },
 
-    LIST("List plugins, categories, servers and server software", "show", "resolve") {
+    List("List plugins, categories, servers and server software", "Show", "Resolve") {
         @Override
         public void run(@NotNull Tokens tokens) {
             if (!Plugins.selected().isEmpty()) Plugins.listSelected();
@@ -109,7 +105,7 @@ public enum Command {
 
     // TODO: Search / find command to find plugins, categories, servers and software
 
-    STATUS("View installation status", "info", "verify", "check") {
+    Status("View installation status", "Info", "Verify", "Check") {
         @Override
         public
         void run(@NotNull Tokens tokens) {
@@ -118,7 +114,7 @@ public enum Command {
         }
     },
 
-    UNINSTALL("Uninstall plugins, server software and files", "remove", "delete") {
+    Uninstall("Uninstall plugins, server software and files", "Remove", "Delete") {
         @Override
         public void run(@NotNull Tokens tokens) {
             List<Plugin> plugins = Plugins.selected();
@@ -135,7 +131,7 @@ public enum Command {
         }
     },
 
-    UPDATE("Update plugins and software", "upgrade") {
+    Update("Update plugins and software", "Upgrade") {
         @Override
         public void run(@NotNull Tokens tokens) {
             List<Plugin> plugins = Plugins.selected();
@@ -172,7 +168,7 @@ public enum Command {
     }
 
     public static @NotNull Command get(@NotNull String ref) throws NotFoundException {
-        for (Command c : Command.values()) for (String r : c.refs) if (r.equals(ref)) return c;
+        for (Command c : Command.values()) for (String r : c.refs) if (r.equalsIgnoreCase(ref)) return c;
         throw new NotFoundException(ref);
     }
 
