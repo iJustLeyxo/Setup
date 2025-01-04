@@ -3,6 +3,8 @@ package com.cavetale.manager.data.download.build;
 import org.jetbrains.annotations.NotNull;
 
 public record Group(@NotNull String group) {
+    public static @NotNull Group DEFAULT = Group.of("com.cavetale");
+
     @Override
     public String toString() {
         return this.group;

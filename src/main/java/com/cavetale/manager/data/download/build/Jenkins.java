@@ -6,8 +6,8 @@ import com.cavetale.manager.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 public final class Jenkins extends Source {
-    public Jenkins(@NotNull Job job, @NotNull Group group, @NotNull Artifact artifact, @NotNull Ver ver) {
+    public Jenkins(@NotNull Job job, @NotNull Group group, @NotNull Ref ref, @NotNull Ver ver) {
         super(Util.uriOf("https://cavetale.com/jenkins/job/" + job + "/lastSuccessfulBuild/" +
-                group + "$" + artifact + "/artifact/" + group + "/" + artifact + "/" + ver + "/" + artifact + "-" + ver + ".jar"), ver);
+                group + "$" + ref + "/artifact/" + group + "/" + ref + "/" + ver + "/" + ref + "-" + ver + ".jar"), ver);
     }
 }

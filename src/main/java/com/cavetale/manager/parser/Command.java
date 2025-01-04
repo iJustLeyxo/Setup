@@ -139,8 +139,6 @@ public enum Command {
         }
     },
 
-    // TODO: Search / find command to find plugins, categories, servers and software
-
     Status("View installation status", "Info", "Verify", "Check") {
         @Override
         public
@@ -190,6 +188,7 @@ public enum Command {
 
     // TODO: Accept eula option
     // TODO: Run command
+    // TODO: Find command to fins stuff
 
     public final @NotNull String[] refs;
     public final @NotNull String info;
