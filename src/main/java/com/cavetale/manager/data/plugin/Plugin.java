@@ -338,8 +338,7 @@ public enum Plugin implements Provider {
 
     public static class PluginNotFoundException extends InputException {
         public PluginNotFoundException(@NotNull String ref) {
-            super("Plugin \"" + ref + "\" not found");
-            // TODO: Path flag suggestion
+            super("Plugin \"" + ref + "\" not found. Did you mean to use -\"P\" for --path?");
         }
     }
 

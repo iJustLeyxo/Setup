@@ -120,7 +120,7 @@ public enum Server implements Provider {
 
     public static class NotFoundException extends InputException {
         public NotFoundException(@NotNull String ref) {
-            super("Server \"" + ref + "\" not found");
+            super("Server \"" + ref + "\" not found. Did you mean to use -\"S\" for --software?");
         }
     }
 }

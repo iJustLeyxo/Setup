@@ -57,7 +57,10 @@ public final class Plugins {
             } catch (Plugin.NotAPluginException e) {
                 continue;
             } catch (Plugin.PluginNotFoundException ignored) {}
-            if (p == null) Plugins.unknown.add(f.getName());
+            if (p == null) {
+                Plugins.unknown.add(f.getName());
+                Console.log(Type.DEBUG, Style.WARN, "Unknown plugin " + f.getName());
+            }
             else p.addInstallation(f.getName());
         }
 
