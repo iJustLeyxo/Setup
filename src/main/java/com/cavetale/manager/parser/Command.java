@@ -7,15 +7,21 @@ import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.parser.container.CategoryContainer;
 import com.cavetale.manager.parser.container.PathContainer;
 import com.cavetale.manager.parser.container.ServerContainer;
+import com.cavetale.manager.parser.container.SoftwareContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
+import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public enum Command {
     Exit("Exit interactive mode", "E", "Quit", "Q", "Stop") {
@@ -141,6 +147,50 @@ public enum Command {
         }
     },
 
+    RUN("Run installed server software") {
+        @Override
+        public void run(@NotNull Tokens result) {
+            List<Software> selected = Softwares.selected();
+            if (!result.flags().containsKey(Flag.software) || Softwares.selected().isEmpty()) {
+                selected = Arrays.asList(Software.values());
+            }
+            if (selected.size() > 1) Console.log(Type.WARN, "Multiple software selected\n");
+            for (Software software : selected) {
+                List<String> installations = software.installations();
+                if (!installations.isEmpty()) {
+                    if (installations.size() > 1) Console.log(Type.WARN, software.name() + " has multiple installations\n");
+                    String installation = installations.getFirst();
+                    Console.log(Type.INFO, "Running " + installation + "\n\n" + XCode.RESET);
+
+                    try {
+                        ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation);
+                        builder.directory(Softwares.FOLDER);
+                        builder.redirectErrorStream(true);
+
+                        Process process = builder.start();
+
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            System.out.println(line);
+                        }
+
+                        int exit = process.waitFor();
+                        if (exit == 0) Console.log(Type.INFO, "\n" + installation + " exited with code " + exit + "\n");
+                        else Console.log(Type.WARN, "\n" + installation + " exited with code " + exit + "\n");
+                    } catch (IOException e) {
+                        Console.log(Type.ERR, "\nFailed to run " + installation + " (" + e.getMessage() + ")\n");
+                    } catch (InterruptedException e) {
+                        Console.log(Type.WARN, "\n" + installation + " was interrupted\n");
+                    }
+
+                    return;
+                }
+            }
+            Console.log(Type.REQUESTED, Style.ERR, "None of the selected software is installed\n");
+        }
+    },
+
     Status("View installation status", "Info", "Verify", "Check") {
         @Override
         public
@@ -189,7 +239,6 @@ public enum Command {
     };
 
     // TODO: Accept eula option
-    // TODO: Run command
     // TODO: Find command to fins stuff
 
     public final @NotNull String[] refs;

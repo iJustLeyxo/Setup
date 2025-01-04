@@ -15,6 +15,7 @@ help             | Show usage help
 install          | Install plugins and server software                                 
 link             | Link any jar archive path to the plugins directory                  
 list             | List plugins, categories, servers and server software               
+run              | Run the installed server software                                   
 status           | View installation status                                            
 uninstall        | Uninstall plugins, server software and files                        
 update           | Update plugins and software                                         
@@ -35,6 +36,7 @@ Flag             | Info                             | Usage
 -s --server      | Specify server(s)                | -s []:all | [servers]            
 -S --software    | Specify server software          | -S []:all | [software]           
 -v --verbose     | Detailed console output          |                                  
+
 ```
 
 ##### Adding commands
