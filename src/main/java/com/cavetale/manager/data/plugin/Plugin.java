@@ -59,7 +59,7 @@ public enum Plugin implements Provider {
     Enderball("com.cavetale.enderball", "0.1-SNAPSHOT"),
     Enemy("com.cavetale.enemy", "0.1-SNAPSHOT"),
     Exploits("com.winthier.exploits", "0.1-SNAPSHOT"),
-    ExtremeGrassGrowing("com.cavetale.extremegrassgrowing", "0.1-SNAPSHOT"),
+    ExtremeGrassGrowing("com.cavetale.extremegrassgrowing", "0.1-SNAPSHOT"), // TODO: "EGG"
     Fam("com.cavetale.fam", "0.1-SNAPSHOT"),
     FastLeafDecay("com.cavetale.fastleafdecay", "1.0-SNAPSHOT"),
     Festival("com.cavetale.festival", "0.1-SNAPSHOT"),
@@ -78,7 +78,7 @@ public enum Plugin implements Provider {
     InvisibleItemFrames("com.cavetale.invisibleitemframes", "0.1-SNAPSHOT"),
     ItemStore("com.winthier.itemstore", "0.1-SNAPSHOT"),
     KeepInventory("com.winthier.keepinventory", "0.1-SNAPSHOT"),
-    KingOfTheLadder("com.cavetale.kotl", "kotl", "0.1-SNAPSHOT"),
+    KingOfTheLadder("com.cavetale.kotl", "kotl", "0.1-SNAPSHOT"), // TODO: "KOTL"
     // TODO: KingOfTheRing
     Kit("com.winthier.kit", "0.1"),
     // TODO: LastLog
@@ -101,7 +101,7 @@ public enum Plugin implements Provider {
     Overboard("com.cavetale.overboard", "0.1-SNAPSHOT"),
     Perm("com.winthier.perm", "0.1-SNAPSHOT"),
     Photos("com.winthier.photos", "0.1-SNAPSHOT"),
-    Pictionary("com.cavetale.pictionary", "0.1-SNAPSHOT"),
+    Pictionary("com.cavetale.pictionary", "0.1-SNAPSHOT"), // TODO: "CavePaint"
     PlayerCache("com.winthier.playercache", "0.1-SNAPSHOT"),
     PlayerInfo("com.winthier.playerinfo", "0.1-SNAPSHOT"),
     PlugInfo("com.cavetale.pluginfo", "0.1-SNAPSHOT"),
@@ -117,7 +117,7 @@ public enum Plugin implements Provider {
     @Deprecated
     Raid("com.cavetale.raid", "0.1-SNAPSHOT"),
     RandomPlayerHead("com.winthier.rph", "random-player-head", "0.1-SNAPSHOT"),
-    RedGreenLight("com.cavetale.redgreenlight", "0.1-SNAPSHOT"),
+    RedLightGreenLight("com.cavetale.redgreenlight", "0.1-SNAPSHOT"), // TODO: "RedGreenLight", "RLGL"
     Resident("com.cavetale.resident", "0.1-SNAPSHOT"),
     Resource("com.winthier.resource", "0.1"),
     ResourcePack("com.cavetale.resourcepack", "0.1-SNAPSHOT"),
@@ -237,8 +237,27 @@ public enum Plugin implements Provider {
     }
 
     public void update() {
-        this.uninstall();
-        this.install();
+        Console.log(Type.INFO, "Updating " + this.name() + " plugin"); // Uninstall plugin
+        File folder = Plugins.FOLDER;
+        for (String file : this.installations) {
+            if (new File(folder, file).delete()) continue;
+            if (!Console.log(Type.DEBUG, Style.ERR, " failed - failed to delete " + file + "\n")) {
+                Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to delete " + file + "\n");
+            }
+            return;
+        }
+        this.installations.clear();
+
+        try { // Install plugin
+            String file = this.name() + "-" + this.source.version + ".jar";
+            Util.download(this.source.uri, new File(Plugins.FOLDER, file));
+            this.installations.add(file);
+            Console.log(Type.INFO, Style.DONE, " done\n");
+        } catch (IOException e) {
+            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
+                Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to download (" + e.getMessage() + ")\n");
+            }
+        }
     }
 
     public void uninstall() {

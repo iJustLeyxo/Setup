@@ -29,6 +29,7 @@ public final class Plugins {
 
     private static void reloadSelected(@NotNull Tokens tokens) {
         Console.log(Type.DEBUG, "Reloading selected plugins");
+        Plugins.selected.clear();
         PluginContainer plugins = (PluginContainer) tokens.flags().get(Flag.plugin);
         if (tokens.flags().containsKey(Flag.all) || (plugins != null && plugins.isEmpty())) { // Select all
             for (Plugin p : Plugin.values()) p.setSelected(true);
@@ -45,8 +46,7 @@ public final class Plugins {
         ServerContainer servers = (ServerContainer) tokens.flags().get(Flag.server); // Select by server
         if (servers != null) for (Server s : servers.get()) for (Plugin p : s.plugins()) p.setSelected(true);
 
-        Plugins.selected.clear(); // Update selection
-        for (Plugin p : Plugin.values()) if (p.isSelected()) Plugins.selected.add(p);
+        for (Plugin p : Plugin.values()) if (p.isSelected()) Plugins.selected.add(p); // Update selection
     }
 
     private static void reloadInstallations() {

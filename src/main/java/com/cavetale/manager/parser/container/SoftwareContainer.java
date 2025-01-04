@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 public final class SoftwareContainer extends SetContainer<Software> {
     @Override
     public boolean option(@NotNull String option) throws InputException {
-        Software software = Software.get(option.toUpperCase());
+        Software software = Software.get(option);
         if (this.contents.contains(software)) Console.log(Type.INFO, "Ignoring duplicate software \"" + option + "\n");
-        this.contents.add(software);
+        else this.contents.add(software);
         return true;
     }
 }

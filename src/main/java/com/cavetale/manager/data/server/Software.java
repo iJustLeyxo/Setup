@@ -13,14 +13,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Server software, used to register downloadable server software
  */
 public enum Software {
-    PAPER("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/66/downloads/paper-1.21.3-66.jar", "1.21.3-66",
-            "Paper", "PaperMC"); // TODO: Download newest version using Paper API
+    Paper("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/66/downloads/paper-1.21.3-66.jar", "1.21.3-66", "PaperMC"); // TODO: Download newest version using Paper API
 
     private final @NotNull Source source;
     private final @NotNull String[] refs;
@@ -28,10 +26,10 @@ public enum Software {
     private boolean selected = false;
     private final @NotNull List<String> installations = new LinkedList<>();
 
-    Software(@NotNull String uri, @NotNull String version, @NotNull String ref, @NotNull String @NotNull ... aliases) {
+    Software(@NotNull String uri, @NotNull String version, @NotNull String @NotNull ... aliases) {
         this.source = new Source.Other(Util.uriOf(uri), version);
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = ref;
+        this.refs[0] = this.name();
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
     }
 
@@ -81,8 +79,27 @@ public enum Software {
     }
 
     public void update() {
-        this.uninstall();
-        this.install();
+        Console.log(Type.INFO, "Updating " + this.name() + " software"); // Uninstall software
+        File folder = Softwares.FOLDER;
+        for (String file : this.installations) {
+            if (new File(folder, file).delete()) continue;
+            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to delete " + file + "\n")) {
+                Console.log(Type.ERR, "Updating " + this.name() + " software failed - failed to delete " + file + "\n");
+            }
+            return;
+        }
+        this.installations.clear();
+
+        try { // Install software
+            String file = this.name() + "-" + source.version + ".jar";
+            Util.download(this.source.uri, new File(Softwares.FOLDER, file));
+            this.installations.add(file);
+            Console.log(Type.INFO, Style.DONE, " done\n");
+        } catch (IOException e) {
+            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
+                Console.log(Type.ERR, "Updating " + this.name() + " software failed - failed to download (" + e.getMessage() + ")\n");
+            }
+        }
     }
 
     public void uninstall() {
@@ -101,7 +118,7 @@ public enum Software {
     }
 
     public static @NotNull Software get(@NotNull String ref) throws SoftwareNotFoundException {
-        for (Software s : Software.values()) for (String r : s.refs) if (r.equals(ref)) return s;
+        for (Software s : Software.values()) for (String r : s.refs) if (r.equalsIgnoreCase(ref)) return s;
         throw new SoftwareNotFoundException(ref);
     }
 

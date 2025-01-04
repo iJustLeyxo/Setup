@@ -26,15 +26,18 @@ public final class Softwares {
 
     private static void reloadSelected(@NotNull Tokens tokens) {
         Console.log(Type.DEBUG, "Reloading selected software");
-        SoftwareContainer softCon = (SoftwareContainer) tokens.flags().get(Flag.software);
-        if (tokens.flags().containsKey(Flag.all) || (softCon != null && softCon.isEmpty())) { // Select all
+        Softwares.selected.clear();
+        SoftwareContainer softwares = (SoftwareContainer) tokens.flags().get(Flag.software);
+        if (tokens.flags().containsKey(Flag.all) || (softwares != null && softwares.isEmpty())) { // Select all
             for (Software s : Software.values()) s.setSelected(true);
             return;
         }
 
         for (Software s : Software.values()) s.setSelected(false); // Reset selections
 
-        if (softCon != null) for (Software s : softCon.get()) s.setSelected(true); // Select by software
+        if (softwares != null) for (Software s : softwares.get()) s.setSelected(true); // Select by software
+
+        for (Software s : Software.values()) if (s.isSelected()) Softwares.selected.add(s); // Update selection
     }
 
     private static void reloadInstallations() {

@@ -5,7 +5,6 @@ import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
 import com.cavetale.manager.util.console.XCode;
-import com.sun.source.tree.Tree;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,14 +26,14 @@ public enum Category implements Provider {
             TooManyEntities, Trees, Watchman, WinTag),
     Core("Essential plugins", Chat, Connect, Plugin.Core, Money, Mytems, Perm, PlayerCache, Sidebar,
             SQL, Title, VoidGenerator, WorldMarker),
-    Creative("Plugins for creative servers", Plugin.Creative, FlatGenerator, Pictionary),
-    Event("Plugins for events without a dedicated server"),
+    Creative("Plugins for creative servers", Plugin.Creative, FlatGenerator, VoidGenerator),
     Home("Plugins for home servers", CullMob),
-    Hub("Plugins for hub servers", ExtremeGrassGrowing, KingOfTheLadder, RedGreenLight),
-    Mine("Plugins for mine servers", Dungeons),
-    MiniGame("Plugins for mini game servers", Bingo, Colorfall, Enderball, HideAndSeek, Overboard,
-            PVPArena, Race, Spleef, SurvivalGames, Vertigo),
-    Seasonal("Seasonal event plugins", Easter, Festival, Maypole, Xmas),
+    Hub("Plugins for hub servers", ExtremeGrassGrowing, KingOfTheLadder, RedLightGreenLight),
+    Mine("Plugins for mining servers", Dungeons),
+    Event("Plugins for events", Bingo, Colorfall, Enderball, ExtremeGrassGrowing,
+            HideAndSeek, KingOfTheLadder, Overboard, Pictionary, PVPArena, Race, RedLightGreenLight,
+            Spleef, SurvivalGames, Vertigo),
+    Seasonal("Plugins for seasonal events", Easter, Festival, Maypole, Xmas),
     Survival("Plugins for survival servers", Dusk, Election, Enemy, Exploits, FastLeafDecay,
             GoldenTicket, HopperFilter, KeepInventory, MassStorage, PocketMob, Poster, Resident,
             Resource, Shop, Skills, Structure),

@@ -15,12 +15,12 @@ import java.util.*;
 public enum Server implements Provider {
     Base("Plugins for all servers", Category.Core, Category.Global),
     Void("Plugins for void servers", Server.Base),
-    Hub("Plugins for hub servers", Server.Base, Category.Survival, Category.Build,
-            Category.Hub, Plugin.Structure),
+    Hub("Plugins for hub servers", Server.Base, Category.Survival, Category.Build, Category.Hub,
+            Plugin.Structure, Plugin.ExtremeGrassGrowing, Plugin.KingOfTheLadder, Plugin.RedLightGreenLight),
     Build("Plugins for build servers", Server.Base, Category.Survival, Category.Build, Category.Home),
     Mine("Plugins for mine servers", Server.Base, Category.Survival, Category.Build, Category.Mine),
     Creative("Plugins for creative servers", Server.Base, Category.Creative, Category.Build,
-            Plugin.Enemy, Plugin.Festival, Plugin.LinkPortal, Plugin.Race, Plugin.Raid, Plugin.Resident),
+            Plugin.Enemy, Plugin.Festival, Plugin.Pictionary, Plugin.Race, Plugin.Resident),
     Event("Plugins for event servers", Server.Base, Plugin.Worlds),
     Classic("Plugins for classic servers", Server.Base, Category.Survival, Category.Build);
 
