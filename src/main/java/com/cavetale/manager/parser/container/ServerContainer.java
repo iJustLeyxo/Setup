@@ -14,7 +14,7 @@ public final class ServerContainer extends SetContainer<Server> {
     public boolean option(@NotNull String option) throws InputException {
         Server server = Server.get(option);
         if (this.contents.contains(server)) Console.log(Type.INFO, "Ignoring duplicate \"" + option + "\n");
-        this.contents.add(server);
+        else this.contents.add(server);
         return true;
     }
 }

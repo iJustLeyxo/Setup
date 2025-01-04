@@ -1,9 +1,7 @@
 package com.cavetale.manager.parser;
 
-import com.cavetale.manager.data.plugin.PlugIndexer;
-import com.cavetale.manager.data.server.SoftwareIndexer;
 import com.cavetale.manager.parser.container.Container;
-import com.cavetale.manager.parser.container.NotAContainer;
+import com.cavetale.manager.parser.container.DummyContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Type;
 import org.jetbrains.annotations.Contract;
@@ -22,10 +20,10 @@ public final class Parser {
      * @throws InputException When an invalid input was found
      */
     @Contract("_ -> new")
-    public static @NotNull Result parse(@NotNull String @NotNull [] args) throws InputException {
+    public static @NotNull Tokens parse(@NotNull String @NotNull [] args) throws InputException {
         Console.log(Type.DEBUG, "Parsing input\n");
         Set<Command> commands = new LinkedHashSet<>();
-        Map<Flag, NotAContainer> flags = new HashMap<>();
+        Map<Flag, DummyContainer> flags = new HashMap<>();
         Flag flag = null;
         for (String arg : args) {
             if (arg.charAt(0) == '-') {
@@ -42,7 +40,7 @@ public final class Parser {
             } else {
                 if (flag != null && (!(flags.get(flag) instanceof Container<?> container) || !container.option(arg))) flag = null;
                 if (flag == null) {
-                    Command cmd = Command.get(arg);
+                    Command cmd = Command.get(arg.toUpperCase());
                     if (commands.contains(cmd)) Console.log(Type.INFO, "Ignoring duplicate command \"" + arg + "\n");
                     commands.add(cmd);
                 }
@@ -50,6 +48,6 @@ public final class Parser {
         }
         Tokens tokens = new Tokens(commands, flags);
         Console.log(Type.DEBUG, "Finished parsing done\n");
-        return new Result(tokens, new PlugIndexer(tokens), new SoftwareIndexer(tokens));
+        return tokens;
     }
 }

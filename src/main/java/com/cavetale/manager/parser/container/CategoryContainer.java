@@ -14,7 +14,7 @@ public final class CategoryContainer extends SetContainer<Category> {
     public boolean option(@NotNull String option) throws InputException {
         Category category = Category.get(option);
         if (this.contents.contains(category)) Console.log(Type.INFO, "Ignoring duplicate category \"" + option + "\n");
-        this.contents.add(category);
+        else this.contents.add(category);
         return true;
     }
 }

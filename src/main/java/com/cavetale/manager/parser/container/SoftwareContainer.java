@@ -14,7 +14,7 @@ public final class SoftwareContainer extends SetContainer<Software> {
     public boolean option(@NotNull String option) throws InputException {
         Software software = Software.get(option);
         if (this.contents.contains(software)) Console.log(Type.INFO, "Ignoring duplicate software \"" + option + "\n");
-        this.contents.add(software);
+        else this.contents.add(software);
         return true;
     }
 }
