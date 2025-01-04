@@ -13,7 +13,7 @@ Command          | Info
 exit             | Exit interactive mode                                               
 help             | Show usage help                                                     
 install          | Install plugins and server software                                 
-link             | Link any .jar to the plugins directory                              
+link             | Link any jar archive path to the plugins directory                  
 list             | List plugins, categories, servers and server software               
 status           | View installation status                                            
 uninstall        | Uninstall plugins, server software and files                        
@@ -24,9 +24,10 @@ Flag             | Info                             | Usage
 ---------------------------------------------------------------------------------------
 -a --all         | Select all                       |                                  
 -c --category    | Specify categor(y/ies)           | -s []:all | [categories]         
--d --default     | Normal console output            |                                  
+-n --normal      | Normal console output            |                                  
 -f --force       | Force execution                  |                                  
 -h --help        | Show command help                |                                  
+-I --installed   | Select installed                 |                                  
 -i --interactive | Enter command prompt mode        |                                  
 -P --path        | Specify a file path              | -P <path>                        
 -p --plugin      | Specify plugins(s)               | -p []:all | [categories]         
