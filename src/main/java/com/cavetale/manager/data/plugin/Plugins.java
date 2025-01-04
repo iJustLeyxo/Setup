@@ -1,11 +1,8 @@
 package com.cavetale.manager.data.plugin;
 
-import com.cavetale.manager.data.Source;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.Tokens;
-import com.cavetale.manager.parser.container.CategoryContainer;
 import com.cavetale.manager.parser.container.PluginContainer;
-import com.cavetale.manager.parser.container.ServerContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
@@ -14,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 

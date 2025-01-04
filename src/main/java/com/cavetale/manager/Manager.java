@@ -1,9 +1,6 @@
 package com.cavetale.manager;
 
-import com.cavetale.manager.data.plugin.Categories;
-import com.cavetale.manager.data.plugin.Category;
-import com.cavetale.manager.data.plugin.Plugins;
-import com.cavetale.manager.data.plugin.Servers;
+import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.parser.*;
 import com.cavetale.manager.util.console.Console;

@@ -1,8 +1,8 @@
 package com.cavetale.manager.data.plugin;
 
-import com.cavetale.manager.data.DataError;
-import com.cavetale.manager.data.DataException;
-import com.cavetale.manager.data.Source;
+import com.cavetale.manager.data.*;
+import com.cavetale.manager.data.download.*;
+import com.cavetale.manager.data.download.build.*;
 import com.cavetale.manager.parser.InputException;
 import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
@@ -21,171 +21,201 @@ import java.util.List;
  * List of available plugins
  */
 public enum Plugin implements Provider {
-    // TODO: Adventure
+    Adventure, // TODO: Status?
+    AdviceAnimals(Parent.of("com.winthier")), // TODO: Status?
+    AFK,
+    AntiPopup(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/7d0370f/AntiPopup-10.1.jar"), Ver.of("10.1")),
+    Area,
+    ArmorStandEditor(Parent.of("io.github.rypofalem"), Ver.of("1.17-25")),
+    Auction,
+    Bans(Parent.of("com.winthier")),
+    Bingo,
+    BlockClip,
+    BlockTrigger,
+    CaptureTheFlag,
+    Caves,
+    Chair,
+    Chat(Parent.of("com.winthier")),
+    Chess,
+    Christmas, // TODO: Status?
+    Colorfall(Parent.of("io.github.feydk")),
+    Connect(Parent.of("com.winthier")),
+    // TODO: ConnectCore Status?
+    Core,
+    Countdown(Parent.of("com.winthier"), Ver.of("0.1")),
     @Deprecated
-    AdviceAnimals("com.winthier.adviceanimals", "0.1-SNAPSHOT"),
-    AFK("com.cavetale.afk", "0.1-SNAPSHOT"),
-    AntiPopup(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/499358a/AntiPopup-10.jar"), "10"),
-    Area("com.cavetale.area", "0.1-SNAPSHOT"),
-    ArmorStandEditor("io.github.rypofalem.armorstandeditor", "1.17-25"),
-    Auction("com.cavetale.auction", "0.1-SNAPSHOT"),
-    Bans("com.winthier.bans", "0.1-SNAPSHOT"),
-    Bingo("com.cavetale.bingo", "0.1-SNAPSHOT"),
-    BlockClip("com.cavetale.blockclip", "0.1-SNAPSHOT"),
-    BlockTrigger("com.cavetale.blocktrigger", "0.1-SNAPSHOT"),
-    // TODO: BungeeCavetale
-    // TODO: CaptureTheFlag
-    Caves("com.cavetale.caves", "0.1-SNAPSHOT"),
-    // TODO: CavetaleResourcePack
-    Chair("com.cavetale.chair", "0.1-SNAPSHOT"),
-    Chat("com.winthier.chat", "0.1-SNAPSHOT"),
-    // TODO: Chess
+    CraftBay(Parent.of("com.winthier"), Ver.of("2.26-SNAPSHOT")), // TODO: Status?
+    Creative(Parent.of("com.winthier")),
+    CullMob,
+    Decorator(Parent.of("com.winthier")),
+    Dungeons,
+    Dusk(Parent.of("com.winthier"), Ver.of("0.1")),
+    Easter,
+    Editor,
+    Election,
+    Enderball,
+    Enemy,
+    Exploits(Parent.of("com.winthier")),
+    ExtremeGrassGrowing("EGG"),
+    Fam,
+    FastLeafDecay(Ver.of("1.0-SNAPSHOT")),
+    Festival,
+    FlatGenerator,
+    Fly,
+    FreeHat,
+    GoldenTicket,
     @Deprecated
-    Christmas("com.cavetale.christmas", "0.1-SNAPSHOT"),
-    Colorfall("io.github.feydk.colorfall", "0.1-SNAPSHOT"),
-    Connect("com.winthier.connect", "0.1-SNAPSHOT"),
-    // TODO: ConnectCore
-    Core("com.cavetale.core", "0.1-SNAPSHOT"),
-    Countdown("com.winthier.countdown", "0.1"),
+    Halloween,
+    HideAndSeek,
+    Home,
+    HopperFilter(Parent.of("com.winthier")),
+    HotSwap,
+    Inventory,
     @Deprecated
-    CraftBay("com.winthier.craftbay", "2.26-SNAPSHOT"),
-    Creative("com.winthier.creative", "0.1-SNAPSHOT"),
-    CullMob("com.cavetale.cullmob", "0.1-SNAPSHOT"),
-    Decorator("com.winthier.decorator", "0.1-SNAPSHOT"),
-    Dungeons("com.cavetale.dungeons", "0.1-SNAPSHOT"),
-    Dusk("com.winthier.dusk", "0.1"),
-    Easter("com.cavetale.easter", "0.1-SNAPSHOT"),
-    Editor("com.cavetale.editor", "0.1-SNAPSHOT"),
-    Election("com.cavetale.election", "0.1-SNAPSHOT"),
-    Enderball("com.cavetale.enderball", "0.1-SNAPSHOT"),
-    Enemy("com.cavetale.enemy", "0.1-SNAPSHOT"),
-    Exploits("com.winthier.exploits", "0.1-SNAPSHOT"),
-    ExtremeGrassGrowing("com.cavetale.extremegrassgrowing", "0.1-SNAPSHOT"), // TODO: "EGG"
-    Fam("com.cavetale.fam", "0.1-SNAPSHOT"),
-    FastLeafDecay("com.cavetale.fastleafdecay", "1.0-SNAPSHOT"),
-    Festival("com.cavetale.festival", "0.1-SNAPSHOT"),
-    FlatGenerator("com.cavetale.flatgenerator", "0.1-SNAPSHOT"),
-    Fly("com.cavetale.fly", "0.1-SNAPSHOT"),
-    FreeHat("com.cavetale.freehat", "0.1-SNAPSHOT"),
-    GoldenTicket("com.cavetale.goldenticket", "0.1-SNAPSHOT"),
+    InvisibleItemFrames,
+    ItemStore(Parent.of("com.winthier")),
+    KeepInventory(Parent.of("com.winthier")),
+    KingOfTheLadder(Ref.of("kotl"), "KOTL"),
+    // TODO: KingOfTheRing Status?
+    Kit(Parent.of("com.winthier"), Ver.of("0.1")),
     @Deprecated
-    Halloween("com.cavetale.halloween", "0.1-SNAPSHOT"),
-    HideAndSeek("com.cavetale.hideandseek", "0.1-SNAPSHOT"),
-    Home("com.cavetale.home", "0.1-SNAPSHOT"),
-    HopperFilter("com.winthier.hopperfilter", "0.1-SNAPSHOT"),
-    HotSwap("com.cavetale.hotswap", "0.1-SNAPSHOT"),
-    Inventory("com.cavetale.inventory", "0.1-SNAPSHOT"),
+    LinkPortal(Parent.of("com.winthier")),
+    MagicMap,
+    Mail(Parent.of("com.winthier")),
+    MapLoad,
+    MassStorage,
+    Maypole(Parent.of("com.winthier"), Ver.of("0.1")),
+    MemberList,
+    Menu,
+    Merchant,
+    Miniverse,
+    MobArena,
+    Money,
+    Mytems,
+    OpenInv(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/download/5.1.4/OpenInv.jar"), Ver.of("5.1.4")),
+    Overboard,
+    Perm(Parent.of("com.winthier")),
+    Photos(Parent.of("com.winthier")),
+    Pictionary("CavePaint"),
+    PlayerCache(Parent.of("com.winthier")),
+    PlayerInfo(Parent.of("com.winthier")),
+    PlugInfo,
+    PocketMob,
+    Poster,
+    Protect(Parent.of("com.winthier")),
+    ProtocolLib(Util.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/download/5.3.0/ProtocolLib.jar"), Ver.of("4.7.1-SNAPSHOT")),
+    PVPArena,
+    Quidditch,
     @Deprecated
-    InvisibleItemFrames("com.cavetale.invisibleitemframes", "0.1-SNAPSHOT"),
-    ItemStore("com.winthier.itemstore", "0.1-SNAPSHOT"),
-    KeepInventory("com.winthier.keepinventory", "0.1-SNAPSHOT"),
-    KingOfTheLadder("com.cavetale.kotl", "kotl", "0.1-SNAPSHOT"), // TODO: "KOTL"
-    // TODO: KingOfTheRing
-    Kit("com.winthier.kit", "0.1"),
-    // TODO: LastLog
+    Quiz(Parent.of("com.winthier")),
+    Race,
     @Deprecated
-    LinkPortal("com.winthier.linkportal", "0.1-SNAPSHOT"),
-    MagicMap("com.cavetale.magicmap", "0.1-SNAPSHOT"),
-    Mail("com.winthier.mail", "0.1-SNAPSHOT"),
-    MapLoad("com.cavetale.mapload", "0.1-SNAPSHOT"),
-    MassStorage("com.cavetale.massstorage", "0.1-SNAPSHOT"),
-    Maypole("com.winthier.maypole", "0.1"),
-    MemberList("com.cavetale.memberlist", "0.1-SNAPSHOT"),
-    Menu("com.cavetale.menu", "0.1-SNAPSHOT"),
-    Merchant("com.cavetale.merchant", "0.1-SNAPSHOT"),
-    Miniverse("com.cavetale.miniverse", "0.1-SNAPSHOT"),
-    // TODO: MobArena
-    Money("com.cavetale.money", "0.1-SNAPSHOT"),
-    Mytems("com.cavetale.mytems", "0.1-SNAPSHOT"),
-    // TODO: NBTDump
-    OpenInv(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/download/5.1.3/OpenInv.jar"), "5.1.3"),
-    Overboard("com.cavetale.overboard", "0.1-SNAPSHOT"),
-    Perm("com.winthier.perm", "0.1-SNAPSHOT"),
-    Photos("com.winthier.photos", "0.1-SNAPSHOT"),
-    Pictionary("com.cavetale.pictionary", "0.1-SNAPSHOT"), // TODO: "CavePaint"
-    PlayerCache("com.winthier.playercache", "0.1-SNAPSHOT"),
-    PlayerInfo("com.winthier.playerinfo", "0.1-SNAPSHOT"),
-    PlugInfo("com.cavetale.pluginfo", "0.1-SNAPSHOT"),
-    PocketMob("com.cavetale.pocketmob", "0.1-SNAPSHOT"),
-    Poster("com.cavetale.poster", "0.1-SNAPSHOT"),
-    Protect("com.winthier.protect", "0.1-SNAPSHOT"),
-    ProtocolLib("com.comphenix.protocol", "4.7.1-SNAPSHOT"), // TODO: External download
-    PVPArena("com.cavetale.pvparena", "0.1-SNAPSHOT"),
-    // TODO: Quidditch
+    Raid,
+    RandomPlayerHead(Group.of("com.winthier.rph"), Ref.of("random-player-head"), Ver.of("0.1-SNAPSHOT")),
+    RedGreenLight("RedLightGreenLight", "RGL", "RLGL"),
+    Resident,
+    Resource(Parent.of("com.winthier"), Ver.of("0.1")),
+    ResourcePack,
+    Rules(Parent.of("com.winthier")),
+    Server,
     @Deprecated
-    Quiz("com.winthier.quiz", "0.1-SNAPSHOT"),
-    Race("com.cavetale.race", "0.1-SNAPSHOT"),
-    @Deprecated
-    Raid("com.cavetale.raid", "0.1-SNAPSHOT"),
-    RandomPlayerHead("com.winthier.rph", "random-player-head", "0.1-SNAPSHOT"),
-    RedLightGreenLight("com.cavetale.redgreenlight", "0.1-SNAPSHOT"), // TODO: "RedGreenLight", "RLGL"
-    Resident("com.cavetale.resident", "0.1-SNAPSHOT"),
-    Resource("com.winthier.resource", "0.1"),
-    ResourcePack("com.cavetale.resourcepack", "0.1-SNAPSHOT"),
-    Rules("com.winthier.rules", "0.1-SNAPSHOT"),
-    Server("com.cavetale.server", "0.1-SNAPSHOT"),
-    @Deprecated
-    ServerStatus("com.cavetale.serverstatus", "0.1-SNAPSHOT"),
-    Shop("com.winthier.shop", "0.1-SNAPSHOT"),
-    Shutdown("com.winthier.shutdown", "0.1-SNAPSHOT"),
-    Sidebar("com.cavetale.sidebar", "0.1-SNAPSHOT"),
-    SignSpy("com.cavetale.signspy", "0.1-SNAPSHOT"),
-    Skills("com.cavetale.skills", "0.1-SNAPSHOT"),
-    // TODO: SkyBlock
-    Spawn("com.winthier.spawn", "0.1-SNAPSHOT"),
-    Spike("com.cavetale.spike", "0.1-SNAPSHOT"),
-    Spleef("com.winthier.spleef", "0.1-SNAPSHOT"),
-    SQL("com.winthier.sql", "0.1-SNAPSHOT"),
-    StarBook("com.winthier.starbook", "0.1-SNAPSHOT"),
-    StopRain("com.winthier.stoprain", "0.1-SNAPSHOT"),
-    Streamer("com.cavetale.streamer", "0.1-SNAPSHOT"),
-    Structure("com.cavetale.structure", "0.1-SNAPSHOT"),
-    SurvivalGames("com.cavetale.survivalgames", "0.1-SNAPSHOT"),
-    Televator("com.cavetale.televator", "0.1-SNAPSHOT"),
-    // TODO: Territory
-    // TODO: Tetris
-    Ticket("com.winthier.ticket", "0.1-SNAPSHOT"),
-    Tinfoil("com.winthier.tinfoil", "0.1"),
-    Title("com.winthier.title", "0.1-SNAPSHOT"),
-    TooManyEntities("com.winthier.toomanyentities", "0.1"),
-    TPA("com.cavetale.tpa", "0.1-SNAPSHOT"),
-    Trees("com.cavetale.trees", "0.1-SNAPSHOT"),
-    Tutor("com.cavetale.tutor", "0.1-SNAPSHOT"),
-    Vertigo("io.github.feydk.vertigo", "0.1-SNAPSHOT"),
-    VoidGenerator("com.cavetale.voidgenerator", "0.1-SNAPSHOT"),
-    Vote("com.cavetale.vote", "0.1-SNAPSHOT"),
-    Wall("com.winthier.wall", "0.1-SNAPSHOT"),
-    Wardrobe("com.cavetale.wardrobe", "0.1-SNAPSHOT"),
-    Warp("com.cavetale.warp", "0.1-SNAPSHOT"),
-    Watchman("com.cavetale.watchman", "0.1-SNAPSHOT"),
-    // TODO: Waterfall
-    // TODO: Windicator
-    WinTag("com.cavetale.wintag", "0.1-SNAPSHOT"),
-    WorldEdit(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/5935693/download"), "7.3.9"),
-    WorldMarker("com.cavetale.worldmarker", "0.1-SNAPSHOT"),
-    Worlds("com.winthier.worlds", "0.1-SNAPSHOT"),
-    Xmas("com.cavetale.xmas", "0.1-SNAPSHOT");
+    ServerStatus,
+    Shop(Parent.of("com.winthier")),
+    Shutdown(Parent.of("com.winthier")),
+    Sidebar,
+    SignSpy,
+    Skills,
+    Skyblock,
+    Spawn(Parent.of("com.winthier")),
+    Spike,
+    Spleef(Parent.of("com.winthier")),
+    SQL(Parent.of("com.winthier")),
+    StarBook(Parent.of("com.winthier")),
+    StopRain(Parent.of("com.winthier")),
+    Streamer,
+    Structure,
+    SurvivalGames,
+    Televator,
+    Tetris,
+    Ticket(Parent.of("com.winthier")),
+    Tinfoil(Parent.of("com.winthier"), Ver.of("0.1")),
+    Title(Parent.of("com.winthier")),
+    TooManyEntities(Parent.of("com.winthier"), Ver.of("0.1")),
+    TPA,
+    Trees,
+    Tutor,
+    Vertigo(Parent.of("io.github.feydk")),
+    VoidGenerator,
+    Vote,
+    Wall(Parent.of("com.winthier")),
+    Wardrobe,
+    Warp,
+    Watchman,
+    Windicator,
+    WinTag,
+    WorldEdit(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/5935693/download"), Ver.of("7.3.9")),
+    WorldMarker,
+    Worlds(Parent.of("com.winthier")),
+    Xmas;
 
     private final @NotNull Source source;
     private final @NotNull Plugin[] plugins;
+    private final @NotNull String[] refs;
 
     private boolean selected = false;
     private boolean installed = false;
     private final @NotNull List<String> installations = new LinkedList<>();
 
-    Plugin(@NotNull URI uri, @NotNull String version) {
-        this.source = new Source.Other(uri, version);
-        this.plugins = new Plugin[]{this};
+    Plugin(@NotNull String @NotNull ... aliases) {
+        this(Ver.DEFAULT);
     }
 
-    Plugin(@NotNull String groupId, @NotNull String version) {
-        this.source = new Source.Jenkins(this.name(), groupId, this.name().toLowerCase(), version);
-        this.plugins = new Plugin[]{this};
+    Plugin(@NotNull Parent parent, @NotNull String @NotNull ... aliases) {
+        this(parent, Ver.DEFAULT);
     }
 
-    Plugin(@NotNull String groupId, @NotNull String artifactId, @NotNull String version) {
-        this.source = new Source.Jenkins(this.name(), groupId, artifactId, version);
+    Plugin(@NotNull Ref ref, @NotNull String @NotNull ... aliases) {
+        this(Parent.DEFAULT, ref, Ver.DEFAULT);
+    }
+
+    Plugin(@NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        this(Parent.DEFAULT, ver);
+    }
+
+    Plugin(@NotNull Group group, @NotNull Ref ref, @NotNull String @NotNull ... aliases) {
+        this(group, ref, Ver.DEFAULT);
+    }
+
+    Plugin(@NotNull Parent parent, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        this.source = new Jenkins(Job.of(this.name()), Group.of(parent, this.name().toLowerCase()), Ref.of(this.name().toLowerCase()), ver);
         this.plugins = new Plugin[]{this};
+        this.refs = new String[aliases.length + 1];
+        this.refs[0] = this.name();
+        System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+    }
+
+    Plugin(@NotNull Parent parent, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        this.source = new Jenkins(Job.of(this.name()), Group.of(parent, ref), ref, ver);
+        this.plugins = new Plugin[]{this};
+        this.refs = new String[aliases.length + 1];
+        this.refs[0] = this.name();
+        System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+    }
+
+    Plugin(@NotNull Group group, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        this.source = new Jenkins(Job.of(this.name()), group, ref, ver);
+        this.plugins = new Plugin[]{this};
+        this.refs = new String[aliases.length + 1];
+        this.refs[0] = this.name();
+        System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+    }
+
+    Plugin(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        this.source = new Source.Other(uri, ver);
+        this.plugins = new Plugin[]{this};
+        this.refs = new String[aliases.length + 1];
+        this.refs[0] = this.name();
+        System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
     }
 
     @Override
@@ -229,13 +259,13 @@ public enum Plugin implements Provider {
             return;
         }
         try {
-            String file = this.name() + "-" + this.source.version + ".jar";
-            Util.download(this.source.uri, new File(Plugins.FOLDER, file));
+            String file = this.name() + "-" + this.source.ver() + ".jar";
+            Util.download(this.source.uri(), new File(Plugins.FOLDER, file));
             this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed\n")) {
-                Console.log(Type.ERR, "Installing " + this.name() + " plugin failed\n");
+            if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
+                Console.log(Type.ERR, "Installing " + this.name() + " plugin failed (" + e.getMessage() + ")\n");
             }
         }
     }
@@ -259,8 +289,8 @@ public enum Plugin implements Provider {
         this.installations.clear();
 
         try { // Install plugin
-            String file = this.name() + "-" + this.source.version + ".jar";
-            Util.download(this.source.uri, new File(Plugins.FOLDER, file));
+            String file = this.name() + "-" + this.source.ver() + ".jar";
+            Util.download(this.source.uri(), new File(Plugins.FOLDER, file));
             this.addInstallation(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {

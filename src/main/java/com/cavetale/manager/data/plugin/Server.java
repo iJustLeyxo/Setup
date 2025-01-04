@@ -22,7 +22,7 @@ public enum Server implements Provider {
             Plugin.Enemy, Plugin.Festival, Plugin.Pictionary, Plugin.Race, Plugin.Resident),
     Event("Plugins for event servers", Base, Plugin.Worlds),
     Hub("Plugins for hub servers", Base, Survival, Category.Build, Category.Hub,
-            Plugin.Structure, Plugin.ExtremeGrassGrowing, Plugin.KingOfTheLadder, Plugin.RedLightGreenLight),
+            Plugin.Structure, Plugin.ExtremeGrassGrowing, Plugin.KingOfTheLadder, Plugin.RedGreenLight),
     Mine("Plugins for mine servers", Base, Survival, Category.Build, Category.Mine),
     Void("Plugins for void servers", Base);
 

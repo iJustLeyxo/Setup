@@ -1,7 +1,8 @@
 package com.cavetale.manager.data.server;
 
 import com.cavetale.manager.data.DataException;
-import com.cavetale.manager.data.Source;
+import com.cavetale.manager.data.download.Source;
+import com.cavetale.manager.data.download.Ver;
 import com.cavetale.manager.parser.InputException;
 import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ import java.util.List;
  * Server software, used to register downloadable server software
  */
 public enum Software {
-    Paper("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/66/downloads/paper-1.21.3-66.jar", "1.21.3-66", "PaperMC"); // TODO: Download newest version using Paper API
+    Paper(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/66/downloads/paper-1.21.3-66.jar"), Ver.of("1.21.3-66"), "PaperMC"); // TODO: Download newest version using Paper API
 
     private final @NotNull Source source;
     private final @NotNull String[] refs;
@@ -26,8 +28,8 @@ public enum Software {
     private boolean selected = false;
     private final @NotNull List<String> installations = new LinkedList<>();
 
-    Software(@NotNull String uri, @NotNull String version, @NotNull String @NotNull ... aliases) {
-        this.source = new Source.Other(Util.uriOf(uri), version);
+    Software(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        this.source = new Source.Other(uri, ver);
         this.refs = new String[aliases.length + 1];
         this.refs[0] = this.name();
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
@@ -67,8 +69,8 @@ public enum Software {
             return;
         }
         try {
-            String file = this.name() + "-" + source.version + ".jar";
-            Util.download(this.source.uri, new File(Softwares.FOLDER, file));
+            String file = this.name() + "-" + this.source.ver() + ".jar";
+            Util.download(this.source.uri(), new File(Softwares.FOLDER, file));
             this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
@@ -91,8 +93,8 @@ public enum Software {
         this.installations.clear();
 
         try { // Install software
-            String file = this.name() + "-" + source.version + ".jar";
-            Util.download(this.source.uri, new File(Softwares.FOLDER, file));
+            String file = this.name() + "-" + source.ver() + ".jar";
+            Util.download(this.source.uri(), new File(Softwares.FOLDER, file));
             this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
