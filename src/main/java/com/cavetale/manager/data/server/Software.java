@@ -21,7 +21,7 @@ import java.util.List;
  * Server software, used to register downloadable server software
  */
 public enum Software {
-    Paper(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/66/downloads/paper-1.21.3-66.jar"), Ver.of("1.21.3-66"), "PaperMC"); // TODO: Download newest version using Paper API
+    Paper(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/82/downloads/paper-1.21.3-82.jar"), Ver.of("1.21.3-66"), "PaperMC"); // TODO: Download newest version using Paper API
 
     private final @NotNull Source source;
     private final @NotNull String[] refs;
