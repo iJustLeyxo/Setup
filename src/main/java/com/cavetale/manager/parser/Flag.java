@@ -26,15 +26,6 @@ public enum Flag {
     interactive("Enter command prompt mode"),
     normal("Normal console output"),
 
-    path('P', "Specify a file path", "-P <path>") {
-        private final @NotNull PathContainer container = new PathContainer();
-
-        @Override
-        public @NotNull Container<?> container() {
-            return this.container;
-        }
-    },
-
     plugin('p', "Specify plugins(s)", "-p []:all | [categories]") {
         private final @NotNull PluginContainer container = new PluginContainer();
 
