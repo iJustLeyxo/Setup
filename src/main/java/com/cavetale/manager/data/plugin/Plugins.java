@@ -28,13 +28,13 @@ public final class Plugins {
 
         PluginContainer plugins = (PluginContainer) Flag.plugin.container();
         if (Flag.installed.isSelected()) {
-            Console.log(Type.DEBUG, "Selecting installed plugins");
+            Console.log(Type.DEBUG, "Selecting installed plugins\n");
             for (Plugin p : Plugins.installed) p.setSelected(true);
         } else if (Flag.all.isSelected() ||  (Flag.plugin.isSelected() && plugins.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all plugins");
+            Console.log(Type.DEBUG, "Selecting all plugins\n");
             for (Plugin p : Plugin.values()) p.setSelected(true);
         } else {
-            Console.log(Type.DEBUG, "Selecting plugins " + plugins.get());
+            Console.log(Type.DEBUG, "Selecting plugins " + plugins.get() + "\n");
             for (Plugin p : plugins.get()) p.setSelected(true); // Select by plugin
 
             for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.setSelected(true); // Select by category
@@ -46,7 +46,7 @@ public final class Plugins {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.EXTRA, "Reloading installed plugins");
+        Console.log(Type.EXTRA, "Reloading installed plugins\n");
         for (Plugin p : Plugin.values()) p.clearInstallations(); // Reset installations
         Plugins.installed.clear();
         Plugins.unknown.clear();

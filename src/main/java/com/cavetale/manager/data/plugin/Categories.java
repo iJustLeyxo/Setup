@@ -24,13 +24,13 @@ public final class Categories {
 
         CategoryContainer categories = (CategoryContainer) Flag.category.container();
         if (Flag.installed.isSelected()) {
-            Console.log(Type.DEBUG, "Selecting installed categories");
+            Console.log(Type.DEBUG, "Selecting installed categories\n");
             for (Category c : Categories.installed) c.setSelected(true);
         } else if (Flag.all.isSelected() || (Flag.category.isSelected() && categories.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all categories");
+            Console.log(Type.DEBUG, "Selecting all categories\n");
             for (Category c : Category.values()) c.setSelected(true);
         } else {
-            Console.log(Type.DEBUG, "Selecting categories " + categories.get()); // Select by category
+            Console.log(Type.DEBUG, "Selecting categories " + categories.get() + "\n"); // Select by category
             for (Category c : categories.get()) c.setSelected(true);
 
             for (Server s : Server.values()) if (s.isSelected()) for (Category c : s.categories()) c.setSelected(true); // Select by server
@@ -40,7 +40,7 @@ public final class Categories {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.EXTRA, "Reloading installed categories");
+        Console.log(Type.EXTRA, "Reloading installed categories\n");
         Categories.installed.clear(); // Reset installations
 
         for (Category c : Category.values()) c.setInstalled(); // Update installations
