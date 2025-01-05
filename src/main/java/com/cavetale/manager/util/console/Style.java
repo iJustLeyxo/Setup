@@ -2,6 +2,8 @@ package com.cavetale.manager.util.console;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.SequencedCollection;
+
 /**
  * Console output styles, used to manage color, weight, etc. of console outputs
  */
@@ -10,6 +12,8 @@ public enum Style {
     INPUT(XCode.BOLD, XCode.WHITE),
     DEBUG(XCode.GRAY),
     SELECT(XCode.BLUE),
+    COMMAND(XCode.CYAN),
+    FLAG(XCode.ORANGE),
     INSTALL(XCode.GREEN),
     UPDATE(XCode.GREEN),
     UNINSTALL(XCode.RED),

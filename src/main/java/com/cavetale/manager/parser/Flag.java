@@ -19,9 +19,11 @@ public enum Flag {
         }
     },
 
+    command('C', "Filter by commands"),
     debug("Debug console output"),
     execute('x', "Run the command after the flag"),
     error("Detailed error output"),
+    flag('F', "Filter by flags"),
     force("Force execution"),
     help("Show command help"),
     installed('I', "Select installed"),
