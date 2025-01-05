@@ -93,6 +93,7 @@ public enum Command {
                     if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
                         Console.log(Type.ERR, "Linking " + origin.getName() + " failed (" + e.getMessage() + ")\n");
                     }
+                    if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
                 }
             }
         }
@@ -183,8 +184,10 @@ public enum Command {
                         else Console.log(Type.WARN, "\n" + installation + " exited with code " + exit + "\n");
                     } catch (IOException e) {
                         Console.log(Type.ERR, "\nFailed to run " + installation + " (" + e.getMessage() + ")\n");
+                        if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
                     } catch (InterruptedException e) {
                         Console.log(Type.WARN, "\n" + installation + " was interrupted\n");
+                        if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
                     }
 
                     return;

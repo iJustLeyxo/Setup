@@ -76,7 +76,8 @@ public final class Manager {
                 "---------------------------------------- " +
                 "Help -----------------------------------------\n" + XCode.WEIGHT_OFF +
                 "Interactive: java -jar Manager.jar\n" +
-                "Single: java -jar Manager.jar <1+command(s)> <0+flag(s)>\n\n" + XCode.BOLD +
+                "Single: java -jar Manager.jar <command>\n" +
+                "Command: <flag(s)> <command(s)> <flag(s)>\n\n" + XCode.BOLD +
                 "-------------------------------------- " +
                 "Commands ---------------------------------------\n");
         Console.logF(Type.REQUESTED, Style.HELP, "%-16s | %-68s\n", "Command", "Info");

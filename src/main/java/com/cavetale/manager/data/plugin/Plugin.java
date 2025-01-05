@@ -3,6 +3,7 @@ package com.cavetale.manager.data.plugin;
 import com.cavetale.manager.data.*;
 import com.cavetale.manager.download.*;
 import com.cavetale.manager.data.build.*;
+import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
 import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
@@ -267,6 +268,7 @@ public enum Plugin implements Provider {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
                 Console.log(Type.ERR, "Installing " + this.name() + " plugin failed (" + e.getMessage() + ")\n");
             }
+            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
@@ -297,6 +299,7 @@ public enum Plugin implements Provider {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
                 Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to download (" + e.getMessage() + ")\n");
             }
+            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
