@@ -20,6 +20,7 @@ public enum Flag {
     },
 
     debug("Debug console output"),
+    error("Detailed error output"),
     force("Force execution"),
     help("Show command help"),
     installed('I', "Select installed"),

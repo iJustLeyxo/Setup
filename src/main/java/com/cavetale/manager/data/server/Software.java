@@ -3,6 +3,7 @@ package com.cavetale.manager.data.server;
 import com.cavetale.manager.data.DataException;
 import com.cavetale.manager.download.Source;
 import com.cavetale.manager.download.Ver;
+import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
 import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
@@ -81,6 +82,7 @@ public enum Software {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
                 Console.log(Type.ERR, "Installing " + this.name() + " software failed (" + e.getMessage() + ")\n");
             }
+            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
@@ -105,6 +107,7 @@ public enum Software {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
                 Console.log(Type.ERR, "Updating " + this.name() + " software failed - failed to download (" + e.getMessage() + ")\n");
             }
+            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
