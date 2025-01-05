@@ -1,53 +1,181 @@
 package com.cavetale.manager.parser;
 
+import com.cavetale.manager.Manager;
 import com.cavetale.manager.parser.container.Container;
-import com.cavetale.manager.parser.container.DummyContainer;
 import com.cavetale.manager.util.console.Console;
+import com.cavetale.manager.util.console.Detail;
+import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 public final class Parser {
+    private final @Nullable Command command;
+    private final @NotNull List<String> args = new LinkedList<>();
+    private final @NotNull List<Flag> flags = new LinkedList<>();
+
+    private final char[] chars;
+    private int i;
+
     /**
      * Parses input arguments
-     * @param args Arguments to parse
-     * @return A parsing result
+     * @param arg Argument to parse
      * @throws InputException When an invalid input was found
      */
-    @Contract("_ -> new")
-    public static @NotNull Tokens parse(@NotNull String @NotNull [] args) throws InputException {
-        Console.log(Type.DEBUG, "Parsing input\n");
-        Set<Command> commands = new LinkedHashSet<>();
-        Map<Flag, DummyContainer> flags = new HashMap<>();
-        Flag flag = null;
-        for (String arg : args) {
-            if (arg.charAt(0) == '-') {
-                flag = null;
-                if (arg.length() > 2 && arg.charAt(1) == '-') {
-                    flag = Flag.get(arg.substring(2));
-                    if (!flags.containsKey(flag)) flags.put(flag, flag.container());
-                } else if (arg.length() > 1) {
-                    for (int i = 1; i < arg.length(); i++) {
-                        flag = Flag.get(arg.charAt(i));
-                        if (!flags.containsKey(flag)) flags.put(flag, flag.container());
-                    }
-                }
-            } else {
-                if (flag != null && (!(flags.get(flag) instanceof Container<?> container) || !container.option(arg))) flag = null;
-                if (flag == null) {
-                    Command cmd = Command.get(arg.toUpperCase());
-                    if (commands.contains(cmd)) Console.log(Type.INFO, "Ignoring duplicate command \"" + arg + "\n");
-                    commands.add(cmd);
-                }
-            }
+    public Parser(@NotNull String arg) throws InputException {
+        Console.log(Type.EXTRA, "Parsing input\n");
+
+        for (Command c : Command.values()) c.setSelected(false); // Reset commands and flags
+        for (Flag f : Flag.values()) {
+            f.setSelected(false);
+            Container<?> container = f.container();
+            if (container != null) container.clear();
         }
-        Tokens tokens = new Tokens(commands, flags);
-        Console.log(Type.DEBUG, "Finished parsing done\n");
-        return tokens;
+
+        chars = arg.toCharArray(); // Parse
+        i = 0;
+
+        while(flag()); // Parse flags before command
+
+        skip(); // Parse command
+
+        StringBuilder builder = new StringBuilder();
+        for (; i < chars.length; i++) {
+            char c = chars[i];
+            if (c == ' ' || c == '-') break;
+            builder.append(c);
+        }
+
+        if (builder.isEmpty()) this.command = null;
+        else {
+            this.command = Command.get(builder.toString());
+            this.command.setSelected(true);
+        }
+
+        this.args.addAll(this.args()); // Parse command arguments
+
+        while (flag()); // Parse flags after command
+
+        this.flags.clear(); // Reload flags
+        for (Flag f : Flag.values()) if (f.isSelected()) this.flags.add(f);
+
+        Console.log(Type.EXTRA, "Parsing done\n");
+    }
+
+    public @Nullable Command command() {
+        return this.command;
+    }
+
+    public @NotNull List<Flag> flags() {
+        return this.flags;
+    }
+
+    private boolean flag() throws InputException {
+        skip();
+
+        if (i < 0 || chars.length - 2 < i || chars[i] != '-') return false;
+
+        Flag flag = null;
+
+        if (i <= chars.length - 4 && chars[i + 1] == '-' && chars[i + 2] != ' ' && chars[i + 2] != '-' && chars[i + 3] != ' ' && chars[i + 3] != '-') { // Parse long flag
+            StringBuilder builder = new StringBuilder();
+            for (i += 2; i < chars.length; i++) {
+                char c = chars[i];
+                if (c == ' ' || c == '-') break;
+                builder.append(c);
+            }
+
+            Console.log(Type.DEBUG, "Parsed flag --" + builder + "\n");
+            flag = Flag.get(builder.toString());
+            flag.setSelected(true);
+        } else if (chars[i + 1] != ' ' && chars[i + 1] != '-') { // Parse short flag(s)
+            for (i++; i < chars.length; i++) {
+                char c = chars[i];
+                if (c == ' ' || c == '-') break;
+                flag = Flag.get(c);
+                flag.setSelected(true);
+                Console.log(Type.DEBUG, "Parsed flag -" + c + "\n");
+            }
+        } else {
+            return false;
+        }
+
+        assert flag != null; // Parse flag arguments
+        Container<?> container = flag.container();
+        if (container == null) return false;
+
+        for (String s : this.args()) container.add(s);
+
+        return true;
+    }
+
+    private @NotNull List<String> args() {
+        List<String> args = new LinkedList<>();
+
+        StringBuilder builder;
+        boolean exit = false;
+        while(!exit) {
+            skip();
+            builder = new StringBuilder();
+            for (; i < chars.length; i++) {
+                char c = chars[i];
+                if (c == ' ') break;
+                if (c == '-') {
+                    exit = true;
+                    break;
+                }
+                builder.append(c);
+            }
+
+            if (!builder.isEmpty()) {
+                String string = builder.toString();
+                args.add(string);
+                Console.log(Type.DEBUG, "Parsed argument " + string + "\n");
+            }
+
+            else exit = true;
+        }
+
+        return args;
+    }
+
+    private void skip() {
+        while (i < chars.length && chars[i] == ' ') i++;
+    }
+
+    /**
+     * Analyse the parsed tokens for some basic flags
+     * @return {@code true} if something has changes
+     */
+    public boolean analyse() {
+        Console.log(Type.EXTRA, "Analysing flags");
+        StringBuilder s = new StringBuilder();
+        if (Flag.debug.isSelected()) {
+            Console.detail = Detail.MAX;
+            s.append("Debug mode activated\n");
+        } else if (Flag.verbose.isSelected()) {
+            Console.detail = Detail.HIGH;
+            s.append("Verbose mode activated\n");
+        } else if (Flag.normal.isSelected()) {
+            Console.detail = Detail.STD;
+            s.append("Default verbosity mode activated\n");
+        } else if (Flag.quiet.isSelected()) {
+            Console.detail = Detail.LOW;
+            s.append("Quiet mode activated\n");
+        }
+        if (Flag.interactive.isSelected() && !Manager.interactive) {
+            Manager.interactive = true;
+            s.append("Interactive mode activated\n");
+        }
+        if (!s.isEmpty()) {
+            Console.log(Type.INFO, s.toString());
+            Console.log(Type.EXTRA, "Finished analysing tokens\n");
+            return true;
+        }
+        Console.log(Type.EXTRA, Style.DONE, " done\n");
+        return false;
     }
 }

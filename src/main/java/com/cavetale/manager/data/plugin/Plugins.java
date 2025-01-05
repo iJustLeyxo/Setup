@@ -1,7 +1,7 @@
 package com.cavetale.manager.data.plugin;
 
 import com.cavetale.manager.parser.Flag;
-import com.cavetale.manager.parser.Tokens;
+import com.cavetale.manager.parser.Parser;
 import com.cavetale.manager.parser.container.PluginContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -21,18 +21,21 @@ public final class Plugins {
     private static final @NotNull List<Plugin> installed = new LinkedList<>();
     private static final @NotNull List<String> unknown = new LinkedList<>();
 
-    public static void reloadSelected(@NotNull Tokens tokens) {
-        Console.log(Type.DEBUG, "Reloading selected plugins");
+    public static void reloadSelected(@NotNull Parser parser) {
+        Console.log(Type.EXTRA, "Reloading selected plugins\n");
         for (Plugin p : Plugin.values()) p.setSelected(false); // Reset selections
         Plugins.selected.clear();
 
-        PluginContainer plugins = (PluginContainer) tokens.flags().get(Flag.plugin);
-        if (tokens.flags().containsKey(Flag.installed)) {
+        PluginContainer plugins = (PluginContainer) Flag.plugin.container();
+        if (Flag.installed.isSelected()) {
+            Console.log(Type.DEBUG, "Selecting installed plugins");
             for (Plugin p : Plugins.installed) p.setSelected(true);
-        } else if (tokens.flags().containsKey(Flag.all) || (plugins != null && plugins.isEmpty())) { // Select all
+        } else if (Flag.all.isSelected() ||  (Flag.plugin.isSelected() && plugins.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting all plugins");
             for (Plugin p : Plugin.values()) p.setSelected(true);
         } else {
-            if (plugins != null) for (Plugin p : plugins.get()) p.setSelected(true); // Select by plugin
+            Console.log(Type.DEBUG, "Selecting plugins " + plugins.get());
+            for (Plugin p : plugins.get()) p.setSelected(true); // Select by plugin
 
             for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.setSelected(true); // Select by category
 
@@ -43,7 +46,7 @@ public final class Plugins {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.DEBUG, "Reloading installed plugins");
+        Console.log(Type.EXTRA, "Reloading installed plugins");
         for (Plugin p : Plugin.values()) p.clearInstallations(); // Reset installations
         Plugins.installed.clear();
         Plugins.unknown.clear();
@@ -59,7 +62,7 @@ public final class Plugins {
             } catch (Plugin.PluginNotFoundException ignored) {}
             if (p == null) {
                 Plugins.unknown.add(f.getName());
-                Console.log(Type.DEBUG, Style.WARN, "Unknown plugin " + f.getName());
+                Console.log(Type.EXTRA, Style.WARN, "Unknown plugin " + f.getName());
             }
             else p.addInstallation(f.getName());
         }

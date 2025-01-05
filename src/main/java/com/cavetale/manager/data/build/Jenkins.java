@@ -1,7 +1,7 @@
-package com.cavetale.manager.data.download.build;
+package com.cavetale.manager.data.build;
 
-import com.cavetale.manager.data.download.Source;
-import com.cavetale.manager.data.download.Ver;
+import com.cavetale.manager.download.Source;
+import com.cavetale.manager.download.Ver;
 import com.cavetale.manager.util.Util;
 import org.jetbrains.annotations.NotNull;
 

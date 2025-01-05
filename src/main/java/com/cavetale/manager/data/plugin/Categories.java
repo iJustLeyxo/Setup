@@ -1,7 +1,7 @@
 package com.cavetale.manager.data.plugin;
 
 import com.cavetale.manager.parser.Flag;
-import com.cavetale.manager.parser.Tokens;
+import com.cavetale.manager.parser.Parser;
 import com.cavetale.manager.parser.container.CategoryContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -17,18 +17,21 @@ public final class Categories {
     private static final @NotNull List<Category> selected = new LinkedList<>();
     private static final @NotNull List<Category> installed = new LinkedList<>();
 
-    public static void reloadSelected(@NotNull Tokens tokens) {
-        Console.log(Type.DEBUG, "Reloading selected categories");
+    public static void reloadSelected(@NotNull Parser parser) {
+        Console.log(Type.EXTRA, "Reloading selected categories\n");
         for (Category c : Category.values()) c.setSelected(false); // Reset selections
         Categories.selected.clear();
 
-        CategoryContainer categories = (CategoryContainer) tokens.flags().get(Flag.category);
-        if (tokens.flags().containsKey(Flag.installed)) {
+        CategoryContainer categories = (CategoryContainer) Flag.category.container();
+        if (Flag.installed.isSelected()) {
+            Console.log(Type.DEBUG, "Selecting installed categories");
             for (Category c : Categories.installed) c.setSelected(true);
-        } else if (tokens.flags().containsKey(Flag.all) || (categories != null && categories.isEmpty())) { // Select all
+        } else if (Flag.all.isSelected() || (Flag.category.isSelected() && categories.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting all categories");
             for (Category c : Category.values()) c.setSelected(true);
         } else {
-            if (categories != null) for (Category c : categories.get()) c.setSelected(true); // Select by category
+            Console.log(Type.DEBUG, "Selecting categories " + categories.get()); // Select by category
+            for (Category c : categories.get()) c.setSelected(true);
 
             for (Server s : Server.values()) if (s.isSelected()) for (Category c : s.categories()) c.setSelected(true); // Select by server
         }
@@ -37,7 +40,7 @@ public final class Categories {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.DEBUG, "Reloading installed categories");
+        Console.log(Type.EXTRA, "Reloading installed categories");
         Categories.installed.clear(); // Reset installations
 
         for (Category c : Category.values()) c.setInstalled(); // Update installations

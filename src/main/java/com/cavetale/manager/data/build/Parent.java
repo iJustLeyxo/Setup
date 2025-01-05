@@ -1,4 +1,4 @@
-package com.cavetale.manager.data.download.build;
+package com.cavetale.manager.data.build;
 
 import org.jetbrains.annotations.NotNull;
 

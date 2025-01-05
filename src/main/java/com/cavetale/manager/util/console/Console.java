@@ -132,7 +132,7 @@ public final class Console {
             if (moduleVersion != null) b.append(" <" + moduleVersion + ">");
             if (moduleName != null || moduleVersion != null) b.append(" /");
             b.append(e.getFileName()).append(": ").append(e.getClassName()).append(".").append(e.getMethodName()).append("() #").append(e.getLineNumber());
-            System.out.printf(b.toString());
+            System.out.println(b);
         }
         if (t.getCause() != null) {
             System.out.print("Caused by ");
@@ -175,11 +175,11 @@ public final class Console {
      * Get new input arguments from console
      * @return user input argument
      */
-    public static @NotNull String @NotNull [] in() {
+    public static @NotNull String in() {
         Console.sep();
         Console.log(Type.PROMPT, "> ");
         Console.log(Type.PROMPT, Style.INPUT);
-        return System.console().readLine().split(" ");
+        return System.console().readLine();
     }
 
     /**

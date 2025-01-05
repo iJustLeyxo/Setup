@@ -8,10 +8,7 @@ import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
 import com.cavetale.manager.util.console.XCode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Cavetale installation manager, used to manage plugins and server software for testing servers
@@ -21,41 +18,43 @@ public final class Manager {
 
     public static void main(String[] args) {
         System.out.println();
+        String arg = String.join(" ", args);
 
         while (interactive) { // Cycle of inputs respective command executions
             if (args != null && args.length > 0) interactive = false;
-            else args = Console.in();
+            else arg = Console.in();
             try {
-                Tokens tokens = Parser.parse(args);
-                boolean changed = tokens.analyse();
-                if (tokens.commands().isEmpty()) {
+                Parser parser = new Parser(arg);
+
+                Command cmd = parser.command();
+                boolean changed = parser.analyse();
+
+                if (cmd == null) {
                     if (!changed) Console.log(Type.WARN, "Nothing to do. Try typing \"help\".\n");
                 } else {
                     Plugins.reloadInstallations();
                     Categories.reloadInstallations();
                     Servers.reloadInstallations();
                     Softwares.reloadInstallations();
-                    Softwares.reloadSelected(tokens);
-                    Servers.reloadSelected(tokens);
-                    Categories.reloadSelected(tokens);
-                    Plugins.reloadSelected(tokens);
+                    Softwares.reloadSelected(parser);
+                    Servers.reloadSelected(parser);
+                    Categories.reloadSelected(parser);
+                    Plugins.reloadSelected(parser);
 
-                    Console.log(Type.DEBUG, "Running " + tokens.commands().size() + " command(s)\n");
-                    for (Command cmd : tokens.commands()) {
-                        Console.log(Type.DEBUG, "Running " + cmd.refs[0] + " command\n");
-                        if (tokens.flags().containsKey(Flag.help)) {
-                            cmd.help(tokens);
-                            continue;
-                        }
-                        cmd.run(tokens);
-                        Console.log(Type.DEBUG, "Finished running " + cmd.refs[0] + " command\n");
+                    Console.log(Type.EXTRA, "Running command " + cmd.name() + " with flags " + parser.flags() + "\n");
+
+                    if (Flag.help.isSelected()) {
+                        cmd.help(parser);
+                        continue;
                     }
-                    Console.log(Type.DEBUG, "Finished running command(s)\n");
+
+                    cmd.run(parser);
+                    Console.log(Type.EXTRA, "Finished running command " + cmd.name() + "\n");
                 }
             } catch (InputException e) {
                 Console.log(Type.ERR, e.getMessage() + "\n");
-                if (Console.logs(Type.DEBUG)) {
-                    Console.log(Type.DEBUG, e);
+                if (Console.logs(Type.EXTRA)) {
+                    Console.log(Type.EXTRA, e);
                 }
                 if (!interactive) System.exit(1);
             }
@@ -67,7 +66,7 @@ public final class Manager {
     // TODO: Add resource pack download
 
     public static void exit() {
-        Console.log(Type.DEBUG, "Exiting\n");
+        Console.log(Type.EXTRA, "Exiting\n");
         Console.sep();
         System.exit(0);
     }
@@ -98,8 +97,8 @@ public final class Manager {
         ArrayList<Flag> flags = new ArrayList<>(List.of(Flag.values()));
         Collections.sort(flags);
         for (Flag f : flags) {
-            Console.logF(Type.REQUESTED, Style.HELP, "%2s %-13s | %-32s | %-33s\n", "-" + f.shortRef,
-                    "--" + f.name(), f.info, Objects.requireNonNullElse(f.usage, ""));
+            Console.logF(Type.REQUESTED, Style.HELP, "%2s %-13s | %-32s | %-33s\n", "-" + f.ref(),
+                    "--" + f.name(), f.info(), Objects.requireNonNullElse(f.usage(), ""));
         }
     }
 }

@@ -4,10 +4,7 @@ import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Software;
 import com.cavetale.manager.data.server.Softwares;
-import com.cavetale.manager.parser.container.CategoryContainer;
 import com.cavetale.manager.parser.container.PathContainer;
-import com.cavetale.manager.parser.container.ServerContainer;
-import com.cavetale.manager.parser.container.SoftwareContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
@@ -21,26 +18,25 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public enum Command {
     Exit("Exit interactive mode", "E", "Quit", "Q", "Stop") {
         @Override
-        public void run(@NotNull Tokens tokens) {
+        public void run(@NotNull Parser parser) {
             Manager.exit();
         }
     },
 
     Help("Show usage help") {
         @Override
-        public void run(@NotNull Tokens tokens) {
+        public void run(@NotNull Parser parser) {
             Manager.help();
         }
     },
 
     Install("Install plugins and server software", "Add") {
         @Override
-        public void run(@NotNull Tokens tokens) {
+        public void run(@NotNull Parser parser) {
             List<Plugin> plugins = Plugins.selected();
             List<Software> software = Softwares.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
@@ -58,13 +54,13 @@ public enum Command {
     Link("Link any jar archive path to the plugins directory") {
         @Override
         public
-        void run(@NotNull Tokens tokens) {
-            PathContainer patCon = (PathContainer) tokens.flags().get(Flag.path);
-            if (patCon == null || patCon.isEmpty() || patCon.isEmpty()) {
+        void run(@NotNull Parser parser) {
+            PathContainer path = (PathContainer) Flag.path.container().get();
+            if (path == null || path.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "No path specified\n");
                 return;
             }
-            File origin = new File(patCon.get());
+            File origin = new File(path.get());
             try {
                 Plugin.get(origin);
             } catch (Plugin.NotAPluginException e) {
@@ -97,51 +93,51 @@ public enum Command {
 
     List("List plugins, categories, servers and server software", "Show", "Resolve") {
         @Override
-        public void run(@NotNull Tokens tokens) {
-            if (tokens.flags().containsKey(Flag.installed)) {
-                if (tokens.flags().containsKey(Flag.all)) {
+        public void run(@NotNull Parser parser) {
+            if (Flag.installed.isSelected()) {
+                if (Flag.all.isSelected()) {
                     Plugins.listInstalled();
                     Categories.listInstalled();
                     Servers.listInstalled();
                     Softwares.listInstalled();
                 } else {
                     boolean selected = false;
-                    if (tokens.flags().containsKey(Flag.plugin)) {
+                    if (Flag.plugin.isSelected()) {
                         Plugins.listInstalled();
                         selected = true;
                     }
-                    if (tokens.flags().containsKey(Flag.category)) {
+                    if (Flag.category.isSelected()) {
                         Categories.listInstalled();
                         selected = true;
                     }
-                    if (tokens.flags().containsKey(Flag.server)) {
+                    if (Flag.server.isSelected()) {
                         Servers.listInstalled();
                         selected = true;
                     }
-                    if (tokens.flags().containsKey(Flag.software)) {
+                    if (Flag.software.isSelected()) {
                         Softwares.listInstalled();
                         selected = true;
                     }
                     if (!selected) Plugins.listInstalled();
                 }
             } else {
-                if (tokens.flags().containsKey(Flag.all) || (!tokens.flags().containsKey(Flag.plugin) && !tokens.flags().containsKey(Flag.category) && !tokens.flags().containsKey(Flag.server) && !tokens.flags().containsKey(Flag.software))) {
+                if (Flag.all.isSelected() || (!Flag.plugin.isSelected() && !Flag.category.isSelected() && !Flag.server.isSelected() && !Flag.software.isSelected())) {
                     Plugins.list();
                     Categories.list();
                     Servers.list();
                     Softwares.list();
                 } else if (Plugins.selected().isEmpty() && Categories.selected().isEmpty() && Servers.selected().isEmpty() && Softwares.selected().isEmpty()) {
-                    if (tokens.flags().containsKey(Flag.plugin)) Plugins.list();
-                    if (tokens.flags().containsKey(Flag.category)) Categories.list();
-                    if (tokens.flags().containsKey(Flag.server)) Servers.list();
-                    if (tokens.flags().containsKey(Flag.software)) Softwares.list();
+                    if (Flag.plugin.isSelected()) Plugins.list();
+                    if (Flag.category.isSelected()) Categories.list();
+                    if (Flag.server.isSelected()) Servers.list();
+                    if (Flag.software.isSelected()) Softwares.list();
                 } else {
-                    if (tokens.flags().containsKey(Flag.plugin) || tokens.flags().containsKey(Flag.category) || tokens.flags().containsKey(Flag.server)) {
+                    if (Flag.plugin.isSelected() || Flag.category.isSelected() || Flag.server.isSelected()) {
                         Plugins.listSelected();
-                        if (tokens.flags().containsKey(Flag.category)) Categories.listSelected();
-                        if (tokens.flags().containsKey(Flag.server)) Servers.listSelected();
+                        if (Flag.category.isSelected()) Categories.listSelected();
+                        if (Flag.server.isSelected()) Servers.listSelected();
                     }
-                    if (tokens.flags().containsKey(Flag.software)) Softwares.listSelected();
+                    if (Flag.software.isSelected()) Softwares.listSelected();
                 }
             }
         }
@@ -149,9 +145,9 @@ public enum Command {
 
     RUN("Run installed server software") {
         @Override
-        public void run(@NotNull Tokens result) {
+        public void run(@NotNull Parser parser) {
             List<Software> selected = Softwares.selected();
-            if (!result.flags().containsKey(Flag.software) || Softwares.selected().isEmpty()) {
+            if (!Flag.software.isSelected() || Softwares.selected().isEmpty()) {
                 selected = Arrays.asList(Software.values());
             }
             if (selected.size() > 1) Console.log(Type.WARN, "Multiple software selected\n");
@@ -194,7 +190,7 @@ public enum Command {
     Status("View installation status", "Info", "Verify", "Check") {
         @Override
         public
-        void run(@NotNull Tokens tokens) {
+        void run(@NotNull Parser parser) {
             Plugins.summarize();
             Softwares.summarize();
         }
@@ -202,7 +198,7 @@ public enum Command {
 
     Uninstall("Uninstall plugins, server software and files", "Remove", "Delete") {
         @Override
-        public void run(@NotNull Tokens tokens) {
+        public void run(@NotNull Parser parser) {
             List<Plugin> plugins = Plugins.selected();
             List<Software> software = Softwares.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
@@ -219,7 +215,7 @@ public enum Command {
 
     Update("Update plugins and software", "Upgrade") {
         @Override
-        public void run(@NotNull Tokens tokens) {
+        public void run(@NotNull Parser parser) {
             List<Plugin> plugins = Plugins.selected();
             List<Software> software = Softwares.selected();
             if (plugins.isEmpty() && software.isEmpty()) { // Auto select installed if nothing specified
@@ -244,6 +240,8 @@ public enum Command {
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
+    private boolean selected = false;
+
     Command(@NotNull String info, @NotNull String @NotNull ... refs) {
         this.refs = new String[refs.length + 1];
         this.refs[0] = this.name().toLowerCase();
@@ -251,15 +249,23 @@ public enum Command {
         this.info = info;
     }
 
-    public abstract void run(@NotNull Tokens result);
+    public abstract void run(@NotNull Parser parser);
 
-    public void help(@NotNull Tokens result) {
+    public void help(@NotNull Parser parser) {
         Console.log(Type.REQUESTED, Style.HELP, this.refs[0] + ": " + this.info + "\n");
     }
 
     public static @NotNull Command get(@NotNull String ref) throws NotFoundException {
         for (Command c : Command.values()) for (String r : c.refs) if (r.equalsIgnoreCase(ref)) return c;
         throw new NotFoundException(ref);
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return this.selected;
     }
 
     public static class NotFoundException extends InputException {

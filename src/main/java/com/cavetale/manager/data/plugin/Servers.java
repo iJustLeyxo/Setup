@@ -1,8 +1,7 @@
 package com.cavetale.manager.data.plugin;
 
 import com.cavetale.manager.parser.Flag;
-import com.cavetale.manager.parser.Tokens;
-import com.cavetale.manager.parser.container.CategoryContainer;
+import com.cavetale.manager.parser.Parser;
 import com.cavetale.manager.parser.container.ServerContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -18,17 +17,20 @@ public final class Servers {
     private static final @NotNull List<Server> selected = new LinkedList<>();
     private static final @NotNull List<Server> installed = new LinkedList<>();
 
-    public static void reloadSelected(@NotNull Tokens tokens) {
-        Console.log(Type.DEBUG, "Reloading selected servers");
+    public static void reloadSelected(@NotNull Parser parser) {
+        Console.log(Type.EXTRA, "Reloading selected servers\n");
         for (Server s : Server.values()) s.setSelected(false); // Reset selections
         Servers.selected.clear();
 
-        ServerContainer servers = (ServerContainer) tokens.flags().get(Flag.server);
-        if (tokens.flags().containsKey(Flag.installed)) {
+        ServerContainer servers = (ServerContainer) Flag.server.container();
+        if (Flag.installed.isSelected()) {
             for (Server s : Servers.installed) s.setSelected(true);
-        } else if (tokens.flags().containsKey(Flag.all) || (servers != null && servers.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting installed servers");
+        } else if (Flag.all.isSelected() || (Flag.server.isSelected() && servers.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting all servers");
             for (Server s : Server.values()) s.setSelected(true);
-        } else if (servers != null) {
+        } else {
+            Console.log(Type.DEBUG, "Selecting servers " + servers.get());
             for (Server s : servers.get()) s.setSelected(true); // Select by server
         }
 
@@ -36,7 +38,7 @@ public final class Servers {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.DEBUG, "Reloading installed servers");
+        Console.log(Type.EXTRA, "Reloading installed servers");
         Servers.installed.clear(); // Reset installations
 
         for (Server s : Server.values()) s.setInstalled(); // Update installations

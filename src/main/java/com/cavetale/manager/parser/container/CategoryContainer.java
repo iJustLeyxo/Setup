@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class CategoryContainer extends SetContainer<Category> {
     @Override
-    public boolean option(@NotNull String option) throws InputException {
-        Category category = Category.get(option);
-        if (this.contents.contains(category)) Console.log(Type.INFO, "Ignoring duplicate category \"" + option + "\n");
+    public boolean add(@NotNull String arg) throws InputException {
+        Category category = Category.get(arg);
+        if (this.contents.contains(category)) Console.log(Type.INFO, "Ignoring duplicate category \"" + arg + "\n");
         else this.contents.add(category);
         return true;
     }

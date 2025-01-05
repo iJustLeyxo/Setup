@@ -11,11 +11,16 @@ public final class PathContainer extends Container<String> {
     }
 
     @Override
-    public boolean option(@NotNull String option) {
+    public boolean add(@NotNull String arg) {
         if (this.contents == null) {
-            this.contents = option;
+            this.contents = arg;
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void clear() {
+        this.contents = null;
     }
 }
