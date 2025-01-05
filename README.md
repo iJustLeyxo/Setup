@@ -12,6 +12,7 @@ Command: <flag(s)> <command(s)> <flag(s)>
 Command          | Info                                                                
 ---------------------------------------------------------------------------------------
 exit             | Exit interactive mode                                               
+find             | Find anything                                                       
 help             | Show usage help                                                     
 install          | Install plugins and server software                                 
 link             | Link any jar archive path to the plugins directory                  
@@ -26,9 +27,11 @@ Flag             | Info                             | Usage
 ---------------------------------------------------------------------------------------
 -a --all         | Select all                       |                                  
 -c --category    | Specify categor(y/ies)           | -s []:all | [categories]         
+-C --command     | Filter by commands               |                                  
 -d --debug       | Debug console output             |                                  
 -x --execute     | Run the command after the flag   |                                  
 -e --error       | Detailed error output            |                                  
+-F --flag        | Filter by flags                  |                                  
 -f --force       | Force execution                  |                                  
 -h --help        | Show command help                |                                  
 -I --installed   | Select installed                 |                                  
@@ -39,6 +42,7 @@ Flag             | Info                             | Usage
 -s --server      | Specify server(s)                | -s []:all | [servers]            
 -S --software    | Specify server software          | -S []:all | [software]           
 -v --verbose     | Detailed console output          |                                  
+
 
 
 ```

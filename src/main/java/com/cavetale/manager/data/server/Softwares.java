@@ -27,13 +27,13 @@ public final class Softwares {
 
         SoftwareContainer softwares = (SoftwareContainer) Flag.software.container();
         if (Flag.installed.isSelected()) {
-            Console.log(Type.DEBUG, "Selecting installed software");
+            Console.log(Type.DEBUG, "Selecting installed software\n");
             for (Software s : Softwares.installed) s.setSelected(true);
         } else if (Flag.all.isSelected() || (Flag.software.isSelected() && softwares.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all software");
+            Console.log(Type.DEBUG, "Selecting all software\n");
             for (Software s : Software.values()) s.setSelected(true);
         } else {
-            Console.log(Type.DEBUG, "Selecting servers " + softwares.get());
+            Console.log(Type.DEBUG, "Selecting servers " + softwares.get() + "\n");
             for (Software s : softwares.get()) s.setSelected(true); // Select by software
         }
 
@@ -41,7 +41,7 @@ public final class Softwares {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.EXTRA, "Reloading installed software");
+        Console.log(Type.EXTRA, "Reloading installed software\n");
         for (Software s : Software.values()) s.clearInstallations(); // Reset installations
         Softwares.installed.clear();
         Softwares.unknown.clear();

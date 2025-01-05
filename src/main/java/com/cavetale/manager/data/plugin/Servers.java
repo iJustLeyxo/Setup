@@ -25,12 +25,12 @@ public final class Servers {
         ServerContainer servers = (ServerContainer) Flag.server.container();
         if (Flag.installed.isSelected()) {
             for (Server s : Servers.installed) s.setSelected(true);
-            Console.log(Type.DEBUG, "Selecting installed servers");
+            Console.log(Type.DEBUG, "Selecting installed servers\n");
         } else if (Flag.all.isSelected() || (Flag.server.isSelected() && servers.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all servers");
+            Console.log(Type.DEBUG, "Selecting all servers\n");
             for (Server s : Server.values()) s.setSelected(true);
         } else {
-            Console.log(Type.DEBUG, "Selecting servers " + servers.get());
+            Console.log(Type.DEBUG, "Selecting servers " + servers.get() + "\n");
             for (Server s : servers.get()) s.setSelected(true); // Select by server
         }
 
@@ -38,7 +38,7 @@ public final class Servers {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.EXTRA, "Reloading installed servers");
+        Console.log(Type.EXTRA, "Reloading installed servers\n");
         Servers.installed.clear(); // Reset installations
 
         for (Server s : Server.values()) s.setInstalled(); // Update installations

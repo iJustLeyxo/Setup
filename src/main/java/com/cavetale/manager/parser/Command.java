@@ -4,6 +4,7 @@ import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Software;
 import com.cavetale.manager.data.server.Softwares;
+import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
@@ -16,13 +17,103 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum Command {
     Exit("Exit interactive mode", "E", "Quit", "Q", "Stop") {
         @Override
         public void run(@NotNull Parser parser) {
             Manager.exit();
+        }
+    },
+
+    Find("Find anything", "Search") {
+        private static double MIN = 0.33;
+
+        @Override
+        public void run(@NotNull Parser parser) {
+            String arg = String.join(" ", parser.args()).toLowerCase();
+
+            boolean all = Flag.all.isSelected() || (!Flag.command.isSelected() && !Flag.flag.isSelected() && !Flag.plugin.isSelected() && !Flag.category.isSelected() && !Flag.server.isSelected() && !Flag.software.isSelected());
+            boolean found = false;
+
+            if (all || Flag.command.isSelected()) found = commands(arg);
+            if (all || Flag.flag.isSelected()) found = flags(arg);
+            if (all || Flag.plugin.isSelected()) found = plugins(arg) || found;
+            if (all || Flag.category.isSelected()) found = categories(arg) || found;
+            if (all || Flag.server.isSelected()) found = servers(arg) || found;
+            if (all || Flag.software.isSelected()) found = software(arg) || found;
+
+            if (!found) Console.log(Type.REQUESTED, Style.WARN, "Nothing found to match \"" + arg + "\"\n");
+        }
+
+        private boolean commands(@NotNull String arg) {
+            HashMap<Command, Double> commands = new HashMap<>();
+
+            for (Command command : Command.values()) {
+                double similarity = 0;
+                for (String ref : command.refs) similarity = Math.max(Util.similarity(arg, ref.toLowerCase()), similarity);
+                commands.put(command, similarity);
+            }
+
+            List<Command> result = commands.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
+            if (result.isEmpty()) return false;
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.COMMAND, "Commands", 4, 21, result.toArray());
+            return true;
+        }
+
+        private boolean flags(@NotNull String arg) {
+            HashMap<Flag, Double> flags = new HashMap<>();
+            for (Flag flag : Flag.values()) flags.put(flag, Util.similarity(arg, flag.name().toLowerCase()));
+            List<Flag> result = flags.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
+            if (result.isEmpty()) return false;
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.FLAG, "Flags", 4, 21, result.toArray());
+            return true;
+        }
+
+        private boolean plugins(@NotNull String arg) {
+            HashMap<Plugin, Double> plugins = new HashMap<>();
+            for (Plugin plugin : Plugin.values()) plugins.put(plugin, Util.similarity(arg, plugin.name().toLowerCase()));
+            List<Plugin> result = plugins.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
+            if (result.isEmpty()) return false;
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.PLUGIN, "Plugins", 4, 21, result.toArray());
+            return true;
+        }
+
+        private boolean categories(@NotNull String arg) {
+            HashMap<Category, Double> categories = new HashMap<>();
+            for (Category category : Category.values()) categories.put(category, Util.similarity(arg, category.name().toLowerCase()));
+            List<Category> result = categories.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
+            if (result.isEmpty()) return false;
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.CATEGORY, "Categories", 4, 21, result.toArray());
+            return true;
+        }
+
+        private boolean servers(@NotNull String arg) {
+            HashMap<Server, Double> servers = new HashMap<>();
+            for (Server server : Server.values()) servers.put(server, Util.similarity(arg, server.name().toLowerCase()));
+            List<Server> result = servers.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
+            if (result.isEmpty()) return false;
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.SERVER, "Servers", 4, 21, result.toArray());
+            return true;
+        }
+
+        private boolean software(@NotNull String arg) {
+            HashMap<Software, Double> software = new HashMap<>();
+            for (Software soft : Software.values()) software.put(soft, Util.similarity(arg, soft.name().toLowerCase()));
+            List<Software> result = software.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
+            if (result.isEmpty()) return false;
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.SOFTWARE, "Software", 4, 21, result.toArray());
+            return true;
         }
     },
 

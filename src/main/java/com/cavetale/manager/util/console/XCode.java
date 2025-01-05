@@ -9,12 +9,14 @@ public enum XCode {
     RESET("\u001B[0m"),
     BOLD("\u001B[1m"),
     WEIGHT_OFF("\u001B[22m"),
+    ORANGE("\u001B[33m"),
     GRAY("\u001B[90m"),
     RED("\u001B[91m"),
     GREEN("\u001B[92m"),
     YELLOW("\u001B[93m"),
     BLUE("\u001B[94m"),
     MAGENTA("\u001B[95m"),
+    CYAN("\u001B[96m"),
     WHITE("\u001B[97m");
 
     private final @NotNull String code;
