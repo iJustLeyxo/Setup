@@ -5,7 +5,8 @@ Cavetale installation manager for plugins and server software on test servers
 ```
 ---------------------------------------- Help -----------------------------------------
 Interactive: java -jar Manager.jar
-Single: java -jar Manager.jar <1+command(s)> <0+flag(s)>
+Single: java -jar Manager.jar <command>
+Command: <flag(s)> <command(s)> <flag(s)>
 
 -------------------------------------- Commands ---------------------------------------
 Command          | Info                                                                
@@ -15,7 +16,7 @@ help             | Show usage help
 install          | Install plugins and server software                                 
 link             | Link any jar archive path to the plugins directory                  
 list             | List plugins, categories, servers and server software               
-run              | Run the installed server software                                   
+run              | Run installed server software                                       
 status           | View installation status                                            
 uninstall        | Uninstall plugins, server software and files                        
 update           | Update plugins and software                                         
@@ -25,17 +26,20 @@ Flag             | Info                             | Usage
 ---------------------------------------------------------------------------------------
 -a --all         | Select all                       |                                  
 -c --category    | Specify categor(y/ies)           | -s []:all | [categories]         
--n --normal      | Normal console output            |                                  
+-d --debug       | Debug console output             |                                  
+-x --execute     | Run the command after the flag   |                                  
+-e --error       | Detailed error output            |                                  
 -f --force       | Force execution                  |                                  
 -h --help        | Show command help                |                                  
 -I --installed   | Select installed                 |                                  
 -i --interactive | Enter command prompt mode        |                                  
--P --path        | Specify a file path              | -P <path>                        
+-n --normal      | Normal console output            |                                  
 -p --plugin      | Specify plugins(s)               | -p []:all | [categories]         
 -q --quiet       | Reduced console output           |                                  
 -s --server      | Specify server(s)                | -s []:all | [servers]            
 -S --software    | Specify server software          | -S []:all | [software]           
 -v --verbose     | Detailed console output          |                                  
+
 
 ```
 
