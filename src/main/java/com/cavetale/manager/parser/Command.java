@@ -4,7 +4,6 @@ import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Software;
 import com.cavetale.manager.data.server.Softwares;
-import com.cavetale.manager.parser.container.PathContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
@@ -55,37 +54,45 @@ public enum Command {
         @Override
         public
         void run(@NotNull Parser parser) {
-            PathContainer path = (PathContainer) Flag.path.container().get();
-            if (path == null || path.isEmpty()) {
-                Console.log(Type.REQUESTED, Style.WARN, "No path specified\n");
+            List<File> files = parser.args().stream().map(File::new).toList();
+
+            if (files.isEmpty()) {
+                Console.log(Type.REQUESTED, Style.WARN, "No path(s) specified\n");
                 return;
             }
-            File origin = new File(path.get());
-            try {
-                Plugin.get(origin);
-            } catch (Plugin.NotAPluginException e) {
-                Console.log(Type.WARN, e.getMessage() + "\n");
-            } catch (Plugin.PluginNotFoundException e) {
-                Console.log(Type.WARN, "Unknown plugin " + origin.getName());
-            }
-            Console.log(Type.REQUESTED, Style.LINK, origin.getName() + " will be linked\n");
-            if (!Console.confirm("Continue linking")) return;
-            Console.log(Type.INFO, "Linking " + origin.getName());
-            File folder = Plugins.FOLDER;
-            folder.mkdirs();
-            File link = new File(folder, origin.getName());
-            if (link.exists()) {
-                if (!Console.log(Type.INFO, Style.ERR, " failed (already exists)\n")) {
-                    Console.log(Type.ERR, "Linking " + this.name() + " plugin failed (already exists)\n");
+
+            for (File origin : files) {
+                try {
+                    Plugin.get(origin);
+                } catch (Plugin.NotAPluginException e) {
+                    Console.log(Type.WARN, e.getMessage() + "\n");
+                } catch (Plugin.PluginNotFoundException e) {
+                    Console.log(Type.WARN, "Unknown plugin " + origin.getName() + "\n");
                 }
-                return;
             }
-            try {
-                Files.createSymbolicLink(link.toPath(), origin.toPath());
-                Console.log(Type.INFO, Style.DONE, " done\n");
-            } catch (IOException e) {
-                if (!Console.log(Type.INFO, Style.ERR, " failed\n")) {
-                    Console.log(Type.ERR, "Linking " + origin.getName() + " failed\n");
+
+            Console.log(Type.REQUESTED, Style.LINK, files.size() + " file(s) will be linked\n");
+            if (!Console.confirm("Continue linking")) return;
+
+            for (File origin : files) {
+                Console.log(Type.INFO, "Linking " + origin.getName());
+                File folder = Plugins.FOLDER;
+                folder.mkdirs();
+                File link = new File(folder, origin.getName());
+                if (link.exists()) {
+                    if (!Console.log(Type.INFO, Style.ERR, " failed (already exists)\n")) {
+                        Console.log(Type.ERR, "Linking " + this.name() + " plugin failed (already exists)\n");
+                    }
+                    return;
+                }
+                try {
+                    System.out.println("Linking from " + link + " to " + origin);
+                    Files.createSymbolicLink(link.getAbsoluteFile().toPath(), origin.getAbsoluteFile().toPath());
+                    Console.log(Type.INFO, Style.DONE, " done\n");
+                } catch (IOException e) {
+                    if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
+                        Console.log(Type.ERR, "Linking " + origin.getName() + " failed (" + e.getMessage() + ")\n");
+                    }
                 }
             }
         }

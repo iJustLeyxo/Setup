@@ -41,7 +41,7 @@ public final class Manager {
                     Categories.reloadSelected(parser);
                     Plugins.reloadSelected(parser);
 
-                    Console.log(Type.EXTRA, "Running command " + cmd.name() + " with flags " + parser.flags() + "\n");
+                    Console.log(Type.EXTRA, "Running command " + cmd.name() + " with args " + parser.args() + " and flags " + parser.flags() + "\n");
 
                     if (Flag.help.isSelected()) {
                         cmd.help(parser);

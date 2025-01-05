@@ -55,7 +55,7 @@ public final class Parser {
             this.command.setSelected(true);
         }
 
-        this.args.addAll(this.args()); // Parse command arguments
+        this.args.addAll(this.arg()); // Parse command arguments
 
         while (flag()); // Parse flags after command
 
@@ -63,14 +63,6 @@ public final class Parser {
         for (Flag f : Flag.values()) if (f.isSelected()) this.flags.add(f);
 
         Console.log(Type.EXTRA, "Parsing done\n");
-    }
-
-    public @Nullable Command command() {
-        return this.command;
-    }
-
-    public @NotNull List<Flag> flags() {
-        return this.flags;
     }
 
     private boolean flag() throws InputException {
@@ -107,12 +99,12 @@ public final class Parser {
         Container<?> container = flag.container();
         if (container == null) return false;
 
-        for (String s : this.args()) container.add(s);
+        for (String s : this.arg()) container.add(s);
 
         return true;
     }
 
-    private @NotNull List<String> args() {
+    private @NotNull List<String> arg() {
         List<String> args = new LinkedList<>();
 
         StringBuilder builder;
@@ -144,6 +136,18 @@ public final class Parser {
 
     private void skip() {
         while (i < chars.length && chars[i] == ' ') i++;
+    }
+
+    public @Nullable Command command() {
+        return this.command;
+    }
+
+    public @NotNull List<String> args() {
+        return this.args;
+    }
+
+    public @NotNull List<Flag> flags() {
+        return this.flags;
     }
 
     /**
