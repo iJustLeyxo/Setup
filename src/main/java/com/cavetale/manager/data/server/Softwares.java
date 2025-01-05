@@ -1,8 +1,7 @@
 package com.cavetale.manager.data.server;
 
-import com.cavetale.manager.data.plugin.Servers;
 import com.cavetale.manager.parser.Flag;
-import com.cavetale.manager.parser.Tokens;
+import com.cavetale.manager.parser.Parser;
 import com.cavetale.manager.parser.container.SoftwareContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -21,17 +20,20 @@ public final class Softwares {
     private static final @NotNull List<Software> installed = new LinkedList<>();
     private static final @NotNull List<String> unknown = new LinkedList<>();
 
-    public static void reloadSelected(@NotNull Tokens tokens) {
-        Console.log(Type.DEBUG, "Reloading selected software");
+    public static void reloadSelected(@NotNull Parser parser) {
+        Console.log(Type.EXTRA, "Reloading selected software\n");
         for (Software s : Software.values()) s.setSelected(false); // Reset selections
         Softwares.selected.clear();
 
-        SoftwareContainer softwares = (SoftwareContainer) tokens.flags().get(Flag.software);
-        if (tokens.flags().containsKey(Flag.installed)) {
+        SoftwareContainer softwares = (SoftwareContainer) Flag.software.container();
+        if (Flag.installed.isSelected()) {
+            Console.log(Type.DEBUG, "Selecting installed software");
             for (Software s : Softwares.installed) s.setSelected(true);
-        } else if (tokens.flags().containsKey(Flag.all) || (softwares != null && softwares.isEmpty())) { // Select all
+        } else if (Flag.all.isSelected() || (Flag.software.isSelected() && softwares.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting all software");
             for (Software s : Software.values()) s.setSelected(true);
-        } else if (softwares != null) {
+        } else {
+            Console.log(Type.DEBUG, "Selecting servers " + softwares.get());
             for (Software s : softwares.get()) s.setSelected(true); // Select by software
         }
 
@@ -39,7 +41,7 @@ public final class Softwares {
     }
 
     public static void reloadInstallations() {
-        Console.log(Type.DEBUG, "Reloading installed software");
+        Console.log(Type.EXTRA, "Reloading installed software");
         for (Software s : Software.values()) s.clearInstallations(); // Reset installations
         Softwares.installed.clear();
         Softwares.unknown.clear();

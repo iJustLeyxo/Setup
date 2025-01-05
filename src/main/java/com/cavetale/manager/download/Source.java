@@ -1,10 +1,5 @@
-package com.cavetale.manager.data.download;
+package com.cavetale.manager.download;
 
-import com.cavetale.manager.data.download.build.Artifact;
-import com.cavetale.manager.data.download.build.Group;
-import com.cavetale.manager.data.download.build.Parent;
-import com.cavetale.manager.data.download.build.Ref;
-import com.cavetale.manager.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;

@@ -16,12 +16,17 @@ public abstract class SetContainer<T> extends Container<Set<T>> {
 
     @Override
     public boolean isEmpty() {
-        return this.contents.isEmpty();
+        return this.get().isEmpty();
     }
 
     @Override
     public @NotNull Set<T> get() {
         assert this.contents != null;
         return this.contents;
+    }
+
+    @Override
+    public void clear() {
+        this.get().clear();
     }
 }

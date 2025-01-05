@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class PluginContainer extends SetContainer<Plugin> {
     @Override
-    public boolean option(@NotNull String option) throws InputException {
-        Plugin plugin = Plugin.get(option);
-        if (this.contents.contains(plugin)) Console.log(Type.INFO, "Ignoring duplicate plugins \"" + option + "\n");
+    public boolean add(@NotNull String arg) throws InputException {
+        Plugin plugin = Plugin.get(arg);
+        if (this.contents.contains(plugin)) Console.log(Type.INFO, "Ignoring duplicate plugins \"" + arg + "\n");
         else this.contents.add(plugin);
         return true;
     }

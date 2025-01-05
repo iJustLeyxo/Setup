@@ -1,4 +1,4 @@
-package com.cavetale.manager.data.download;
+package com.cavetale.manager.download;
 
 import org.jetbrains.annotations.NotNull;
 

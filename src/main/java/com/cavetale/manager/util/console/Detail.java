@@ -11,7 +11,8 @@ public enum Detail {
     MIN(-2),
     LOW(-1),
     STD(0),
-    HIGH(1);
+    HIGH(1),
+    MAX(Integer.MAX_VALUE);
 
     public final int val;
 

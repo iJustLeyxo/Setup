@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class ServerContainer extends SetContainer<Server> {
     @Override
-    public boolean option(@NotNull String option) throws InputException {
-        Server server = Server.get(option);
-        if (this.contents.contains(server)) Console.log(Type.INFO, "Ignoring duplicate \"" + option + "\n");
+    public boolean add(@NotNull String arg) throws InputException {
+        Server server = Server.get(arg);
+        if (this.contents.contains(server)) Console.log(Type.INFO, "Ignoring duplicate \"" + arg + "\n");
         else this.contents.add(server);
         return true;
     }

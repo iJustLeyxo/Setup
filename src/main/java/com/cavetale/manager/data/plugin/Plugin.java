@@ -1,8 +1,8 @@
 package com.cavetale.manager.data.plugin;
 
 import com.cavetale.manager.data.*;
-import com.cavetale.manager.data.download.*;
-import com.cavetale.manager.data.download.build.*;
+import com.cavetale.manager.download.*;
+import com.cavetale.manager.data.build.*;
 import com.cavetale.manager.parser.InputException;
 import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
@@ -278,10 +278,10 @@ public enum Plugin implements Provider {
             File file = new File(folder, fileName);
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) continue;
-                if (!Console.log(Type.DEBUG, Style.ERR, " failed - failed to delete " + file + "\n")) {
+                if (!Console.log(Type.EXTRA, Style.ERR, " failed - failed to delete " + file + "\n")) {
                     Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to delete " + file + "\n");
                 }
-            } else if (!Console.log(Type.DEBUG, Style.ERR, " failed - skipped " + file + " (linked)\n")) {
+            } else if (!Console.log(Type.EXTRA, Style.ERR, " failed - skipped " + file + " (linked)\n")) {
                 Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - skipped " + file + " (linked)\n");
             }
             return;
@@ -309,10 +309,10 @@ public enum Plugin implements Provider {
                 if (file.delete()) {
                     this.installations.remove(fileName);
                     Console.log(Type.INFO, Style.DONE, " done\n");
-                } else if (!Console.log(Type.DEBUG, Style.ERR, " failed\n")) {
+                } else if (!Console.log(Type.EXTRA, Style.ERR, " failed\n")) {
                     Console.log(Type.ERR, "Uninstalling " + file + " plugin failed\n");
                 }
-            } else if (!Console.log(Type.DEBUG, Style.WARN, " skipped (linked)\n")) {
+            } else if (!Console.log(Type.EXTRA, Style.WARN, " skipped (linked)\n")) {
                 Console.log(Type.WARN, "Uninstalling " + file + " plugin skipped (linked)\n");
             }
         }

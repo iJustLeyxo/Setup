@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class SoftwareContainer extends SetContainer<Software> {
     @Override
-    public boolean option(@NotNull String option) throws InputException {
-        Software software = Software.get(option);
-        if (this.contents.contains(software)) Console.log(Type.INFO, "Ignoring duplicate software \"" + option + "\n");
+    public boolean add(@NotNull String arg) throws InputException {
+        Software software = Software.get(arg);
+        if (this.contents.contains(software)) Console.log(Type.INFO, "Ignoring duplicate software \"" + arg + "\n");
         else this.contents.add(software);
         return true;
     }
