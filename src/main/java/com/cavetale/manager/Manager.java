@@ -64,7 +64,7 @@ public final class Manager {
         Manager.exit();
     }
 
-    // TODO: Add resource pack download
+    // TODO: Resource pack download (with hash)
 
     public static void exit() {
         Console.log(Type.EXTRA, "Exiting\n");
