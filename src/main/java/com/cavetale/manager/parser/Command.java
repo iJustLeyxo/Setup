@@ -177,7 +177,6 @@ public enum Command {
                     return;
                 }
                 try {
-                    System.out.println("Linking from " + link + " to " + origin);
                     Files.createSymbolicLink(link.getAbsoluteFile().toPath(), origin.getAbsoluteFile().toPath());
                     Console.log(Type.INFO, Style.DONE, " done\n");
                 } catch (IOException e) {
