@@ -11,15 +11,9 @@ import com.cavetale.manager.util.console.Type;
 import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public enum Command {
@@ -260,23 +254,49 @@ public enum Command {
                         ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
                         builder.directory(Softwares.FOLDER);
                         builder.redirectErrorStream(true);
-
                         Process process = builder.start();
 
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            System.out.println(line);
-                        }
+                        OutputStream inStream = process.getOutputStream();
+                        InputStream outStream = process.getInputStream();
 
+                        Thread inThread = new Thread(() -> {
+                            try {
+                                int i = System.in.read();
+                                while (0 <= i) {
+                                    inStream.write(i);
+                                    inStream.flush();
+                                    i = System.in.read();
+                                }
+                            } catch (IOException _) { }
+                        });
+
+                        inThread.setDaemon(true);
+                        inThread.start();
+
+                        Thread outThread = new Thread(() -> {
+                            try {
+                                System.out.print(XCode.GRAY + "[" + software.name() + "] " + XCode.RESET);
+                                int i = outStream.read(); // i: current char
+                                while(0 <= i) {
+                                    System.out.write(i);
+                                    System.out.flush();
+                                    if (i == '\n') System.out.print(XCode.GRAY + "[" + software.name() + "] " + XCode.RESET);
+                                    i = outStream.read();
+                                }
+                                inThread.interrupt();
+                            } catch (IOException _) { }
+                        });
+
+                        outThread.setDaemon(true);
+                        outThread.start();
                         int exit = process.waitFor();
-                        if (exit == 0) Console.log(Type.INFO, "\n" + installation + " exited with code " + exit + "\n");
-                        else Console.log(Type.WARN, "\n" + installation + " exited with code " + exit + "\n");
+                        if (exit == 0) Console.log(Type.INFO, "\n\n" + installation + " exited with code " + exit + "\n");
+                        else Console.log(Type.WARN, "\n\n" + installation + " exited with code " + exit + "\n");
                     } catch (IOException e) {
-                        Console.log(Type.ERR, "\nFailed to run " + installation + " (" + e.getMessage() + ")\n");
+                        Console.log(Type.ERR, "\n\nFailed to run " + installation + " (" + e.getMessage() + ")\n");
                         if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
                     } catch (InterruptedException e) {
-                        Console.log(Type.WARN, "\n" + installation + " was interrupted\n");
+                        Console.log(Type.WARN, "\n\n" + installation + " was interrupted\n");
                         if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
                     }
 
