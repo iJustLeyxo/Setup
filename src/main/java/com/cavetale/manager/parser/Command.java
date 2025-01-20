@@ -257,7 +257,7 @@ public enum Command {
                     Console.log(Type.INFO, "Running " + installation + "\n\n" + XCode.RESET);
 
                     try {
-                        ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation);
+                        ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
                         builder.directory(Softwares.FOLDER);
                         builder.redirectErrorStream(true);
 
