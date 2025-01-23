@@ -154,7 +154,7 @@ public enum Plugin implements Provider {
     Watchman,
     Windicator,
     WinTag,
-    WorldEdit(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/5935693/download"), Ver.of("7.3.9")),
+    WorldEdit(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/6013130/download"), Ver.of("7.3.10-Beta-1")),
     WorldMarker,
     Worlds(Parent.of("com.winthier")),
     Xmas;
