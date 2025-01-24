@@ -39,7 +39,7 @@ Flag             | Info                             | Usage
 -I --installed   | Select installed                 |                                  
 -i --interactive | Enter command prompt mode        |                                  
 -n --normal      | Normal console output            |                                  
--p --plugin      | Specify plugins(s)               | -p []:all | [categories]         
+-p --plugin      | Specify plugins(s)               | -p []:all | [plugins]         
 -q --quiet       | Reduced console output           |                                  
 -s --server      | Specify server(s)                | -s []:all | [servers]            
 -S --software    | Specify server software          | -S []:all | [software]           
