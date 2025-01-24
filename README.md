@@ -42,9 +42,6 @@ Flag             | Info                             | Usage
 -s --server      | Specify server(s)                | -s []:all | [servers]            
 -S --software    | Specify server software          | -S []:all | [software]           
 -v --verbose     | Detailed console output          |                                  
-
-
-
 ```
 
 ##### Adding commands
