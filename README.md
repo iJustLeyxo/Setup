@@ -12,6 +12,7 @@ Command: <flag(s)> <command(s)> <flag(s)>
 Command          | Info                                                                
 ---------------------------------------------------------------------------------------
 connect          | Link this tool to a server installation                             
+eula             | Agree to the Minecraft EULA                                         
 exit             | Exit interactive mode                                               
 find             | Find anything                                                       
 help             | Show usage help                                                     

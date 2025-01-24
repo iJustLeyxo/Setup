@@ -77,6 +77,49 @@ public enum Command {
         }
     },
 
+    EULA("Agree to the Minecraft EULA") {
+        @Override
+        public void run(@NotNull Parser parser) {
+            File eula = new File("eula.txt");
+            if (!eula.exists()) {
+                Console.log(Type.ERR, eula.getName() + " does not exist. You may need to run the server first.\n");
+                return;
+            }
+
+            if (!Console.confirm("Agree to the Minecraft EULA")) return;
+
+            StringBuilder builder = new StringBuilder(); // Read eula
+            try (FileInputStream in = new FileInputStream(eula)) {
+                StringBuilder lineBuilder = new StringBuilder();
+                byte[] bytes = in.readAllBytes();
+                in.close();
+                for (int i = 0; i < bytes.length; i++) {
+                    char c = (char) bytes[i];
+                    if (c == '\n' || bytes.length - 1 <= i) {
+                        String line = lineBuilder.toString();
+                        if (line.equals("eula=false")) line = "eula=true";
+                        else if (line.equals("eula=true")) Console.log(Type.INFO, "Already accepted the eula\n");
+                        builder.append(line);
+                        if (c == '\n') builder.append(c);
+                        lineBuilder = new StringBuilder();
+                    } else lineBuilder.append(c);
+                }
+            } catch (IOException e) {
+                Console.log(Type.ERR, "Failed to read eula (" + e.getMessage() + ")\n");
+                if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+                return;
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(eula)))) { // Write eula
+                writer.write(builder.toString());
+                writer.flush();
+            } catch (IOException e) {
+                Console.log(Type.ERR, "Failed to write eula (" + e.getMessage() + ")\n");
+                if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+            }
+        }
+    },
+
     Exit("Exit interactive mode", "E", "Quit", "Q", "Stop") {
         @Override
         public void run(@NotNull Parser parser) {
