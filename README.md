@@ -11,6 +11,7 @@ Command: <flag(s)> <command(s)> <flag(s)>
 -------------------------------------- Commands ---------------------------------------
 Command          | Info                                                                
 ---------------------------------------------------------------------------------------
+connect          | Link this tool to a server installation                             
 exit             | Exit interactive mode                                               
 find             | Find anything                                                       
 help             | Show usage help                                                     
