@@ -267,7 +267,7 @@ public enum Command {
                                     inStream.flush();
                                     i = System.in.read();
                                 }
-                            } catch (IOException _) { }
+                            } catch (IOException ignored) { }
                         });
 
                         inThread.setDaemon(true);
@@ -284,7 +284,7 @@ public enum Command {
                                     i = outStream.read();
                                 }
                                 inThread.interrupt();
-                            } catch (IOException _) { }
+                            } catch (IOException ignored) { }
                         });
 
                         outThread.setDaemon(true);
