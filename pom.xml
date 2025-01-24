@@ -25,7 +25,6 @@
           <target>21</target>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
-           <compilerArgs>--enable-preview</compilerArgs>
         </configuration>
       </plugin>
 
