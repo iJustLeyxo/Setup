@@ -166,9 +166,9 @@ public enum Command {
                 File link = new File(folder, origin.getName());
                 if (link.exists()) {
                     if (!Console.log(Type.INFO, Style.ERR, " failed (already exists)\n")) {
-                        Console.log(Type.ERR, "Linking " + this.name() + " plugin failed (already exists)\n");
+                        Console.log(Type.ERR, "Linking " + origin.getName() + " failed (already exists)\n");
                     }
-                    return;
+                    continue;
                 }
                 try {
                     Files.createSymbolicLink(link.getAbsoluteFile().toPath(), origin.getAbsoluteFile().toPath());
