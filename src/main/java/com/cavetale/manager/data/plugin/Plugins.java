@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public final class Plugins {
 
     private static final @NotNull List<Plugin> selected = new LinkedList<>();
     private static final @NotNull List<Plugin> installed = new LinkedList<>();
+    private static final @NotNull List<String> linked = new LinkedList<>();
     private static final @NotNull List<String> unknown = new LinkedList<>();
 
     public static void reloadSelected(@NotNull Parser parser) {
@@ -49,22 +51,26 @@ public final class Plugins {
         Console.log(Type.EXTRA, "Reloading installed plugins\n");
         for (Plugin p : Plugin.values()) p.clearInstallations(); // Reset installations
         Plugins.installed.clear();
+        Plugins.linked.clear();
         Plugins.unknown.clear();
         File folder = new File("plugins/"); // Scan installations
         File[] files = folder.listFiles();
         if (files == null) return;
         for (File f : files) {
+            if (f.isDirectory()) continue;
             Plugin p = null;
             try {
                 p = Plugin.get(f);
             } catch (Plugin.NotAPluginException e) {
                 continue;
             } catch (Plugin.PluginNotFoundException ignored) {}
-            if (p == null) {
-                Plugins.unknown.add(f.getName());
-                Console.log(Type.EXTRA, Style.WARN, "Unknown plugin " + f.getName());
+            if (Files.isSymbolicLink(f.toPath())) Plugins.linked.add(f.getName());
+            else {
+                if (p == null) {
+                    Plugins.unknown.add(f.getName());
+                    Console.log(Type.EXTRA, Style.WARN, "Unknown plugin " + f.getName());
+                } else p.addInstallation(f.getName());
             }
-            else p.addInstallation(f.getName());
         }
 
         for (Plugin p : Plugin.values()) if (p.isInstalled()) Plugins.installed.add(p); // Update installation
@@ -87,6 +93,10 @@ public final class Plugins {
 
     public static @NotNull List<Plugin> selected() {
         return Plugins.selected;
+    }
+
+    public static @NotNull List<String> linked() {
+        return Plugins.linked;
     }
 
     public static @NotNull List<String> unknown() {
@@ -133,6 +143,12 @@ public final class Plugins {
         Console.sep();
         Console.logL(Type.REQUESTED, Style.INSTALL, installed.size() +
                 " plugin(s) installed", 4, 21, installed.toArray());
+        List<String> linked = Plugins.linked;
+        if (!linked.isEmpty()) {
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.LINK, linked.size() +
+                    " plugin(s) linked", 4, 21, linked.toArray());
+        }
         List<String> unknown = Plugins.unknown;
         if (!unknown.isEmpty()) {
             Console.sep();
