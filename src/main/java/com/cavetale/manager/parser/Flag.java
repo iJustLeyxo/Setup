@@ -30,7 +30,7 @@ public enum Flag {
     interactive("Enter command prompt mode"),
     normal("Normal console output"),
 
-    plugin('p', "Specify plugins(s)", "-p []:all | [categories]") {
+    plugin('p', "Specify plugins(s)", "-p []:all | [plugins]") {
         private final @NotNull PluginContainer container = new PluginContainer();
 
         @Override
