@@ -93,7 +93,7 @@ public enum Plugin implements Provider {
     MobArena,
     Money,
     Mytems,
-    OpenInv(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/download/5.1.4/OpenInv.jar"), Ver.of("5.1.4")),
+    OpenInv(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/latest/download/OpenInv.jar"), Ver.of("5.1.6")),
     Overboard,
     Perm(Parent.of("com.winthier")),
     Photos(Parent.of("com.winthier")),
@@ -104,7 +104,7 @@ public enum Plugin implements Provider {
     PocketMob,
     Poster,
     Protect(Parent.of("com.winthier")),
-    ProtocolLib(Util.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/download/5.3.0/ProtocolLib.jar"), Ver.of("4.7.1-SNAPSHOT")),
+    ProtocolLib(Util.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/latest/download/ProtocolLib.jar"), Ver.of("5.3.0")),
     PVPArena,
     Quidditch,
     @Deprecated
