@@ -457,8 +457,6 @@ public enum Command {
         }
     };
 
-    // TODO: Accept eula command
-
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
