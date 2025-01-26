@@ -33,8 +33,7 @@ Flag             | Info                             | Usage
 -d --debug       | Debug console output             |                                  
 -x --execute     | Run the command after the flag   |                                  
 -e --error       | Detailed error output            |                                  
--F --flag        | Filter by flags                  |                                  
--f --force       | Force execution                  |                                  
+-f --flag        | Filter by flags                  |                                  
 -h --help        | Show command help                |                                  
 -I --installed   | Select installed                 |                                  
 -i --interactive | Enter command prompt mode        |                                  
