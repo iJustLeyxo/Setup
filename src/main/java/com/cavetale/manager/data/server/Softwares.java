@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.*;
 
 public final class Softwares {
+    // TODO: Only resolve when requested
     public static final @NotNull File FOLDER = new File("./");
 
     private static final @NotNull List<Software> selected = new LinkedList<>();

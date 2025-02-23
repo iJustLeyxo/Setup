@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class Servers {
+    // TODO: Only resolve when requested
     private static final @NotNull List<Server> selected = new LinkedList<>();
     private static final @NotNull List<Server> installed = new LinkedList<>();
 

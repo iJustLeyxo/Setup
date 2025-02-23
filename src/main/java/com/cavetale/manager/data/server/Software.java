@@ -26,6 +26,7 @@ public enum Software {
     private final @NotNull Source source;
     private final @NotNull String[] refs;
 
+    // TODO: Explicit
     private boolean selected = false;
     private final @NotNull List<String> installations = new LinkedList<>();
 

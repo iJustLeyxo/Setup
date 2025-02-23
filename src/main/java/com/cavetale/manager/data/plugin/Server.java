@@ -26,6 +26,7 @@ public enum Server implements Provider {
     Mine("Plugins for mine servers", Base, Survival, Category.Build, Category.Mine),
     Void("Plugins for void servers", Base);
 
+    // TODO: Explicit
     private final @NotNull String info;
     private final @NotNull Server[] servers;
     private final @NotNull Category[] categories;

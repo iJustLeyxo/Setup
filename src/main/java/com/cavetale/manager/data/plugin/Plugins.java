@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class Plugins {
+    // TODO: Only resolve when requested
     public static final @NotNull File FOLDER = new File("plugins/");
 
     private static final @NotNull List<Plugin> selected = new LinkedList<>();

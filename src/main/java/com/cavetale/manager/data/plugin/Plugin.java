@@ -22,6 +22,7 @@ import java.util.List;
  * List of available plugins
  */
 public enum Plugin implements Provider {
+    // TODO: Names
     Adventure, // TODO: Status?
     AdviceAnimals(Parent.of("com.winthier")), // TODO: Status?
     AFK,
@@ -163,8 +164,10 @@ public enum Plugin implements Provider {
     private final @NotNull Plugin[] plugins;
     private final @NotNull String[] refs;
 
+    // TODO: Explicit
     private boolean selected = false;
     private boolean installed = false;
+    // TODO: Linked?
     private final @NotNull List<String> installations = new LinkedList<>();
 
     Plugin(@NotNull String @NotNull ... aliases) {

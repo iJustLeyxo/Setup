@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public enum Command {
     // TODO: Compare only
@@ -130,14 +129,14 @@ public enum Command {
         }
     },
 
-    Exit("Exit interactive mode", "E", "Quit", "Q", "Stop") {
+    EXIT("Exit interactive mode", "E", "QUIT", "Q", "STOP") {
         @Override
         public void run(@NotNull Parser parser) {
             Manager.exit();
         }
     },
 
-    Find("Find anything", "Search") {
+    FIND("Find anything", "Search") {
         private static double MIN = 0.33;
 
         @Override
@@ -224,14 +223,14 @@ public enum Command {
         }
     },
 
-    Help("Show usage help") {
+    HELP("Show usage help") {
         @Override
         public void run(@NotNull Parser parser) {
             Manager.help();
         }
     },
 
-    Install("Install plugins and server software", "Add") {
+    INSTALL("Install plugins and server software", "ADD") {
         @Override
         public void run(@NotNull Parser parser) {
             List<Plugin> plugins = Plugins.selected();
@@ -248,7 +247,7 @@ public enum Command {
         }
     },
 
-    Link("Link any jar archive path to the plugins directory") {
+    LINK("Link any jar archive path to the plugins directory") {
         @Override
         public
         void run(@NotNull Parser parser) {
@@ -296,7 +295,7 @@ public enum Command {
         }
     },
 
-    List("List plugins, categories, servers and server software", "Show", "Resolve") {
+    LIST("List plugins, categories, servers and server software", "SHOW", "RESOLVE") {
         @Override
         public void run(@NotNull Parser parser) {
             if (Flag.installed.isSelected()) {
@@ -420,7 +419,8 @@ public enum Command {
         }
     },
 
-    Status("View installation status", "Info", "Verify", "Check") {
+    // TODO: Status only
+    STATUS("View installation status", "STATE", "INFO") {
         @Override
         public
         void run(@NotNull Parser parser) {
@@ -429,7 +429,7 @@ public enum Command {
         }
     },
 
-    Uninstall("Uninstall plugins, server software and files", "Remove", "Delete") {
+    UNINSTALL("Uninstall plugins, server software and files", "Remove", "Delete") {
         @Override
         public void run(@NotNull Parser parser) {
             List<Plugin> plugins = Plugins.selected();
@@ -446,7 +446,7 @@ public enum Command {
         }
     },
 
-    Update("Update plugins and software", "Upgrade") {
+    UPDATE("Update plugins and software", "Upgrade") {
         @Override
         public void run(@NotNull Parser parser) {
             List<Plugin> plugins = Plugins.selected();
@@ -470,6 +470,7 @@ public enum Command {
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
+    // TODO: Explicit
     private boolean selected = false;
 
     Command(@NotNull String info, @NotNull String @NotNull ... refs) {

@@ -45,6 +45,7 @@ public enum Category implements Provider {
     private final @NotNull String info;
     private final @NotNull Plugin[] plugins;
 
+    // TODO: Explicit
     private boolean selected = false;
     private boolean installed = false;
 
