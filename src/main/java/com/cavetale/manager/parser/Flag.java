@@ -67,7 +67,7 @@ public enum Flag {
     private final @NotNull String info;
     private final @Nullable String usage;
 
-    private @NotNull Sel sel = Sel.NONE;
+    private @NotNull Sel sel = Sel.OFF;
 
     Flag(@NotNull Character shotRef, @NotNull String info) {
         this.ref = shotRef;
@@ -115,15 +115,15 @@ public enum Flag {
     }
 
     public void select() {
-        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
+        if (this.sel == Sel.OFF) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {
-        return this.sel != Sel.NONE;
+        return this.sel != Sel.OFF;
     }
 
     public void reset() {
-        this.sel = Sel.NONE;
+        this.sel = Sel.OFF;
     }
 
     public @Nullable Container<?> container() {

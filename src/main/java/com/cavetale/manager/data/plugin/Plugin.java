@@ -165,7 +165,7 @@ public enum Plugin implements Provider {
     private final @NotNull String[] refs;
 
     // TODO: Custom printing
-    private @NotNull Sel sel = Sel.NONE;
+    private @NotNull Sel sel = Sel.OFF;
     // TODO: Linked?
     private final @NotNull List<String> installations = new LinkedList<>();
 
@@ -250,15 +250,15 @@ public enum Plugin implements Provider {
     }
 
     public void select() {
-        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
+        if (this.sel == Sel.OFF) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {
-        return this.sel != Sel.NONE;
+        return this.sel != Sel.OFF;
     }
 
     public void reset() {
-        this.sel = Sel.NONE;
+        this.sel = Sel.OFF;
     }
 
     public void clearInstallations() {

@@ -28,7 +28,7 @@ public enum Software {
     private final @NotNull Source source;
 
     // TODO: Custom printing
-    private @NotNull Sel sel = Sel.NONE;
+    private @NotNull Sel sel = Sel.OFF;
     private final @NotNull List<String> installations = new LinkedList<>();
 
     Software(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
@@ -59,15 +59,15 @@ public enum Software {
     }
 
     public void select() {
-        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
+        if (this.sel == Sel.OFF) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {
-        return this.sel != Sel.NONE;
+        return this.sel != Sel.OFF;
     }
 
     public void reset() {
-        this.sel = Sel.NONE;
+        this.sel = Sel.OFF;
     }
 
     public void clearInstallations() {

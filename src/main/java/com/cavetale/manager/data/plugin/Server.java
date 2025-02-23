@@ -36,7 +36,7 @@ public enum Server implements Provider {
     private final @NotNull Plugin[] plugins;
 
     // TODO: Custom printing
-    private @NotNull Sel sel = Sel.NONE;
+    private @NotNull Sel sel = Sel.OFF;
     private @Nullable Boolean inst = null;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
@@ -85,7 +85,7 @@ public enum Server implements Provider {
     }
 
     public void reset() {
-        this.sel = Sel.NONE;
+        this.sel = Sel.OFF;
         this.inst = null;
     }
 
@@ -100,11 +100,11 @@ public enum Server implements Provider {
     }
 
     public void select() {
-        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
+        if (this.sel == Sel.OFF) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {
-        return this.sel != Sel.NONE;
+        return this.sel != Sel.OFF;
     }
 
     //= Installation ==

@@ -471,7 +471,7 @@ public enum Command {
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
-    private @NotNull Sel sel = Sel.NONE;
+    private @NotNull Sel sel = Sel.OFF;
 
     Command(@NotNull String info, @NotNull String @NotNull ... refs) {
         this.refs = new String[refs.length + 1];
@@ -511,15 +511,15 @@ public enum Command {
     }
 
     public void select() {
-        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
+        if (this.sel == Sel.OFF) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {
-        return this.sel != Sel.NONE;
+        return this.sel != Sel.OFF;
     }
 
     public void reset() {
-        this.sel = Sel.NONE;
+        this.sel = Sel.OFF;
     }
 
     public static class NotFoundException extends InputException {
