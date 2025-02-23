@@ -4,7 +4,6 @@ import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Software;
-import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;

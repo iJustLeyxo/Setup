@@ -5,11 +5,15 @@ import com.cavetale.manager.download.*;
 import com.cavetale.manager.data.build.*;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
+import com.cavetale.manager.parser.Parser;
+import com.cavetale.manager.parser.container.PluginContainer;
 import com.cavetale.manager.util.Util;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -281,7 +285,7 @@ public enum Plugin implements Provider {
         }
         try {
             String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Plugins.FOLDER, file));
+            Util.download(this.source.uri(), new File(Plugin.FOLDER, file));
             this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
@@ -295,7 +299,7 @@ public enum Plugin implements Provider {
     public void update() {
         Console.log(Type.INFO, "Updating " + this.displayName() + " plugin");
 
-        File folder = Plugins.FOLDER; // Uninstall plugin
+        File folder = Plugin.FOLDER; // Uninstall plugin
         for (String fileName : this.installations) {
             File file = new File(folder, fileName);
             if (!Files.isSymbolicLink(file.toPath())) {
@@ -312,7 +316,7 @@ public enum Plugin implements Provider {
 
         try { // Install plugin
             String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Plugins.FOLDER, file));
+            Util.download(this.source.uri(), new File(Plugin.FOLDER, file));
             this.addInstallation(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
@@ -324,7 +328,7 @@ public enum Plugin implements Provider {
     }
 
     public void uninstall() {
-        File folder = Plugins.FOLDER;
+        File folder = Plugin.FOLDER;
         for (String fileName : this.installations) {
             Console.log(Type.INFO, "Uninstalling " + fileName);
             File file = new File(folder, fileName);
@@ -340,6 +344,16 @@ public enum Plugin implements Provider {
             }
         }
     }
+
+    //= Static ==
+
+    // TODO: Only resolve when requested
+    public static final @NotNull File FOLDER = new File("plugins/");
+
+    private static final @NotNull List<Plugin> selected = new LinkedList<>();
+    private static final @NotNull List<Plugin> installed = new LinkedList<>();
+    private static final @NotNull List<String> linked = new LinkedList<>();
+    private static final @NotNull List<String> unknown = new LinkedList<>();
 
     public static @NotNull Plugin get(@NotNull String ref) throws Plugin.PluginNotFoundException {
         for (Plugin p : Plugin.values()) if (p.displayName().equalsIgnoreCase(ref)) return p;
@@ -358,6 +372,169 @@ public enum Plugin implements Provider {
         for (Plugin p : Plugin.values()) if (ref.equalsIgnoreCase(p.displayName())) return p;
         throw new Plugin.PluginNotFoundException(ref);
     }
+
+    public static void reloadSelected(@NotNull Parser parser) {
+        Console.log(Type.EXTRA, "Reloading selected plugins\n");
+        for (Plugin p : Plugin.values()) p.reset(); // Reset plugin states
+        Plugin.selected.clear();
+
+        PluginContainer plugins = (PluginContainer) Flag.PLUGIN.container();
+        if (Flag.INSTALLED.isSelected()) {
+            Console.log(Type.DEBUG, "Selecting installed plugins\n");
+            for (Plugin p : Plugin.installed) p.target();
+        } else if (Flag.ALL.isSelected() ||  (Flag.PLUGIN.isSelected() && plugins.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting all plugins\n");
+            for (Plugin p : Plugin.values()) p.target();
+        } else {
+            Console.log(Type.DEBUG, "Selecting plugins " + plugins.get() + "\n");
+            for (Plugin p : plugins.get()) p.target(); // Select by plugin
+
+            for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.select(); // Select by category
+
+            for (Server s : Server.values()) if (s.isSelected()) for (Plugin p : s.plugins()) p.select(); // Select by server
+        }
+
+        for (Plugin p : Plugin.values()) if (p.isSelected()) Plugin.selected.add(p); // Update selection
+    }
+
+    public static void reloadInstallations() {
+        Console.log(Type.EXTRA, "Reloading installed plugins\n");
+        for (Plugin p : Plugin.values()) p.clearInstallations(); // Reset installations
+        Plugin.installed.clear();
+        Plugin.linked.clear();
+        Plugin.unknown.clear();
+        File folder = new File("plugins/"); // Scan installations
+        File[] files = folder.listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (f.isDirectory()) continue;
+            Plugin p = null;
+            try {
+                p = Plugin.get(f);
+            } catch (Plugin.NotAPluginException e) {
+                continue;
+            } catch (Plugin.PluginNotFoundException ignored) {}
+            if (Files.isSymbolicLink(f.toPath())) Plugin.linked.add(f.getName());
+            else {
+                if (p == null) {
+                    Plugin.unknown.add(f.getName());
+                    Console.log(Type.EXTRA, Style.WARN, "Unknown plugin " + f.getName());
+                } else p.addInstallation(f.getName());
+            }
+        }
+
+        for (Plugin p : Plugin.values()) if (p.isInstalled()) Plugin.installed.add(p); // Update installation
+    }
+
+    public static @NotNull List<Plugin> get(@Nullable Boolean installed, @Nullable Boolean selected) {
+        List<Plugin> plugins = new LinkedList<>();
+        for (Plugin p : Plugin.values()) {
+            if ((installed == null || installed == p.isInstalled()) &&
+                    (selected == null || selected == p.isSelected())) {
+                plugins.add(p);
+            }
+        }
+        return plugins;
+    }
+
+    public static @NotNull List<Plugin> installed() {
+        return Plugin.installed;
+    }
+
+    public static @NotNull List<Plugin> selected() {
+        return Plugin.selected;
+    }
+
+    public static @NotNull List<String> linked() {
+        return Plugin.linked;
+    }
+
+    public static @NotNull List<String> unknown() {
+        return Plugin.unknown;
+    }
+
+    public static void summarize() {
+        if (!Plugin.selected.isEmpty()) Plugin.summarizeSelected();
+        else if (!Plugin.installed.isEmpty()) Plugin.summarizeInstalled();
+        else {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins selected or installed\n");
+        }
+    }
+
+    private static void summarizeSelected() {
+        Console.sep();
+        List<Plugin> selected = Plugin.selected;
+        Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
+                " plugin(s) selected", 4, 21, selected.toArray());
+        selected = Plugin.get(true, true);
+        if (!selected.isEmpty()) {
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
+                    " plugin(s) installed", 4, 21, selected.toArray());
+        }
+        selected = Plugin.get(true, false);
+        if (!selected.isEmpty()) {
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
+                    " plugin(s) superfluous", 4, 21, selected.toArray());
+        }
+        selected = Plugin.get(false, true);
+        if (!selected.isEmpty()) {
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
+                    " plugin(s) missing", 4, 21, selected.toArray());
+        }
+    }
+
+    private static void summarizeInstalled() {
+        List<Plugin> installed = Plugin.installed;
+        installed.remove(null);
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.INSTALL, installed.size() +
+                " plugin(s) installed", 4, 21, installed.toArray());
+        List<String> linked = Plugin.linked;
+        if (!linked.isEmpty()) {
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.LINK, linked.size() +
+                    " plugin(s) linked", 4, 21, linked.toArray());
+        }
+        List<String> unknown = Plugin.unknown;
+        if (!unknown.isEmpty()) {
+            Console.sep();
+            Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
+                    " plugin(s) unknown", 4, 21, unknown.toArray());
+        }
+    }
+
+    public static void listSelected() {
+        if (Plugin.selected.isEmpty()) {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins selected\n");
+            return;
+        }
+
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.selected.size() + " plugin(s) selected", 4, 21, Plugin.selected.toArray());
+    }
+
+    public static void listInstalled() {
+        if (Plugin.installed.isEmpty()) {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins installed\n");
+            return;
+        }
+
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.installed.size() + " plugin(s) installed", 4, 21, Plugin.installed.toArray());
+    }
+
+    public static void list() {
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.values().length + " plugin(s) available", 4, 21, (Object[]) Plugin.values());
+    }
+
+    //= Exceptions ==
 
     public static class PluginNotFoundException extends InputException {
         public PluginNotFoundException(@NotNull String ref) {
