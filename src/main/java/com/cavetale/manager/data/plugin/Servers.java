@@ -6,7 +6,7 @@ import com.cavetale.manager.parser.container.ServerContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,7 +69,7 @@ public final class Servers {
         else if (!Servers.installed.isEmpty()) Servers.summarizeInstalled();
         else {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.SERVER, XCode.BOLD + "No servers selected or installed\n");
+            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers selected or installed\n");
         }
     }
 
@@ -106,7 +106,7 @@ public final class Servers {
     public static void listSelected() {
         if (Servers.selected.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.SERVER, XCode.BOLD + "No servers selected\n");
+            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers selected\n");
             return;
         }
 
@@ -117,7 +117,7 @@ public final class Servers {
     public static void listInstalled() {
         if (Servers.installed.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.SERVER, XCode.BOLD + "No servers installed\n");
+            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers installed\n");
             return;
         }
 

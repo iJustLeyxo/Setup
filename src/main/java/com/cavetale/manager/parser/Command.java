@@ -9,7 +9,7 @@ import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -361,7 +361,7 @@ public enum Command {
                 if (!installations.isEmpty()) {
                     if (installations.size() > 1) Console.log(Type.WARN, software.displayName() + " has multiple installations\n");
                     String installation = installations.getFirst();
-                    Console.log(Type.INFO, "Running " + installation + "\n\n" + XCode.RESET);
+                    Console.log(Type.INFO, "Running " + installation + "\n\n" + Code.RESET);
 
                     try {
                         ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
@@ -388,12 +388,12 @@ public enum Command {
 
                         Thread outThread = new Thread(() -> {
                             try {
-                                System.out.print(XCode.GRAY + "[" + software.displayName() + "] " + XCode.RESET);
+                                System.out.print(Code.DARK_GRAY_FG + "[" + software.displayName() + "] " + Code.RESET);
                                 int i = outStream.read(); // i: current char
                                 while(0 <= i) {
                                     System.out.write(i);
                                     System.out.flush();
-                                    if (i == '\n') System.out.print(XCode.GRAY + "[" + software.displayName() + "] " + XCode.RESET);
+                                    if (i == '\n') System.out.print(Code.DARK_GRAY_FG + "[" + software.displayName() + "] " + Code.RESET);
                                     i = outStream.read();
                                 }
                                 inThread.interrupt();

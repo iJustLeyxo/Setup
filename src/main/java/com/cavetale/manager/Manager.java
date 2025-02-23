@@ -6,7 +6,7 @@ import com.cavetale.manager.parser.*;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 
 import java.util.*;
 
@@ -72,12 +72,12 @@ public final class Manager {
     }
 
     public static void help() {
-        Console.log(Type.REQUESTED, Style.HELP, XCode.BOLD +
+        Console.log(Type.REQUESTED, Style.HELP, Code.BOLD +
                 "---------------------------------------- " +
-                "Help -----------------------------------------\n" + XCode.WEIGHT_OFF +
+                "Help -----------------------------------------\n" + Code.WEIGHT_OFF +
                 "Interactive: java -jar Manager.jar\n" +
                 "Single: java -jar Manager.jar <command>\n" +
-                "Command: <flag(s)> <command(s)> <flag(s)>\n\n" + XCode.BOLD +
+                "Command: <flag(s)> <command(s)> <flag(s)>\n\n" + Code.BOLD +
                 "-------------------------------------- " +
                 "Commands ---------------------------------------\n");
         Console.logF(Type.REQUESTED, Style.HELP, "%-16s | %-68s\n", "Command", "Info");
@@ -89,7 +89,7 @@ public final class Manager {
             Console.logF(Type.REQUESTED, Style.HELP, "%-16s | %-68s\n",
                     c.refs[0], c.info);
         }
-        Console.log(Type.REQUESTED, Style.HELP, XCode.BOLD +
+        Console.log(Type.REQUESTED, Style.HELP, Code.BOLD +
                 "\n--------------------------------------- " +
                 "Flags -----------------------------------------\n");
         Console.logF(Type.REQUESTED, Style.HELP, "%-16s | %-32s | %-33s\n", "Flag", "Info", "Usage");

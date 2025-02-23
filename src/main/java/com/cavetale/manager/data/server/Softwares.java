@@ -6,7 +6,7 @@ import com.cavetale.manager.parser.container.SoftwareContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,7 +92,7 @@ public final class Softwares {
         else if (!Softwares.installed().isEmpty()) Softwares.summarizeInstalled(); // Show installed software if nothing is selected
         else {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.SOFTWARE, XCode.BOLD + "No software selected or installed\n");
+            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software selected or installed\n");
         }
     }
 
@@ -138,7 +138,7 @@ public final class Softwares {
     public static void listSelected() {
         if (Softwares.selected.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.SOFTWARE, XCode.BOLD + "No software selected\n");
+            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software selected\n");
             return;
         }
 
@@ -149,7 +149,7 @@ public final class Softwares {
     public static void listInstalled() {
         if (Softwares.installed.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.SOFTWARE, XCode.BOLD + "No software installed\n");
+            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software installed\n");
             return;
         }
 

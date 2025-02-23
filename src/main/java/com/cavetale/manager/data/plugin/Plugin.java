@@ -22,7 +22,6 @@ import java.util.List;
  * List of available plugins
  */
 public enum Plugin implements Provider {
-    // TODO: Names
     ADVENTURE, // TODO: Status?
     ADVICE_ANIMALS(Parent.of("com.winthier")), // TODO: Status?
     A_F_K,
@@ -164,7 +163,6 @@ public enum Plugin implements Provider {
     private final @NotNull Plugin[] plugins;
     private final @NotNull String[] refs;
 
-    // TODO: Custom printing
     private @NotNull Sel sel = Sel.OFF;
     // TODO: Linked?
     private final @NotNull List<String> installations = new LinkedList<>();

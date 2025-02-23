@@ -6,7 +6,7 @@ import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +49,6 @@ public enum Category implements Provider {
     private final @NotNull String info;
     private final @NotNull Plugin[] plugins;
 
-    // TODO: Custom printing
     private @NotNull Sel sel = Sel.OFF;
     private @Nullable Boolean inst = null;
 
@@ -135,7 +134,7 @@ public enum Category implements Provider {
 
     public static void list() {
         Console.sep();
-        Console.log(Type.REQUESTED, Style.CATEGORY, XCode.BOLD +
+        Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD +
                 "-------------------------------------- " +
                 "Categories -------------------------------------\n");
         Console.logF(Type.REQUESTED, Style.CATEGORY, "%-16s | %-68s\n", "Category", "Info");

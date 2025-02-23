@@ -6,7 +6,7 @@ import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -137,7 +137,7 @@ public enum Server implements Provider {
 
     public static void list() {
         Console.sep();
-        Console.log(Type.REQUESTED, Style.SERVER, XCode.BOLD +
+        Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD +
                 "--------------------------------------- " +
                 "Servers ---------------------------------------\n");
         Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", "Server", "Info");

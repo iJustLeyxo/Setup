@@ -6,7 +6,7 @@ import com.cavetale.manager.parser.container.CategoryContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +70,7 @@ public final class Categories {
         else if (!Categories.installed.isEmpty()) Categories.summarizeInstalled();
         else {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.CATEGORY, XCode.BOLD +  "No categories selected or installed\n");
+            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD +  "No categories selected or installed\n");
         }
     }
 
@@ -110,7 +110,7 @@ public final class Categories {
     public static void listSelected() {
         if (Categories.selected.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.CATEGORY, XCode.BOLD + "No categories selected\n");
+            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories selected\n");
             return;
         }
 
@@ -121,7 +121,7 @@ public final class Categories {
     public static void listInstalled() {
         if (Categories.installed.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.CATEGORY, XCode.BOLD + "No categories installed\n");
+            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories installed\n");
             return;
         }
 

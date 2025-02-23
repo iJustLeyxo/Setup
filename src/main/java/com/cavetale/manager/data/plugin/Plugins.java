@@ -6,7 +6,7 @@ import com.cavetale.manager.parser.container.PluginContainer;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
+import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,7 +109,7 @@ public final class Plugins {
         else if (!Plugins.installed.isEmpty()) Plugins.summarizeInstalled();
         else {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.PLUGIN, XCode.BOLD + "No plugins selected or installed\n");
+            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins selected or installed\n");
         }
     }
 
@@ -161,7 +161,7 @@ public final class Plugins {
     public static void listSelected() {
         if (Plugins.selected.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.PLUGIN, XCode.BOLD + "No plugins selected\n");
+            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins selected\n");
             return;
         }
 
@@ -172,7 +172,7 @@ public final class Plugins {
     public static void listInstalled() {
         if (Plugins.installed.isEmpty()) {
             Console.sep();
-            Console.log(Type.REQUESTED, Style.PLUGIN, XCode.BOLD + "No plugins installed\n");
+            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins installed\n");
             return;
         }
 
