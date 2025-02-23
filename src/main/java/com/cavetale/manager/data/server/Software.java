@@ -43,10 +43,9 @@ public enum Software {
         return this.refs[0];
     }
 
-    // TODO: What?
     @Override
     public @NotNull String toString() {
-        return this.refs[0];
+        return this.displayName();
     }
 
     //= Selection ==

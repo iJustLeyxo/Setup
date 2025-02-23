@@ -66,6 +66,11 @@ public enum Server implements Provider {
         return this.name;
     }
 
+    @Override
+    public @NotNull String toString() {
+        return this.displayName();
+    }
+
     public @NotNull Server[] servers() {
         return this.servers;
     }

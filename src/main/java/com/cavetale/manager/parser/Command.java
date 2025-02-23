@@ -484,6 +484,11 @@ public enum Command {
         return this.refs[0];
     }
 
+    @Override
+    public @NotNull String toString() {
+        return this.displayName();
+    }
+
     public abstract void run(@NotNull Parser parser);
 
     public void help(@NotNull Parser parser) {

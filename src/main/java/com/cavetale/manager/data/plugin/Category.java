@@ -78,13 +78,13 @@ public enum Category implements Provider {
     }
 
     @Override
-    public Plugin[] plugins() {
-        return this.plugins;
+    public @NotNull String toString() {
+        return this.displayName();
     }
 
     @Override
-    public @NotNull String toString() {
-        return this.displayName();
+    public Plugin[] plugins() {
+        return this.plugins;
     }
 
     public void reset() {

@@ -90,6 +90,11 @@ public enum Flag {
         return this.name;
     }
 
+    @Override
+    public @NotNull String toString() {
+        return this.displayName();
+    }
+
     public @NotNull String info() {
         return this.info;
     }

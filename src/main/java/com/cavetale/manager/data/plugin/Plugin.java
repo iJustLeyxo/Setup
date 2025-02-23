@@ -230,13 +230,13 @@ public enum Plugin implements Provider {
     }
 
     @Override
-    public @NotNull Plugin[] plugins() {
-        return this.plugins;
+    public @NotNull String toString() {
+        return this.displayName();
     }
 
     @Override
-    public @NotNull String toString() {
-        return this.displayName();
+    public @NotNull Plugin[] plugins() {
+        return this.plugins;
     }
 
     //= Selection ==
