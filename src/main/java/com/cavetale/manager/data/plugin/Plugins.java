@@ -26,23 +26,23 @@ public final class Plugins {
 
     public static void reloadSelected(@NotNull Parser parser) {
         Console.log(Type.EXTRA, "Reloading selected plugins\n");
-        for (Plugin p : Plugin.values()) p.setSelected(false); // Reset selections
+        for (Plugin p : Plugin.values()) p.reset(); // Reset plugin states
         Plugins.selected.clear();
 
         PluginContainer plugins = (PluginContainer) Flag.plugin.container();
         if (Flag.installed.isSelected()) {
             Console.log(Type.DEBUG, "Selecting installed plugins\n");
-            for (Plugin p : Plugins.installed) p.setSelected(true);
+            for (Plugin p : Plugins.installed) p.target();
         } else if (Flag.all.isSelected() ||  (Flag.plugin.isSelected() && plugins.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all plugins\n");
-            for (Plugin p : Plugin.values()) p.setSelected(true);
+            for (Plugin p : Plugin.values()) p.target();
         } else {
             Console.log(Type.DEBUG, "Selecting plugins " + plugins.get() + "\n");
-            for (Plugin p : plugins.get()) p.setSelected(true); // Select by plugin
+            for (Plugin p : plugins.get()) p.target(); // Select by plugin
 
-            for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.setSelected(true); // Select by category
+            for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.select(); // Select by category
 
-            for (Server s : Server.values()) if (s.isSelected()) for (Plugin p : s.plugins()) p.setSelected(true); // Select by server
+            for (Server s : Server.values()) if (s.isSelected()) for (Plugin p : s.plugins()) p.select(); // Select by server
         }
 
         for (Plugin p : Plugin.values()) if (p.isSelected()) Plugins.selected.add(p); // Update selection

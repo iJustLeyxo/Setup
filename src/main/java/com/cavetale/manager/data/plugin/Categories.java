@@ -19,21 +19,21 @@ public final class Categories {
 
     public static void reloadSelected(@NotNull Parser parser) {
         Console.log(Type.EXTRA, "Reloading selected categories\n");
-        for (Category c : Category.values()) c.setSelected(false); // Reset selections
+        for (Category c : Category.values()) c.reset(); // Reset category states
         Categories.selected.clear();
 
         CategoryContainer categories = (CategoryContainer) Flag.category.container();
         if (Flag.installed.isSelected()) {
             Console.log(Type.DEBUG, "Selecting installed categories\n");
-            for (Category c : Categories.installed) c.setSelected(true);
+            for (Category c : Categories.installed) c.target();
         } else if (Flag.all.isSelected() || (Flag.category.isSelected() && categories.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all categories\n");
-            for (Category c : Category.values()) c.setSelected(true);
+            for (Category c : Category.values()) c.target();
         } else {
             Console.log(Type.DEBUG, "Selecting categories " + categories.get() + "\n"); // Select by category
-            for (Category c : categories.get()) c.setSelected(true);
+            for (Category c : categories.get()) c.target();
 
-            for (Server s : Server.values()) if (s.isSelected()) for (Category c : s.categories()) c.setSelected(true); // Select by server
+            for (Server s : Server.values()) if (s.isSelected()) for (Category c : s.categories()) c.select(); // Select by server
         }
 
         for (Category c : Category.values()) if (c.isSelected()) Categories.selected.add(c); // Update selection

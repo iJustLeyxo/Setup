@@ -164,8 +164,9 @@ public enum Plugin implements Provider {
     private final @NotNull Plugin[] plugins;
     private final @NotNull String[] refs;
 
-    // TODO: Explicit
-    private boolean selected = false;
+    // TODO: Custom printing
+    private @NotNull Sel sel = Sel.NONE;
+    // TODO: Compute on request
     private boolean installed = false;
     // TODO: Linked?
     private final @NotNull List<String> installations = new LinkedList<>();
@@ -232,12 +233,26 @@ public enum Plugin implements Provider {
         return this.name();
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public boolean isTargeted() {
+        return this.sel == Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.NONE;
+    }
+
+    public void reset() {
+        this.sel = Sel.NONE;
     }
 
     public void clearInstallations() {

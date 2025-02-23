@@ -1,5 +1,6 @@
 package com.cavetale.manager.data.plugin;
 
+import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.parser.InputException;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -45,8 +46,9 @@ public enum Category implements Provider {
     private final @NotNull String info;
     private final @NotNull Plugin[] plugins;
 
-    // TODO: Explicit
-    private boolean selected = false;
+    // TODO: Custom printing
+    private @NotNull Sel sel = Sel.NONE;
+    // TODO: Compute on request
     private boolean installed = false;
 
     Category(@NotNull String info, @NotNull Plugin @NotNull ... plugins) {
@@ -77,12 +79,26 @@ public enum Category implements Provider {
         return this.name();
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public boolean isTargeted() {
+        return this.sel == Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.NONE;
+    }
+
+    public void reset() {
+        this.sel = Sel.NONE;
     }
 
     public void setInstalled() {

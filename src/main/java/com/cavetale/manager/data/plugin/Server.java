@@ -1,5 +1,6 @@
 package com.cavetale.manager.data.plugin;
 
+import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.parser.InputException;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -26,13 +27,14 @@ public enum Server implements Provider {
     Mine("Plugins for mine servers", Base, Survival, Category.Build, Category.Mine),
     Void("Plugins for void servers", Base);
 
-    // TODO: Explicit
     private final @NotNull String info;
     private final @NotNull Server[] servers;
     private final @NotNull Category[] categories;
     private final @NotNull Plugin[] plugins;
 
-    private boolean selected = false;
+    // TODO: Custom printing
+    private @NotNull Sel sel = Sel.NONE;
+    // TODO: Compute on request
     private boolean installed = false;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
@@ -69,12 +71,26 @@ public enum Server implements Provider {
         return this.plugins;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public boolean isTargeted() {
+        return this.sel == Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.NONE;
+    }
+
+    public void reset() {
+        this.sel = Sel.NONE;
     }
 
     public void setInstalled() {

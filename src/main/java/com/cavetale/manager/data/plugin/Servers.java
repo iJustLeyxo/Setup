@@ -20,19 +20,19 @@ public final class Servers {
 
     public static void reloadSelected(@NotNull Parser parser) {
         Console.log(Type.EXTRA, "Reloading selected servers\n");
-        for (Server s : Server.values()) s.setSelected(false); // Reset selections
+        for (Server s : Server.values()) s.reset(); // Reset selections
         Servers.selected.clear();
 
         ServerContainer servers = (ServerContainer) Flag.server.container();
         if (Flag.installed.isSelected()) {
-            for (Server s : Servers.installed) s.setSelected(true);
+            for (Server s : Servers.installed) s.target();
             Console.log(Type.DEBUG, "Selecting installed servers\n");
         } else if (Flag.all.isSelected() || (Flag.server.isSelected() && servers.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all servers\n");
-            for (Server s : Server.values()) s.setSelected(true);
+            for (Server s : Server.values()) s.target();
         } else {
             Console.log(Type.DEBUG, "Selecting servers " + servers.get() + "\n");
-            for (Server s : servers.get()) s.setSelected(true); // Select by server
+            for (Server s : servers.get()) s.target(); // Select by server
         }
 
         for (Server s : Server.values()) if (s.isSelected()) Servers.selected.add(s); // Update selection

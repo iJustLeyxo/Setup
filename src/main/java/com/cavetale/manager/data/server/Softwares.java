@@ -23,19 +23,19 @@ public final class Softwares {
 
     public static void reloadSelected(@NotNull Parser parser) {
         Console.log(Type.EXTRA, "Reloading selected software\n");
-        for (Software s : Software.values()) s.setSelected(false); // Reset selections
+        for (Software s : Software.values()) s.reset(); // Reset selections
         Softwares.selected.clear();
 
         SoftwareContainer softwares = (SoftwareContainer) Flag.software.container();
         if (Flag.installed.isSelected()) {
             Console.log(Type.DEBUG, "Selecting installed software\n");
-            for (Software s : Softwares.installed) s.setSelected(true);
+            for (Software s : Softwares.installed) s.target();
         } else if (Flag.all.isSelected() || (Flag.software.isSelected() && softwares.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all software\n");
-            for (Software s : Software.values()) s.setSelected(true);
+            for (Software s : Software.values()) s.target();
         } else {
             Console.log(Type.DEBUG, "Selecting servers " + softwares.get() + "\n");
-            for (Software s : softwares.get()) s.setSelected(true); // Select by software
+            for (Software s : softwares.get()) s.target(); // Select by software
         }
 
         for (Software s : Software.values()) if (s.isSelected()) Softwares.selected.add(s); // Update selection

@@ -1,6 +1,7 @@
 package com.cavetale.manager.data.server;
 
 import com.cavetale.manager.data.DataException;
+import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.download.Source;
 import com.cavetale.manager.download.Ver;
 import com.cavetale.manager.parser.Flag;
@@ -26,8 +27,8 @@ public enum Software {
     private final @NotNull Source source;
     private final @NotNull String[] refs;
 
-    // TODO: Explicit
-    private boolean selected = false;
+    // TODO: Custom printing
+    private @NotNull Sel sel = Sel.NONE;
     private final @NotNull List<String> installations = new LinkedList<>();
 
     Software(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
@@ -42,12 +43,26 @@ public enum Software {
         return this.refs[0];
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public boolean isTargeted() {
+        return this.sel == Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.NONE;
+    }
+
+    public void reset() {
+        this.sel = Sel.NONE;
     }
 
     public void clearInstallations() {
