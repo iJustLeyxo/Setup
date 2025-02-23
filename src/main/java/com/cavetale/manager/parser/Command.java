@@ -1,6 +1,7 @@
 package com.cavetale.manager.parser;
 
 import com.cavetale.manager.Manager;
+import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Software;
 import com.cavetale.manager.data.server.Softwares;
@@ -470,8 +471,7 @@ public enum Command {
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
-    // TODO: Explicit
-    private boolean selected = false;
+    private @NotNull Sel sel = Sel.NONE;
 
     Command(@NotNull String info, @NotNull String @NotNull ... refs) {
         this.refs = new String[refs.length + 1];
@@ -500,12 +500,26 @@ public enum Command {
         throw new NotFoundException(ref);
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public boolean isTargeted() {
+        return this.sel == Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.NONE;
+    }
+
+    public void reset() {
+        this.sel = Sel.NONE;
     }
 
     public static class NotFoundException extends InputException {

@@ -1,5 +1,6 @@
 package com.cavetale.manager.parser;
 
+import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.parser.container.*;
 import com.cavetale.manager.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -66,7 +67,7 @@ public enum Flag {
     private final @NotNull String info;
     private final @Nullable String usage;
 
-    private boolean selected = false;
+    private @NotNull Sel sel = Sel.NONE;
 
     Flag(@NotNull Character shotRef, @NotNull String info) {
         this.ref = shotRef;
@@ -103,12 +104,26 @@ public enum Flag {
         return this.usage;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public boolean isTargeted() {
+        return this.sel == Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel == Sel.NONE) this.sel = Sel.NORMAL;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.NONE;
+    }
+
+    public void reset() {
+        this.sel = Sel.NONE;
     }
 
     public @Nullable Container<?> container() {

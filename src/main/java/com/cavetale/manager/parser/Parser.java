@@ -28,9 +28,9 @@ public final class Parser {
     public Parser(@NotNull String arg) throws InputException {
         Console.log(Type.EXTRA, "Parsing input\n");
 
-        for (Command c : Command.values()) c.setSelected(false); // Reset commands and flags
+        for (Command c : Command.values()) c.target(); // Reset commands and flags
         for (Flag f : Flag.values()) {
-            f.setSelected(false);
+            f.target();
             Container<?> container = f.container();
             if (container != null) container.clear();
         }
@@ -52,7 +52,7 @@ public final class Parser {
         if (builder.isEmpty()) this.command = null;
         else {
             this.command = Command.get(builder.toString());
-            this.command.setSelected(true);
+            this.command.target();
         }
 
         this.args.addAll(this.arg()); // Parse command arguments
@@ -82,13 +82,13 @@ public final class Parser {
 
             Console.log(Type.DEBUG, "Parsed flag --" + builder + "\n");
             flag = Flag.get(builder.toString());
-            flag.setSelected(true);
+            flag.target();
         } else if (chars[i + 1] != ' ' && chars[i + 1] != '-') { // Parse short flag(s)
             for (i++; i < chars.length; i++) {
                 char c = chars[i];
                 if (c == ' ' || c == '-') break;
                 flag = Flag.get(c);
-                flag.setSelected(true);
+                flag.target();
                 Console.log(Type.DEBUG, "Parsed flag -" + c + "\n");
             }
         } else {
