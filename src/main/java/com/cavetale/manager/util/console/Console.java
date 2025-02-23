@@ -29,6 +29,64 @@ public final class Console {
     }
 
     /**
+     * Logs a type to console
+     * @param type Type and style to log
+     * @return {@code true} if the style was logged and not held back due to verbosity
+     */
+    public static boolean log(@NotNull Type type) {
+        return Console.log(type, type.style, "");
+    }
+
+    /**
+     * Logs a style to console
+     * @param type Type of style to log
+     * @param style Style to override the default style of the specified type
+     * @return {@code true} if the style was logged and not held back due to verbosity
+     */
+    public static boolean log(@NotNull Type type, @NotNull Style style) {
+        return Console.log(type, style, "");
+    }
+
+    /**
+     * Logs a message to console
+     * @param type Type of message to log using the default style of the type
+     * @return {@code true} if the style was logged and not held back due to verbosity
+     */
+    public static boolean log(@NotNull Type type, @NotNull String msg) {
+        return Console.log(type, type.style, msg);
+    }
+
+    /**
+     * Logs an exception to console
+     * @param type Type of message to log
+     * @param t Exception to log
+     * @return {@code true} if the exception was logged and not held back due to verbosity
+     */
+    public static boolean log(@NotNull Type type, @NotNull Throwable t) {
+        if (!Console.logs(type)) return false;
+        Console.sep();
+        Console.log(type);
+        Console.logR(t);
+        Console.sep();
+        return true;
+    }
+
+    /**
+     * Attempts to log msg with main style under secondary visibility. When failed, logs under main visibility and with extra msg.
+     * @param sec Secondary type
+     * @param main Main type
+     * @param extra Extra message
+     * @param msg Main message
+     * @return {@code true} in case something was logged
+     */
+    public static boolean log(@NotNull Type sec, @NotNull Type main, @NotNull String extra, @NotNull String msg) {
+        if (!Console.log(sec, main.style, msg)) {
+            return Console.log(main, extra + msg);
+        }
+        return true;
+    }
+
+    /**
      * Logs a formatted message to console
      * @param type Type of message to log
      * @param style Style to override the default style of the specified type
@@ -74,49 +132,6 @@ public final class Console {
         String s = b.toString();
         if (!s.endsWith("\n")) s += "\n";
         Console.log(type, style, s);
-        return true;
-    }
-
-    /**
-     * Logs a type to console
-     * @param type Type and style to log
-     * @return {@code true} if the style was logged and not held back due to verbosity
-     */
-    public static boolean log(@NotNull Type type) {
-        return Console.log(type, type.style, "");
-    }
-
-    /**
-     * Logs a style to console
-     * @param type Type of style to log
-     * @param style Style to override the default style of the specified type
-     * @return {@code true} if the style was logged and not held back due to verbosity
-     */
-    public static boolean log(@NotNull Type type, @NotNull Style style) {
-        return Console.log(type, style, "");
-    }
-
-    /**
-     * Logs a message to console
-     * @param type Type of message to log using the default style of the type
-     * @return {@code true} if the style was logged and not held back due to verbosity
-     */
-    public static boolean log(@NotNull Type type, @NotNull String msg) {
-        return Console.log(type, type.style, msg);
-    }
-
-    /**
-     * Logs an exception to console
-     * @param type Type of message to log
-     * @param t Exception to log
-     * @return {@code true} if the exception was logged and not held back due to verbosity
-     */
-    public static boolean log(@NotNull Type type, @NotNull Throwable t) {
-        if (!Console.logs(type)) return false;
-        Console.sep();
-        Console.log(type);
-        Console.logR(t);
-        Console.sep();
         return true;
     }
 

@@ -1,7 +1,9 @@
 package com.cavetale.manager.data.plugin;
 
+import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.DataError;
 import com.cavetale.manager.data.DataException;
+import com.cavetale.manager.data.Installable;
 import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.data.build.*;
 import com.cavetale.manager.download.Source;
@@ -27,7 +29,7 @@ import java.util.List;
 /**
  * List of available plugins
  */
-public enum Plugin implements Provider {
+public enum Plugin implements Provider, Installable {
     ADVENTURE, // TODO: Status?
     ADVICE_ANIMALS(Parent.of("com.winthier")), // TODO: Status?
     A_F_K,
@@ -165,9 +167,9 @@ public enum Plugin implements Provider {
     WORLDS(Parent.of("com.winthier")),
     X_MAS;
 
+    private final @NotNull String[] refs;
     private final @NotNull Source source;
     private final @NotNull Plugin[] plugins;
-    private final @NotNull String[] refs;
 
     private @Nullable Sel sel = null;
     // TODO: Linked?
@@ -229,8 +231,19 @@ public enum Plugin implements Provider {
         this.plugins = new Plugin[]{this};
     }
 
+    @Override
     public @NotNull String displayName() {
         return this.refs[0];
+    }
+
+    @Override
+    public @NotNull Source source() {
+        return this.source;
+    }
+
+    @Override
+    public @NotNull File downloads() {
+        return Plugin.FOLDER;
     }
 
     @Override
@@ -274,79 +287,9 @@ public enum Plugin implements Provider {
         return this.inst;
     }
 
+    @Override
     public boolean isInstalled() {
         return !this.installations().isEmpty();
-    }
-
-    //= Actions ==
-
-    public void install() {
-        Console.log(Type.INFO, "Installing " + this.displayName() + " plugin");
-        if (this.isInstalled()) {
-            if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
-                Console.log(Type.WARN, "Installing " + this.displayName() + " plugin skipped (already installed)\n");
-            }
-            return;
-        }
-        try {
-            String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Plugin.FOLDER, file));
-            this.installations().add(file);
-            Console.log(Type.INFO, Style.DONE, " done\n");
-        } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Installing " + this.displayName() + " plugin failed (" + e.getMessage() + ")\n");
-            }
-            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
-        }
-    }
-
-    public void update() {
-        Console.log(Type.INFO, "Updating " + this.displayName() + " plugin");
-
-        // Uninstall plugin
-        for (String fileName : this.installations()) {
-            File file = new File(Plugin.FOLDER, fileName);
-            if (!Files.isSymbolicLink(file.toPath())) {
-                if (file.delete()) continue;
-                if (!Console.log(Type.EXTRA, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                    Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - failed to delete " + file + "\n");
-                }
-            } else if (!Console.log(Type.EXTRA, Style.ERR, " failed - skipped " + file + " (linked)\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - skipped " + file + " (linked)\n");
-            }
-            return;
-        }
-        this.installations().clear();
-
-        try { // Install plugin
-            String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Plugin.FOLDER, file));
-            this.installations().add(file);
-            Console.log(Type.INFO, Style.DONE, " done\n");
-        } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - failed to download (" + e.getMessage() + ")\n");
-            }
-            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
-        }
-    }
-
-    public void uninstall() {
-        for (String fileName : this.installations()) {
-            Console.log(Type.INFO, "Uninstalling " + fileName);
-            File file = new File(Plugin.FOLDER, fileName);
-            if (!Files.isSymbolicLink(file.toPath())) {
-                if (file.delete()) {
-                    this.installations().remove(fileName);
-                    Console.log(Type.INFO, Style.DONE, " done\n");
-                } else if (!Console.log(Type.EXTRA, Style.ERR, " failed\n")) {
-                    Console.log(Type.ERR, "Uninstalling " + file + " plugin failed\n");
-                }
-            } else if (!Console.log(Type.EXTRA, Style.WARN, " skipped (linked)\n")) {
-                Console.log(Type.WARN, "Uninstalling " + file + " plugin skipped (linked)\n");
-            }
-        }
     }
 
     //= Finder ==

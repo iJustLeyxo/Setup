@@ -1,6 +1,7 @@
 package com.cavetale.manager.data.server;
 
 import com.cavetale.manager.data.DataException;
+import com.cavetale.manager.data.Installable;
 import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.data.plugin.Plugin;
 import com.cavetale.manager.download.Source;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  * Server software, used to register downloadable server software
  */
-public enum Software {
+public enum Software implements Installable {
     PAPER(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
 
     private final @NotNull String[] refs;
@@ -42,8 +43,19 @@ public enum Software {
         this.source = new Source.Other(uri, ver);
     }
 
+    @Override
     public @NotNull String displayName() {
         return this.refs[0];
+    }
+
+    @Override
+    public @NotNull Source source() {
+        return this.source;
+    }
+
+    @Override
+    public @NotNull File downloads() {
+        return Software.FOLDER;
     }
 
     @Override
@@ -85,66 +97,7 @@ public enum Software {
         return !this.installations().isEmpty();
     }
 
-    //= Actions ==
-
-    public void install() {
-        Console.log(Type.INFO, "Installing " + this.displayName() + " software");
-        if (this.isInstalled()) {
-            if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
-                Console.log(Type.WARN, "Installing " + this.displayName() + " software skipped (already installed)\n");
-            }
-            return;
-        }
-        try {
-            String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Software.FOLDER, file));
-            this.installations().add(file);
-            Console.log(Type.INFO, Style.DONE, " done\n");
-        } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Installing " + this.displayName() + " software failed (" + e.getMessage() + ")\n");
-            }
-            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
-        }
-    }
-
-    public void update() {
-        Console.log(Type.INFO, "Updating " + this.displayName() + " software"); // Uninstall software
-        for (String file : this.installations()) {
-            if (new File(Software.FOLDER, file).delete()) continue;
-            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to delete " + file + "\n");
-            }
-            return;
-        }
-        this.installations().clear();
-
-        try { // Install software
-            String file = this.displayName() + "-" + source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Software.FOLDER, file));
-            this.installations().add(file);
-            Console.log(Type.INFO, Style.DONE, " done\n");
-        } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to download (" + e.getMessage() + ")\n");
-            }
-            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
-        }
-    }
-
-    public void uninstall() {
-        for (String f : this.installations()) {
-            Console.log(Type.INFO, "Uninstalling " + f + " software");
-            if (new File(Software.FOLDER, f).delete()) {
-                Console.log(Type.INFO, Style.DONE, " done\n");
-                continue;
-            }
-            if (!Console.log(Type.INFO, Style.ERR, " failed\n")) {
-                Console.log(Type.ERR, "Uninstalling " + f + " software failed\n");
-            }
-        }
-        this.installations().clear();
-    }
+    //= Finder ==
 
     public static @NotNull Software get(@NotNull String ref) throws SoftwareNotFoundException {
         for (Software s : Software.values()) for (String r : s.refs) if (r.equalsIgnoreCase(ref)) return s;
