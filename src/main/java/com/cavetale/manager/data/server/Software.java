@@ -2,6 +2,7 @@ package com.cavetale.manager.data.server;
 
 import com.cavetale.manager.data.DataException;
 import com.cavetale.manager.data.Sel;
+import com.cavetale.manager.data.plugin.Plugin;
 import com.cavetale.manager.download.Source;
 import com.cavetale.manager.download.Ver;
 import com.cavetale.manager.parser.Flag;
@@ -248,78 +249,57 @@ public enum Software {
         return software;
     }
 
-    public static void summarize() {
-        if (!Software.selected().isEmpty()) Software.summarizeSelected(); // Compare selected to installed software
-        else if (!Software.installed().isEmpty()) Software.summarizeInstalled(); // Show installed software if nothing is selected
-        else {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software selected or installed\n");
-        }
-    }
+    //= Cosmetics ==
 
-    private static void summarizeSelected() {
+    public static void requestAll() {
         Console.sep();
-        List<Software> selected = Software.selected();
-        Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
-                " software selected", 4, 21, selected.toArray());
-        selected = Software.get(true, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
-                    " software installed", 4, 21, selected.toArray());
-        }
-        selected = Software.get(true, false);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
-                    " software superfluous", 4, 21, selected.toArray());
-        }
-        selected = Software.get(false, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
-                    " software missing", 4, 21, selected.toArray());
-        }
-    }
 
-    private static void summarizeInstalled() {
-        Console.sep();
-        List<Software> installed = Software.installed();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, installed.size() +
-                " software installed", 4, 21, installed.toArray());
-        List<String> unknown = Software.unknown(); // Always show unknown software
-        if (!unknown.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
-                    " software unknown", 4, 21, unknown.toArray());
-        }
-    }
-
-    public static void listSelected() {
-        if (Software.selected().isEmpty()) {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software selected\n");
+        if (Software.values().length == 0) {
+            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software available\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.selected().size() + " software selected", 4, 21, Software.selected().toArray());
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.values().length +
+                " software available", 4, 21, (Object[]) Software.values());
     }
 
-    public static void listInstalled() {
+    public static boolean listSelected() {
+        List<Software> selected = Software.selected();
+        if (selected.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, selected.size() +
+                " software selected", 4, 21, selected.toArray());
+        return true;
+    }
+
+    public static boolean listInstalled() {
+        List<Software> software = Software.installed();
+        if (software.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, software.size() +
+                " software installed", 4, 21, software.toArray());
+        return true;
+    }
+
+    public static void requestInstalled() {
+        Console.sep();
+
         if (Software.installed().isEmpty()) {
-            Console.sep();
             Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software installed\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.installed().size() + " software installed", 4, 21, Software.installed().toArray());
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.installed().size() +
+                " software installed", 4, 21, Software.installed().toArray());
     }
 
-    public static void list() {
+    public static boolean listUnknown() {
+        List<String> unknown = Software.unknown();
+        if (unknown.isEmpty()) return false;
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.values().length + " software available", 4, 21, (Object[]) Software.values());
+        Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
+                " software unknown", 4, 21, unknown.toArray());
+        return true;
     }
 
     public static final class SoftwareNotFoundException extends InputException {

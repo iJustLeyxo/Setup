@@ -21,13 +21,61 @@ import java.util.List;
 import java.util.Map;
 
 public enum Command {
-    // TODO: Compare only
     COMPARE("Compare installed to selected software", "VERIFY", "CHECK"){
         @Override
         public
         void run(@NotNull Parser parser) {
-            Plugin.summarize();
-            Software.summarize();
+            boolean out = false;
+
+            if (Plugin.listSelected()) {
+                out = true;
+
+                List<Plugin> selected = Plugin.get(true, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
+                            " plugin(s) installed", 4, 21, selected.toArray());
+                }
+                selected = Plugin.get(true, false);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
+                            " plugin(s) superfluous", 4, 21, selected.toArray());
+                }
+                selected = Plugin.get(false, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
+                            " plugin(s) missing", 4, 21, selected.toArray());
+                }
+            }
+
+            if (Software.listSelected()) {
+                out = true;
+
+                List<Software> selected = Software.get(true, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
+                            " software installed", 4, 21, selected.toArray());
+                }
+                selected = Software.get(true, false);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
+                            " software superfluous", 4, 21, selected.toArray());
+                }
+                selected = Software.get(false, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
+                            " software missing", 4, 21, selected.toArray());
+                }
+            }
+
+            if (!out) {
+                Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "Nothing selected for comparison\n");
+            }
         }
     },
 
@@ -305,41 +353,41 @@ public enum Command {
         public void run(@NotNull Parser parser) {
             if (Flag.INSTALLED.isSelected()) {
                 if (Flag.ALL.isSelected()) {
-                    Plugin.listInstalled();
-                    Category.listInstalled();
-                    Server.listInstalled();
-                    Software.listInstalled();
+                    Plugin.requestInstalled();
+                    Category.requestInstalled();
+                    Server.requestInstalled();
+                    Software.requestInstalled();
                 } else {
                     boolean selected = false;
                     if (Flag.PLUGIN.isSelected()) {
-                        Plugin.listInstalled();
+                        Plugin.requestInstalled();
                         selected = true;
                     }
                     if (Flag.CATEGORY.isSelected()) {
-                        Category.listInstalled();
+                        Category.requestInstalled();
                         selected = true;
                     }
                     if (Flag.SERVER.isSelected()) {
-                        Server.listInstalled();
+                        Server.requestInstalled();
                         selected = true;
                     }
                     if (Flag.SOFTWARE.isSelected()) {
-                        Software.listInstalled();
+                        Software.requestInstalled();
                         selected = true;
                     }
-                    if (!selected) Plugin.listInstalled();
+                    if (!selected) Plugin.requestInstalled();
                 }
             } else {
                 if (Flag.ALL.isSelected() || (!Flag.PLUGIN.isSelected() && !Flag.CATEGORY.isSelected() && !Flag.SERVER.isSelected() && !Flag.SOFTWARE.isSelected())) {
-                    Plugin.list();
-                    Category.list();
-                    Server.list();
-                    Software.list();
+                    Plugin.requestAll();
+                    Category.requestAll();
+                    Server.requestAll();
+                    Software.requestAll();
                 } else if (Plugin.selected().isEmpty() && Category.selected().isEmpty() && Server.selected().isEmpty() && Software.selected().isEmpty()) {
-                    if (Flag.PLUGIN.isSelected()) Plugin.list();
-                    if (Flag.CATEGORY.isSelected()) Category.list();
-                    if (Flag.SERVER.isSelected()) Server.list();
-                    if (Flag.SOFTWARE.isSelected()) Software.list();
+                    if (Flag.PLUGIN.isSelected()) Plugin.requestAll();
+                    if (Flag.CATEGORY.isSelected()) Category.requestAll();
+                    if (Flag.SERVER.isSelected()) Server.requestAll();
+                    if (Flag.SOFTWARE.isSelected()) Software.requestAll();
                 } else {
                     if (Flag.PLUGIN.isSelected() || Flag.CATEGORY.isSelected() || Flag.SERVER.isSelected()) {
                         Plugin.listSelected();
@@ -424,13 +472,19 @@ public enum Command {
         }
     },
 
-    // TODO: Status only
     STATUS("View installation status", "STATE", "INFO") {
         @Override
         public
         void run(@NotNull Parser parser) {
-            Plugin.summarize();
-            Software.summarize();
+            boolean out = Plugin.listInstalled();
+            out = Plugin.listLinked() || out;
+            out = Plugin.listUnknown() || out;
+            out = Software.listInstalled() || out;
+            out = Software.listUnknown() || out;
+
+            if (!out) {
+                Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "Nothing installed to show\n");
+            }
         }
     },
 
@@ -515,7 +569,7 @@ public enum Command {
     }
 
     public void select() {
-        if (this.sel == Sel.OFF) this.sel = Sel.ON;
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {

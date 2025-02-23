@@ -199,46 +199,18 @@ public enum Category implements Provider {
         return categories;
     }
 
-    public static void summarize() {
-        if (!Category.selected().isEmpty()) Category.summarizeSelected();
-        else if (!Category.installed().isEmpty()) Category.summarizeInstalled();
-        else {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD +  "No categories selected or installed\n");
-        }
-    }
+    //= Cosmetics ==
 
-    private static void summarizeSelected() {
+    public static void requestAll() {
         Console.sep();
-        List<Category> selected = Category.selected();
-        Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
-                " categor(y/ies) selected", 4, 21, selected.toArray());
-        selected = Category.get(true, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
-                    " categor(y/ies) installed", 4, 21, selected.toArray());
-        }
-        selected = Category.get(true, false);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
-                    " categor(y/ies) superfluous", 4, 21, selected.toArray());
-        }
-        selected = Category.get(false, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
-                    " categor(y/ies) missing", 4, 21, selected.toArray());
-        }
-    }
 
-    private static void summarizeInstalled() {
-        List<Category> installed = Category.installed();
-        installed.remove(null);
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.INSTALL, installed.size() +
-                " categor(y/ies) installed", 4, 21, installed.toArray());
+        if (Category.values().length == 0) {
+            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories available\n");
+            return;
+        }
+
+        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.values().length +
+                " categor(y/ies) available", 4, 21, (Object[]) Category.values());
     }
 
     public static void listSelected() {
@@ -249,23 +221,20 @@ public enum Category implements Provider {
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.selected().size() + " categor(y/ies) selected", 4, 21, Category.selected().toArray());
+        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.selected().size() +
+                " categor(y/ies) selected", 4, 21, Category.selected().toArray());
     }
 
-    public static void listInstalled() {
+    public static void requestInstalled() {
+        Console.sep();
+
         if (Category.installed().isEmpty()) {
-            Console.sep();
             Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories installed\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.installed().size() + " categor(y/ies) installed", 4, 21, Category.installed().toArray());
-    }
-
-    public static void list() {
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.values().length + " categor(y/ies) available", 4, 21, (Object[]) Category.values());
+        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.installed().size() +
+                " categor(y/ies) installed", 4, 21, Category.installed().toArray());
     }
 
     public static void details() {

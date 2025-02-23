@@ -115,7 +115,7 @@ public enum Flag {
     }
 
     public void select() {
-        if (this.sel == Sel.OFF) this.sel = Sel.ON;
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {

@@ -472,84 +472,66 @@ public enum Plugin implements Provider {
         return plugins;
     }
 
-    public static void summarize() {
-        if (!Plugin.selected().isEmpty()) Plugin.summarizeSelected();
-        else if (!Plugin.installed().isEmpty()) Plugin.summarizeInstalled();
-        else {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins selected or installed\n");
-        }
-    }
+    //= Cosmetics ==
 
-    private static void summarizeSelected() {
+    public static void requestAll() {
         Console.sep();
-        List<Plugin> selected = Plugin.selected();
-        Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
-                " plugin(s) selected", 4, 21, selected.toArray());
-        selected = Plugin.get(true, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
-                    " plugin(s) installed", 4, 21, selected.toArray());
-        }
-        selected = Plugin.get(true, false);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
-                    " plugin(s) superfluous", 4, 21, selected.toArray());
-        }
-        selected = Plugin.get(false, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
-                    " plugin(s) missing", 4, 21, selected.toArray());
-        }
-    }
 
-    private static void summarizeInstalled() {
-        List<Plugin> installed = Plugin.installed();
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.INSTALL, installed.size() +
-                " plugin(s) installed", 4, 21, installed.toArray());
-        List<String> linked = Plugin.linked();
-        if (!linked.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.LINK, linked.size() +
-                    " plugin(s) linked", 4, 21, linked.toArray());
-        }
-        List<String> unknown = Plugin.unknown();
-        if (!unknown.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
-                    " plugin(s) unknown", 4, 21, unknown.toArray());
-        }
-    }
-
-    public static void listSelected() {
-        if (Plugin.selected().isEmpty()) {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins selected\n");
+        if (Plugin.values().length == 0) {
+            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins available\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.selected().size() + " plugin(s) selected", 4, 21, Plugin.selected().toArray());
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.values().length +
+                " plugin(s) available", 4, 21, (Object[]) Plugin.values());
     }
 
-    public static void listInstalled() {
+    public static boolean listSelected() {
+        List<Plugin> selected = Plugin.selected();
+        if (selected.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.PLUGIN, selected.size() +
+                " plugin(s) selected", 4, 21, selected.toArray());
+        return true;
+    }
+
+    public static boolean listInstalled() {
+        List<Plugin> plugins = Plugin.installed();
+        if (plugins.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.INSTALL, plugins.size() +
+                " plugin(s) installed", 4, 21, plugins.toArray());
+        return true;
+    }
+
+    public static void requestInstalled() {
+        Console.sep();
+
         if (Plugin.installed().isEmpty()) {
-            Console.sep();
             Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins installed\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.installed().size() + " plugin(s) installed", 4, 21, Plugin.installed().toArray());
+        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.installed().size() +
+                " plugin(s) installed", 4, 21, Plugin.installed().toArray());
     }
 
-    public static void list() {
+    public static boolean listLinked() {
+        List<String> linked = Plugin.linked();
+        if (linked.isEmpty()) return false;
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.values().length + " plugin(s) available", 4, 21, (Object[]) Plugin.values());
+        Console.logL(Type.REQUESTED, Style.LINK, linked.size() +
+                " plugin(s) linked", 4, 21, linked.toArray());
+        return true;
+    }
+
+    public static boolean listUnknown() {
+        List<String> unknown = Plugin.unknown();
+        if (unknown.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
+                " plugin(s) unknown", 4, 21, unknown.toArray());
+        return true;
     }
 
     //= Exceptions ==

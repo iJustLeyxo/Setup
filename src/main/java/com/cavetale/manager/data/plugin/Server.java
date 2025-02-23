@@ -198,43 +198,18 @@ public enum Server implements Provider {
         return servers;
     }
 
-    public static void summarize() {
-        if (!Server.selected().isEmpty()) Server.summarizeSelected();
-        else if (!Server.installed().isEmpty()) Server.summarizeInstalled();
-        else {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers selected or installed\n");
-        }
-    }
+    //= Cosmetics ==
 
-    private static void summarizeSelected() {
+    public static void requestAll() {
         Console.sep();
-        List<Server> selected = Server.selected();
-        Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
-                " server(s) selected", 4, 21, selected.toArray());
-        selected = Server.get(true, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
-                    " server(s) installed", 4, 21, selected.toArray());
-        }
-        selected = Server.get(true, false);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
-                    " server(s) superfluous", 4, 21, selected.toArray());
-        }
-        selected = Server.get(false, true);
-        if (!selected.isEmpty()) {
-            Console.sep();
-            Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
-                    " server(s) missing", 4, 21, selected.toArray());
-        }
-    }
 
-    private static void summarizeInstalled() {
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.INSTALL, Server.installed().size() + " server(s) installed", 4, 21, Server.installed().toArray());
+        if (Server.values().length == 0) {
+            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers available\n");
+            return;
+        }
+
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.values().length +
+                " server(s) available", 4, 21, (Object[]) Server.values());
     }
 
     public static void listSelected() {
@@ -245,23 +220,20 @@ public enum Server implements Provider {
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.selected().size() + " server(s) selected", 4, 21, Server.selected().toArray());
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.selected().size() +
+                " server(s) selected", 4, 21, Server.selected().toArray());
     }
 
-    public static void listInstalled() {
+    public static void requestInstalled() {
+        Console.sep();
+
         if (Server.installed().isEmpty()) {
-            Console.sep();
             Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers installed\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.installed().size() + " server(s) installed", 4, 21, Server.installed().toArray());
-    }
-
-    public static void list() {
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.values().length + " server(s) available", 4, 21, (Object[]) Server.values());
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.installed().size() +
+                " server(s) installed", 4, 21, Server.installed().toArray());
     }
 
     public static void details() {
