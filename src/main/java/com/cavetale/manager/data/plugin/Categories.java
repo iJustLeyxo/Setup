@@ -22,11 +22,11 @@ public final class Categories {
         for (Category c : Category.values()) c.reset(); // Reset category states
         Categories.selected.clear();
 
-        CategoryContainer categories = (CategoryContainer) Flag.category.container();
-        if (Flag.installed.isSelected()) {
+        CategoryContainer categories = (CategoryContainer) Flag.CATEGORY.container();
+        if (Flag.INSTALLED.isSelected()) {
             Console.log(Type.DEBUG, "Selecting installed categories\n");
             for (Category c : Categories.installed) c.target();
-        } else if (Flag.all.isSelected() || (Flag.category.isSelected() && categories.isEmpty())) { // Select all
+        } else if (Flag.ALL.isSelected() || (Flag.CATEGORY.isSelected() && categories.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all categories\n");
             for (Category c : Category.values()) c.target();
         } else {

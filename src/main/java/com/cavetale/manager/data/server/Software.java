@@ -22,22 +22,28 @@ import java.util.List;
  * Server software, used to register downloadable server software
  */
 public enum Software {
-    Paper(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
+    PAPER(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
 
-    private final @NotNull Source source;
     private final @NotNull String[] refs;
+    private final @NotNull Source source;
 
     // TODO: Custom printing
     private @NotNull Sel sel = Sel.NONE;
     private final @NotNull List<String> installations = new LinkedList<>();
 
     Software(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this.source = new Source.Other(uri, ver);
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = this.name();
+        this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+
+        this.source = new Source.Other(uri, ver);
     }
 
+    public @NotNull String displayName() {
+        return this.refs[0];
+    }
+
+    // TODO: What?
     @Override
     public @NotNull String toString() {
         return this.refs[0];
@@ -82,48 +88,48 @@ public enum Software {
     }
 
     public void install() {
-        Console.log(Type.INFO, "Installing " + this.name() + " software");
+        Console.log(Type.INFO, "Installing " + this.displayName() + " software");
         if (this.isInstalled()) {
             if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
-                Console.log(Type.WARN, "Installing " + this.name() + " software skipped (already installed)\n");
+                Console.log(Type.WARN, "Installing " + this.displayName() + " software skipped (already installed)\n");
             }
             return;
         }
         try {
-            String file = this.name() + "-" + this.source.ver() + ".jar";
+            String file = this.displayName() + "-" + this.source.ver() + ".jar";
             Util.download(this.source.uri(), new File(Softwares.FOLDER, file));
             this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Installing " + this.name() + " software failed (" + e.getMessage() + ")\n");
+                Console.log(Type.ERR, "Installing " + this.displayName() + " software failed (" + e.getMessage() + ")\n");
             }
-            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
     public void update() {
-        Console.log(Type.INFO, "Updating " + this.name() + " software"); // Uninstall software
+        Console.log(Type.INFO, "Updating " + this.displayName() + " software"); // Uninstall software
         File folder = Softwares.FOLDER;
         for (String file : this.installations) {
             if (new File(folder, file).delete()) continue;
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                Console.log(Type.ERR, "Updating " + this.name() + " software failed - failed to delete " + file + "\n");
+                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to delete " + file + "\n");
             }
             return;
         }
         this.installations.clear();
 
         try { // Install software
-            String file = this.name() + "-" + source.ver() + ".jar";
+            String file = this.displayName() + "-" + source.ver() + ".jar";
             Util.download(this.source.uri(), new File(Softwares.FOLDER, file));
             this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Updating " + this.name() + " software failed - failed to download (" + e.getMessage() + ")\n");
+                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to download (" + e.getMessage() + ")\n");
             }
-            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 

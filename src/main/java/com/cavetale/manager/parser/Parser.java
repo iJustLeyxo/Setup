@@ -157,20 +157,20 @@ public final class Parser {
     public boolean analyse() {
         Console.log(Type.EXTRA, "Analysing flags");
         StringBuilder s = new StringBuilder();
-        if (Flag.debug.isSelected()) {
+        if (Flag.DEBUG.isSelected()) {
             Console.detail = Detail.MAX;
             s.append("Debug mode activated\n");
-        } else if (Flag.verbose.isSelected()) {
+        } else if (Flag.VERBOSE.isSelected()) {
             Console.detail = Detail.HIGH;
             s.append("Verbose mode activated\n");
-        } else if (Flag.normal.isSelected()) {
+        } else if (Flag.NORMAL.isSelected()) {
             Console.detail = Detail.STD;
             s.append("Default verbosity mode activated\n");
-        } else if (Flag.quiet.isSelected()) {
+        } else if (Flag.QUIET.isSelected()) {
             Console.detail = Detail.LOW;
             s.append("Quiet mode activated\n");
         }
-        if (Flag.interactive.isSelected() && !Manager.interactive) {
+        if (Flag.INTERACTIVE.isSelected() && !Manager.interactive) {
             Manager.interactive = true;
             s.append("Interactive mode activated\n");
         }

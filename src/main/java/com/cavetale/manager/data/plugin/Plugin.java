@@ -23,142 +23,142 @@ import java.util.List;
  */
 public enum Plugin implements Provider {
     // TODO: Names
-    Adventure, // TODO: Status?
-    AdviceAnimals(Parent.of("com.winthier")), // TODO: Status?
-    AFK,
-    AntiPopup(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/7d0370f/AntiPopup-10.1.jar"), Ver.of("10.1")),
-    Area,
-    ArmorStandEditor(Parent.of("io.github.rypofalem"), Ver.of("1.17-25")),
-    Auction,
-    Bans(Parent.of("com.winthier")),
-    Bingo,
-    BlockClip,
-    BlockTrigger,
-    CaptureTheFlag,
-    Caves,
-    Chair,
-    Chat(Parent.of("com.winthier")),
-    Chess,
-    Christmas, // TODO: Status?
-    Colorfall(Parent.of("io.github.feydk")),
-    Connect(Parent.of("com.winthier")),
+    ADVENTURE, // TODO: Status?
+    ADVICE_ANIMALS(Parent.of("com.winthier")), // TODO: Status?
+    A_F_K,
+    ANTI_POPUP(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/7d0370f/AntiPopup-10.1.jar"), Ver.of("10.1")),
+    AREA,
+    ARMOR_STAND_EDITOR(Parent.of("io.github.rypofalem"), Ver.of("1.17-25")),
+    AUCTION,
+    BANS(Parent.of("com.winthier")),
+    BINGO,
+    BLOCK_CLIP,
+    BLOCK_TRIGGER,
+    CAPTURE_THE_FLAG,
+    CAVES,
+    CHAIR,
+    CHAT(Parent.of("com.winthier")),
+    CHESS,
+    CHRISTMAS, // TODO: Status?
+    COLORFALL(Parent.of("io.github.feydk")),
+    CONNECT(Parent.of("com.winthier")),
     // TODO: ConnectCore Status?
-    Core,
-    Countdown(Parent.of("com.winthier"), Ver.of("0.1")),
+    CORE,
+    COUNTDOWN(Parent.of("com.winthier"), Ver.of("0.1")),
     @Deprecated
-    CraftBay(Parent.of("com.winthier"), Ver.of("2.26-SNAPSHOT")), // TODO: Status?
-    Creative(Parent.of("com.winthier")),
-    CullMob,
-    Decorator(Parent.of("com.winthier")),
-    Dungeons,
-    Dusk(Parent.of("com.winthier"), Ver.of("0.1")),
-    Easter,
-    Editor,
-    Election,
-    Enderball,
-    Enemy,
-    Exploits(Parent.of("com.winthier")),
-    ExtremeGrassGrowing("EGG"),
-    Fam,
-    FastLeafDecay(Ver.of("1.0-SNAPSHOT")),
-    Festival,
-    FlatGenerator,
-    Fly,
-    FreeHat,
-    GoldenTicket,
+    CRAFT_BAY(Parent.of("com.winthier"), Ver.of("2.26-SNAPSHOT")), // TODO: Status?
+    CREATIVE(Parent.of("com.winthier")),
+    CULL_MOB,
+    DECORATOR(Parent.of("com.winthier")),
+    DUNGEONS,
+    DUSK(Parent.of("com.winthier"), Ver.of("0.1")),
+    EASTER,
+    EDITOR,
+    ELECTION,
+    ENDERBALL,
+    ENEMY,
+    EXPLOITS(Parent.of("com.winthier")),
+    EXTREME_GRASS_GROWING("EGG"),
+    FAM,
+    FAST_LEAF_DECAY(Ver.of("1.0-SNAPSHOT")),
+    FESTIVAL,
+    FLAT_GENERATOR,
+    FLY,
+    FREE_HAT,
+    GOLDEN_TICKET,
     @Deprecated
-    Halloween,
-    HideAndSeek,
-    Home,
-    HopperFilter(Parent.of("com.winthier")),
-    HotSwap,
-    Inventory,
+    HALLOWEEN,
+    HIDE_AND_SEEK,
+    HOME,
+    HOPPER_FILTER(Parent.of("com.winthier")),
+    HOT_SWAP,
+    INVENTORY,
     @Deprecated
-    InvisibleItemFrames,
-    ItemStore(Parent.of("com.winthier")),
-    KeepInventory(Parent.of("com.winthier")),
-    KingOfTheLadder(Ref.of("kotl"), "KOTL"),
+    INVISIBLE_ITEM_FRAMES,
+    ITEM_STORE(Parent.of("com.winthier")),
+    KEEP_INVENTORY(Parent.of("com.winthier")),
+    KING_OF_THE_LADDER(Ref.of("kotl"), "KOTL"),
     // TODO: KingOfTheRing Status?
-    Kit(Parent.of("com.winthier"), Ver.of("0.1")),
+    KIT(Parent.of("com.winthier"), Ver.of("0.1")),
     @Deprecated
-    LinkPortal(Parent.of("com.winthier")),
-    MagicMap,
-    Mail(Parent.of("com.winthier")),
-    MapLoad,
-    MassStorage,
-    Maypole(Parent.of("com.winthier"), Ver.of("0.1")),
-    MemberList,
-    Menu,
-    Merchant,
-    Miniverse,
-    MobArena,
-    Money,
-    Mytems,
-    OpenInv(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/latest/download/OpenInv.jar"), Ver.of("5.1.6")),
-    Overboard,
-    Perm(Parent.of("com.winthier")),
-    Photos(Parent.of("com.winthier")),
-    Pictionary("CavePaint"),
-    PlayerCache(Parent.of("com.winthier")),
-    PlayerInfo(Parent.of("com.winthier")),
-    PlugInfo,
-    PocketMob,
-    Poster,
-    Protect(Parent.of("com.winthier")),
-    ProtocolLib(Util.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/latest/download/ProtocolLib.jar"), Ver.of("5.3.0")),
-    PVPArena,
-    Quidditch,
+    LINK_PORTAL(Parent.of("com.winthier")),
+    MAGIC_MAP,
+    MAIL(Parent.of("com.winthier")),
+    MAP_LOAD,
+    MASS_STORAGE,
+    MAYPOLE(Parent.of("com.winthier"), Ver.of("0.1")),
+    MEMBER_LIST,
+    MENU,
+    MERCHANT,
+    MINIVERSE,
+    MOB_ARENA,
+    MONEY,
+    MYTEMS,
+    OPEN_INV(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/latest/download/OpenInv.jar"), Ver.of("5.1.6")),
+    OVERBOARD,
+    PERM(Parent.of("com.winthier")),
+    PHOTOS(Parent.of("com.winthier")),
+    PICTIONARY("CavePaint"),
+    PLAYER_CACHE(Parent.of("com.winthier")),
+    PLAYER_INFO(Parent.of("com.winthier")),
+    PLUG_INFO,
+    POCKET_MOB,
+    POSTER,
+    PROTECT(Parent.of("com.winthier")),
+    PROTOCOL_LIB(Util.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/latest/download/ProtocolLib.jar"), Ver.of("5.3.0")),
+    P_V_P_ARENA,
+    QUIDDITCH,
     @Deprecated
-    Quiz(Parent.of("com.winthier")),
-    Race,
+    QUIZ(Parent.of("com.winthier")),
+    RACE,
     @Deprecated
-    Raid,
-    RandomPlayerHead(Group.of("com.winthier.rph"), Ref.of("random-player-head"), Ver.of("0.1-SNAPSHOT")),
-    RedGreenLight("RedLightGreenLight", "RGL", "RLGL"),
-    Resident,
-    Resource(Parent.of("com.winthier"), Ver.of("0.1")),
-    ResourcePack,
-    Rules(Parent.of("com.winthier")),
-    Server,
+    RAID,
+    RANDOM_PLAYER_HEAD(Group.of("com.winthier.rph"), Ref.of("random-player-head"), Ver.of("0.1-SNAPSHOT"), "RPH"),
+    RED_GREEN_LIGHT("RedLightGreenLight", "RGL", "RLGL"),
+    RESIDENT,
+    RESOURCE(Parent.of("com.winthier"), Ver.of("0.1")),
+    RESOURCE_PACK,
+    RULES(Parent.of("com.winthier")),
+    SERVER,
     @Deprecated
-    ServerStatus,
-    Shop(Parent.of("com.winthier")),
-    Shutdown(Parent.of("com.winthier")),
-    Sidebar,
-    SignSpy,
-    Skills,
-    Skyblock,
-    Spawn(Parent.of("com.winthier")),
-    Spike,
-    Spleef(Parent.of("com.winthier")),
-    SQL(Parent.of("com.winthier")),
-    StarBook(Parent.of("com.winthier")),
-    StopRain(Parent.of("com.winthier")),
-    Streamer,
-    Structure,
-    SurvivalGames,
-    Televator,
-    Tetris,
-    Ticket(Parent.of("com.winthier")),
-    Tinfoil(Parent.of("com.winthier"), Ver.of("0.1")),
-    Title(Parent.of("com.winthier")),
-    TooManyEntities(Parent.of("com.winthier"), Ver.of("0.1")),
-    TPA,
-    Trees,
-    Tutor,
-    Vertigo(Parent.of("io.github.feydk")),
-    VoidGenerator,
-    Vote,
-    Wall(Parent.of("com.winthier")),
-    Wardrobe,
-    Warp,
-    Watchman,
-    Windicator,
-    WinTag,
-    WorldEdit(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/6013130/download"), Ver.of("7.3.10-Beta-1")),
-    WorldMarker,
-    Worlds(Parent.of("com.winthier")),
-    Xmas;
+    SERVER_STATUS,
+    SHOP(Parent.of("com.winthier")),
+    SHUTDOWN(Parent.of("com.winthier")),
+    SIDEBAR,
+    SIGN_SPY,
+    SKILLS,
+    SKYBLOCK,
+    SPAWN(Parent.of("com.winthier")),
+    SPIKE,
+    SPLEEF(Parent.of("com.winthier")),
+    S_Q_L(Parent.of("com.winthier")),
+    STAR_BOOK(Parent.of("com.winthier")),
+    STOP_RAIN(Parent.of("com.winthier")),
+    STREAMER,
+    STRUCTURE,
+    SURVIVAL_GAMES,
+    TELEVATOR,
+    TETRIS,
+    TICKET(Parent.of("com.winthier")),
+    TINFOIL(Parent.of("com.winthier"), Ver.of("0.1")),
+    TITLE(Parent.of("com.winthier")),
+    TOO_MANY_ENTITIES(Parent.of("com.winthier"), Ver.of("0.1")),
+    T_P_A,
+    TREES,
+    TUTOR,
+    VERTIGO(Parent.of("io.github.feydk")),
+    VOID_GENERATOR,
+    VOTE,
+    WALL(Parent.of("com.winthier")),
+    WARDROBE,
+    WARP,
+    WATCHMAN,
+    WINDICATOR,
+    WIN_TAG,
+    WORLD_EDIT(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/6013130/download"), Ver.of("7.3.10-Beta-1")),
+    WORLD_MARKER,
+    WORLDS(Parent.of("com.winthier")),
+    X_MAS;
 
     private final @NotNull Source source;
     private final @NotNull Plugin[] plugins;
@@ -190,35 +190,43 @@ public enum Plugin implements Provider {
     }
 
     Plugin(@NotNull Parent parent, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this.source = new Jenkins(Job.of(this.name()), Group.of(parent, this.name().toLowerCase()), Ref.of(this.name().toLowerCase()), ver);
-        this.plugins = new Plugin[]{this};
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = this.name();
+        this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+
+        this.source = new Jenkins(Job.of(this.displayName()), Group.of(parent, this.displayName().toLowerCase()), Ref.of(this.displayName().toLowerCase()), ver);
+        this.plugins = new Plugin[]{this};
     }
 
     Plugin(@NotNull Parent parent, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this.source = new Jenkins(Job.of(this.name()), Group.of(parent, ref), ref, ver);
-        this.plugins = new Plugin[]{this};
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = this.name();
+        this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+
+        this.source = new Jenkins(Job.of(this.displayName()), Group.of(parent, ref), ref, ver);
+        this.plugins = new Plugin[]{this};
     }
 
     Plugin(@NotNull Group group, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this.source = new Jenkins(Job.of(this.name()), group, ref, ver);
-        this.plugins = new Plugin[]{this};
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = this.name();
+        this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+
+        this.source = new Jenkins(Job.of(this.displayName()), group, ref, ver);
+        this.plugins = new Plugin[]{this};
     }
 
     Plugin(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        this.refs = new String[aliases.length + 1];
+        this.refs[0] = Util.capsToCamel(this.name());
+        System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+
         this.source = new Source.Other(uri, ver);
         this.plugins = new Plugin[]{this};
-        this.refs = new String[aliases.length + 1];
-        this.refs[0] = this.name();
-        System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+    }
+
+    public @NotNull String displayName() {
+        return this.refs[0];
     }
 
     @Override
@@ -228,7 +236,7 @@ public enum Plugin implements Provider {
 
     @Override
     public @NotNull String toString() {
-        return this.name();
+        return this.displayName();
     }
 
     //= Selection ==
@@ -266,28 +274,28 @@ public enum Plugin implements Provider {
     }
 
     public void install() {
-        Console.log(Type.INFO, "Installing " + this.name() + " plugin");
+        Console.log(Type.INFO, "Installing " + this.displayName() + " plugin");
         if (this.isInstalled()) {
             if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
-                Console.log(Type.WARN, "Installing " + this.name() + " plugin skipped (already installed)\n");
+                Console.log(Type.WARN, "Installing " + this.displayName() + " plugin skipped (already installed)\n");
             }
             return;
         }
         try {
-            String file = this.name() + "-" + this.source.ver() + ".jar";
+            String file = this.displayName() + "-" + this.source.ver() + ".jar";
             Util.download(this.source.uri(), new File(Plugins.FOLDER, file));
             this.installations.add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Installing " + this.name() + " plugin failed (" + e.getMessage() + ")\n");
+                Console.log(Type.ERR, "Installing " + this.displayName() + " plugin failed (" + e.getMessage() + ")\n");
             }
-            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
     public void update() {
-        Console.log(Type.INFO, "Updating " + this.name() + " plugin");
+        Console.log(Type.INFO, "Updating " + this.displayName() + " plugin");
 
         File folder = Plugins.FOLDER; // Uninstall plugin
         for (String fileName : this.installations) {
@@ -295,25 +303,25 @@ public enum Plugin implements Provider {
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) continue;
                 if (!Console.log(Type.EXTRA, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                    Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to delete " + file + "\n");
+                    Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - failed to delete " + file + "\n");
                 }
             } else if (!Console.log(Type.EXTRA, Style.ERR, " failed - skipped " + file + " (linked)\n")) {
-                Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - skipped " + file + " (linked)\n");
+                Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - skipped " + file + " (linked)\n");
             }
             return;
         }
         this.installations.clear();
 
         try { // Install plugin
-            String file = this.name() + "-" + this.source.ver() + ".jar";
+            String file = this.displayName() + "-" + this.source.ver() + ".jar";
             Util.download(this.source.uri(), new File(Plugins.FOLDER, file));
             this.addInstallation(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Updating " + this.name() + " plugin failed - failed to download (" + e.getMessage() + ")\n");
+                Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - failed to download (" + e.getMessage() + ")\n");
             }
-            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
@@ -336,7 +344,7 @@ public enum Plugin implements Provider {
     }
 
     public static @NotNull Plugin get(@NotNull String ref) throws Plugin.PluginNotFoundException {
-        for (Plugin p : Plugin.values()) if (p.name().equalsIgnoreCase(ref)) return p;
+        for (Plugin p : Plugin.values()) if (p.displayName().equalsIgnoreCase(ref)) return p;
         throw new Plugin.PluginNotFoundException(ref);
     }
 
@@ -349,7 +357,7 @@ public enum Plugin implements Provider {
         if (extStart < 0) extStart = ref.length() - 1;
         int endStart = Math.min(verStart, extStart);
         ref = ref.substring(0, endStart);
-        for (Plugin p : Plugin.values()) if (ref.equalsIgnoreCase(p.name())) return p;
+        for (Plugin p : Plugin.values()) if (ref.equalsIgnoreCase(p.displayName())) return p;
         throw new Plugin.PluginNotFoundException(ref);
     }
 

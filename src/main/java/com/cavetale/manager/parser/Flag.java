@@ -1,6 +1,7 @@
 package com.cavetale.manager.parser;
 
 import com.cavetale.manager.parser.container.*;
+import com.cavetale.manager.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,9 +9,9 @@ import org.jetbrains.annotations.Nullable;
  * Flags, used to specify flag properties
  */
 public enum Flag {
-    all("Select all"),
+    ALL('a', "Select all"),
 
-    category("Specify categor(y/ies)", "-s []:all | [categories]") {
+    CATEGORY('c', "Specify categor(y/ies)", "-s []:all | [categories]") {
         private final @NotNull CategoryContainer container = new CategoryContainer();
 
         @Override
@@ -19,17 +20,17 @@ public enum Flag {
         }
     },
 
-    command('C', "Filter by commands"),
-    debug("Debug console output"),
-    execute('x', "Run the command after the flag"),
-    error("Detailed error output"),
-    flag("Filter by flags"),
-    help("Show command help"),
-    installed('I', "Select installed"),
-    interactive("Enter command prompt mode"),
-    normal("Normal console output"),
+    COMMAND('C', "Filter by commands"),
+    DEBUG('d', "Debug console output"),
+    EXECUTE('x', "Run the command after the flag"),
+    ERROR('e', "Detailed error output"),
+    FLAG('f', "Filter by flags"),
+    HELP('h', "Show command help"),
+    INSTALLED('I', "Select installed"),
+    INTERACTIVE('i', "Enter command prompt mode"),
+    NORMAL('n', "Normal console output"),
 
-    plugin('p', "Specify plugins(s)", "-p []:all | [plugins]") {
+    PLUGIN('p', "Specify plugins(s)", "-p []:all | [plugins]") {
         private final @NotNull PluginContainer container = new PluginContainer();
 
         @Override
@@ -38,9 +39,9 @@ public enum Flag {
         }
     },
 
-    quiet("Reduced console output"),
+    QUIET('q', "Reduced console output"),
 
-    server('s', "Specify server(s)", "-s []:all | [servers]") {
+    SERVER('s', "Specify server(s)", "-s []:all | [servers]") {
         private final @NotNull ServerContainer container = new ServerContainer();
 
         @Override
@@ -49,7 +50,7 @@ public enum Flag {
         }
     },
 
-    software('S', "Specify server software", "-S []:all | [software]") {
+    SOFTWARE('S', "Specify server software", "-S []:all | [software]") {
         private final @NotNull SoftwareContainer container = new SoftwareContainer();
 
         @Override
@@ -58,40 +59,35 @@ public enum Flag {
         }
     },
 
-    verbose("Detailed console output");
+    VERBOSE('v', "Detailed console output");
 
     private final @NotNull Character ref;
+    private final @NotNull String name;
     private final @NotNull String info;
     private final @Nullable String usage;
 
     private boolean selected = false;
 
-    Flag(@NotNull String info, @Nullable String usage) {
-        this.ref = this.name().charAt(0);
-        this.info = info;
-        this.usage = usage;
-    }
-
-    Flag(@NotNull String info) {
-        this.ref = this.name().charAt(0);
-        this.info = info;
-        this.usage = null;
-    }
-
     Flag(@NotNull Character shotRef, @NotNull String info) {
         this.ref = shotRef;
+        this.name = Util.capsToCamel(this.name());
         this.info = info;
         this.usage = null;
     }
 
     Flag(@NotNull Character shotRef, @NotNull String info, @Nullable String usage) {
         this.ref = shotRef;
+        this.name = Util.capsToCamel(this.name());
         this.info = info;
         this.usage = usage;
     }
 
     public char ref() {
         return this.ref;
+    }
+
+    public @NotNull String displayName() {
+        return this.name;
     }
 
     public @NotNull String info() {
@@ -122,7 +118,7 @@ public enum Flag {
     }
 
     public static @NotNull Flag get(@NotNull String ref) throws NotFoundException {
-        for (Flag flag : values()) if (flag.name().equalsIgnoreCase(ref)) return flag;
+        for (Flag flag : values()) if (flag.displayName().equalsIgnoreCase(ref)) return flag;
         throw new NotFoundException(ref);
     }
 

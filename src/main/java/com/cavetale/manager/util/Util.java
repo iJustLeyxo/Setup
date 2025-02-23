@@ -10,11 +10,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Download manager, used to download files from the internet
  */
 public final class Util {
+    public static @NotNull String capsToCamel(@NotNull String name) {
+        return Arrays.stream(name.split("_")).map(s -> s.isEmpty() ? "" : s.charAt(0) + s.substring(1).toLowerCase()).collect(Collectors.joining());
+    }
+
     public static @NotNull URI uriOf(@NotNull String uri) {
         try {
             return new URI(uri);

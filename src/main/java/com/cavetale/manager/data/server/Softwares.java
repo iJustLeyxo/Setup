@@ -26,11 +26,11 @@ public final class Softwares {
         for (Software s : Software.values()) s.reset(); // Reset selections
         Softwares.selected.clear();
 
-        SoftwareContainer softwares = (SoftwareContainer) Flag.software.container();
-        if (Flag.installed.isSelected()) {
+        SoftwareContainer softwares = (SoftwareContainer) Flag.SOFTWARE.container();
+        if (Flag.INSTALLED.isSelected()) {
             Console.log(Type.DEBUG, "Selecting installed software\n");
             for (Software s : Softwares.installed) s.target();
-        } else if (Flag.all.isSelected() || (Flag.software.isSelected() && softwares.isEmpty())) { // Select all
+        } else if (Flag.ALL.isSelected() || (Flag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all software\n");
             for (Software s : Software.values()) s.target();
         } else {

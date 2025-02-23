@@ -23,11 +23,11 @@ public final class Servers {
         for (Server s : Server.values()) s.reset(); // Reset selections
         Servers.selected.clear();
 
-        ServerContainer servers = (ServerContainer) Flag.server.container();
-        if (Flag.installed.isSelected()) {
+        ServerContainer servers = (ServerContainer) Flag.SERVER.container();
+        if (Flag.INSTALLED.isSelected()) {
             for (Server s : Servers.installed) s.target();
             Console.log(Type.DEBUG, "Selecting installed servers\n");
-        } else if (Flag.all.isSelected() || (Flag.server.isSelected() && servers.isEmpty())) { // Select all
+        } else if (Flag.ALL.isSelected() || (Flag.SERVER.isSelected() && servers.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all servers\n");
             for (Server s : Server.values()) s.target();
         } else {

@@ -2,6 +2,7 @@ package com.cavetale.manager.data.plugin;
 
 import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.parser.InputException;
+import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
@@ -11,23 +12,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.cavetale.manager.data.plugin.Category.Base;
-import static com.cavetale.manager.data.plugin.Category.Survival;
+import static com.cavetale.manager.data.plugin.Category.BASE;
+import static com.cavetale.manager.data.plugin.Category.SURVIVAL;
 
 /**
  * Servers, used to group plugins by installed server
  */
 public enum Server implements Provider {
-    Build("Plugins for build servers", Base, Survival, Category.Build, Category.Home),
-    Classic("Plugins for classic servers", Base, Survival, Category.Build),
-    Creative("Plugins for creative servers", Base, Category.Creative, Category.Build,
-            Plugin.Enemy, Plugin.Festival, Plugin.Pictionary, Plugin.Race, Plugin.Resident),
-    Event("Plugins for event servers", Base, Plugin.Worlds),
-    Hub("Plugins for hub servers", Base, Survival, Category.Build, Category.Hub,
-            Plugin.Structure, Plugin.ExtremeGrassGrowing, Plugin.KingOfTheLadder, Plugin.RedGreenLight),
-    Mine("Plugins for mine servers", Base, Survival, Category.Build, Category.Mine),
-    Void("Plugins for void servers", Base);
+    BUILD("Plugins for build servers", BASE, SURVIVAL, Category.BUILD, Category.HOME),
+    CLASSIC("Plugins for classic servers", BASE, SURVIVAL, Category.BUILD),
+    CREATIVE("Plugins for creative servers", BASE, Category.CREATIVE, Category.BUILD,
+            Plugin.ENEMY, Plugin.FESTIVAL, Plugin.PICTIONARY, Plugin.RACE, Plugin.RESIDENT),
+    EVENT("Plugins for event servers", BASE, Plugin.WORLDS),
+    HUB("Plugins for hub servers", BASE, SURVIVAL, Category.BUILD, Category.HUB,
+            Plugin.STRUCTURE, Plugin.EXTREME_GRASS_GROWING, Plugin.KING_OF_THE_LADDER, Plugin.RED_GREEN_LIGHT),
+    MINE("Plugins for mine servers", BASE, SURVIVAL, Category.BUILD, Category.MINE),
+    VOID("Plugins for void servers", BASE);
 
+    private final @NotNull String name;
     private final @NotNull String info;
     private final @NotNull Server[] servers;
     private final @NotNull Category[] categories;
@@ -38,7 +40,9 @@ public enum Server implements Provider {
     private @Nullable Boolean inst = null;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
+        this.name = Util.capsToCamel(this.name());
         this.info = info;
+
         Set<Server> servers = new HashSet<>();
         Set<Category> categories = new HashSet<>();
         for (Provider p : providers) {
@@ -56,6 +60,10 @@ public enum Server implements Provider {
             System.arraycopy(child.plugins(), 0, this.plugins, len, child.plugins().length);
             len += child.plugins().length;
         }
+    }
+
+    public @NotNull String displayName() {
+        return this.name;
     }
 
     public @NotNull Server[] servers() {
@@ -118,7 +126,7 @@ public enum Server implements Provider {
     }
 
     public static @NotNull Server get(@NotNull String ref) throws NotFoundException {
-        for (Server s : Server.values()) if (s.name().equalsIgnoreCase(ref)) return s;
+        for (Server s : Server.values()) if (s.displayName().equalsIgnoreCase(ref)) return s;
         throw new NotFoundException(ref);
     }
 
@@ -133,7 +141,7 @@ public enum Server implements Provider {
         ArrayList<Server> servers = new ArrayList<>(List.of(Server.values()));
         Collections.sort(servers);
         for (Server s : servers) {
-            Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", s.name(), s.info);
+            Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", s.displayName(), s.info);
         }
     }
 

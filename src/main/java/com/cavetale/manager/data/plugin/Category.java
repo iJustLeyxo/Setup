@@ -2,6 +2,7 @@ package com.cavetale.manager.data.plugin;
 
 import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.parser.InputException;
+import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
@@ -19,31 +20,32 @@ import static com.cavetale.manager.data.plugin.Plugin.*;
  * Plugin categories, used to group plugins by purpose / usage
  */
 public enum Category implements Provider {
-    Global("Global plugins", AFK, AntiPopup, Area, ArmorStandEditor, Auction, Bans, BlockClip,
-            BlockTrigger, Countdown, Editor, Fam, Fly, Plugin.Home, HotSwap, Inventory, ItemStore,
-            Kit, MagicMap, Mail, MemberList, Menu, OpenInv, PlayerInfo, PlugInfo, Protect,
-            ResourcePack, Rules, Server, Shutdown, Spawn, Spike, StarBook, StopRain, Streamer,
-            Televator, Ticket, Tinfoil, TPA, Tutor, Vote, Wall, Wardrobe, Warp, WorldEdit, Worlds),
-    Build("Plugins for build servers", Chair, FreeHat, Merchant, Photos, RandomPlayerHead, SignSpy,
-            TooManyEntities, Trees, Watchman, WinTag),
-    Core("Essential plugins", Chat, Connect, Plugin.Core, Money, Mytems, Perm, PlayerCache, Sidebar,
-            SQL, Title, VoidGenerator, WorldMarker),
-    Creative("Plugins for creative servers", Plugin.Creative, FlatGenerator, VoidGenerator),
-    Home("Plugins for home servers", CullMob),
-    Hub("Plugins for hub servers", Chess, ExtremeGrassGrowing, KingOfTheLadder, RedGreenLight),
-    Mine("Plugins for mining servers", Dungeons),
-    Event("Plugins for events", Bingo, CaptureTheFlag, Colorfall, Enderball, ExtremeGrassGrowing,
-            HideAndSeek, KingOfTheLadder, MobArena, Overboard, Pictionary, PVPArena, Quidditch, Race, RedGreenLight,
-            Spleef, SurvivalGames, Tetris, Vertigo, Windicator),
-    Seasonal("Plugins for seasonal events", Easter, Festival, Maypole, Xmas),
-    Survival("Plugins for survival servers", Dusk, Election, Enemy, Exploits, FastLeafDecay,
-            GoldenTicket, HopperFilter, KeepInventory, MassStorage, PocketMob, Poster, Resident,
-            Resource, Shop, Skills, Structure),
-    Util("Optional utility plugins", MapLoad, Miniverse, ProtocolLib),
-    WorldGen("World generation plugins", Caves, Decorator),
+    GLOBAL("Global plugins", A_F_K, ANTI_POPUP, AREA, ARMOR_STAND_EDITOR, AUCTION, BANS, BLOCK_CLIP,
+            BLOCK_TRIGGER, COUNTDOWN, EDITOR, FAM, FLY, Plugin.HOME, HOT_SWAP, INVENTORY, ITEM_STORE,
+            KIT, MAGIC_MAP, MAIL, MEMBER_LIST, MENU, OPEN_INV, PLAYER_INFO, PLUG_INFO, PROTECT,
+            RESOURCE_PACK, RULES, SERVER, SHUTDOWN, SPAWN, SPIKE, STAR_BOOK, STOP_RAIN, STREAMER,
+            TELEVATOR, TICKET, TINFOIL, T_P_A, TUTOR, VOTE, WALL, WARDROBE, WARP, WORLD_EDIT, WORLDS),
+    BUILD("Plugins for build servers", CHAIR, FREE_HAT, MERCHANT, PHOTOS, RANDOM_PLAYER_HEAD, SIGN_SPY,
+            TOO_MANY_ENTITIES, TREES, WATCHMAN, WIN_TAG),
+    CORE("Essential plugins", CHAT, CONNECT, Plugin.CORE, MONEY, MYTEMS, PERM, PLAYER_CACHE, SIDEBAR,
+            S_Q_L, TITLE, VOID_GENERATOR, WORLD_MARKER),
+    CREATIVE("Plugins for creative servers", Plugin.CREATIVE, FLAT_GENERATOR, VOID_GENERATOR),
+    HOME("Plugins for home servers", CULL_MOB),
+    HUB("Plugins for hub servers", CHESS, EXTREME_GRASS_GROWING, KING_OF_THE_LADDER, RED_GREEN_LIGHT),
+    MINE("Plugins for mining servers", DUNGEONS),
+    EVENT("Plugins for events", BINGO, CAPTURE_THE_FLAG, COLORFALL, ENDERBALL, EXTREME_GRASS_GROWING,
+            HIDE_AND_SEEK, KING_OF_THE_LADDER, MOB_ARENA, OVERBOARD, PICTIONARY, P_V_P_ARENA, QUIDDITCH, RACE, RED_GREEN_LIGHT,
+            SPLEEF, SURVIVAL_GAMES, TETRIS, VERTIGO, WINDICATOR),
+    SEASONAL("Plugins for seasonal events", EASTER, FESTIVAL, MAYPOLE, X_MAS),
+    SURVIVAL("Plugins for survival servers", DUSK, ELECTION, ENEMY, EXPLOITS, FAST_LEAF_DECAY,
+            GOLDEN_TICKET, HOPPER_FILTER, KEEP_INVENTORY, MASS_STORAGE, POCKET_MOB, POSTER, RESIDENT,
+            RESOURCE, SHOP, SKILLS, STRUCTURE),
+    UTIL("Optional utility plugins", MAP_LOAD, MINIVERSE, PROTOCOL_LIB),
+    WORLD_GEN("World generation plugins", CAVES, DECORATOR),
 
-    Base("Basic plugins for all servers", Global, Core);
+    BASE("Basic plugins for all servers", GLOBAL, CORE);
 
+    private final @NotNull String name;
     private final @NotNull String info;
     private final @NotNull Plugin[] plugins;
 
@@ -52,11 +54,13 @@ public enum Category implements Provider {
     private @Nullable Boolean inst = null;
 
     Category(@NotNull String info, @NotNull Plugin @NotNull ... plugins) {
+        this.name = Util.capsToCamel(this.name());
         this.info = info;
         this.plugins = plugins;
     }
 
     Category(@NotNull String info, @NotNull Category @NotNull ... children) {
+        this.name = Util.capsToCamel(this.name());
         this.info = info;
 
         int len = 0; // Copy plugins
@@ -69,6 +73,10 @@ public enum Category implements Provider {
         }
     }
 
+    public @NotNull String displayName() {
+        return this.name;
+    }
+
     @Override
     public Plugin[] plugins() {
         return this.plugins;
@@ -76,7 +84,7 @@ public enum Category implements Provider {
 
     @Override
     public @NotNull String toString() {
-        return this.name();
+        return this.displayName();
     }
 
     public void reset() {
@@ -121,7 +129,7 @@ public enum Category implements Provider {
     }
 
     public static @NotNull Category get(@NotNull String ref) throws NotFoundException {
-        for (Category c : values()) if (c.name().equalsIgnoreCase(ref)) return c;
+        for (Category c : values()) if (c.displayName().equalsIgnoreCase(ref)) return c;
         throw new NotFoundException(ref);
     }
 
@@ -135,7 +143,7 @@ public enum Category implements Provider {
                 "-------------------------------------------\n");
         ArrayList<Category> categories = new ArrayList<>(List.of(Category.values()));
         Collections.sort(categories);
-        for (Category c : categories) Console.logF(Type.REQUESTED, Style.CATEGORY, "%-16s | %-68s\n", c.name(), c.info);
+        for (Category c : categories) Console.logF(Type.REQUESTED, Style.CATEGORY, "%-16s | %-68s\n", c.displayName(), c.info);
     }
 
     public static final class NotFoundException extends InputException {

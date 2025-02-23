@@ -29,11 +29,11 @@ public final class Plugins {
         for (Plugin p : Plugin.values()) p.reset(); // Reset plugin states
         Plugins.selected.clear();
 
-        PluginContainer plugins = (PluginContainer) Flag.plugin.container();
-        if (Flag.installed.isSelected()) {
+        PluginContainer plugins = (PluginContainer) Flag.PLUGIN.container();
+        if (Flag.INSTALLED.isSelected()) {
             Console.log(Type.DEBUG, "Selecting installed plugins\n");
             for (Plugin p : Plugins.installed) p.target();
-        } else if (Flag.all.isSelected() ||  (Flag.plugin.isSelected() && plugins.isEmpty())) { // Select all
+        } else if (Flag.ALL.isSelected() ||  (Flag.PLUGIN.isSelected() && plugins.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all plugins\n");
             for (Plugin p : Plugin.values()) p.target();
         } else {

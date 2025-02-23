@@ -3,7 +3,6 @@ package com.cavetale.manager;
 import com.cavetale.manager.data.plugin.*;
 import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.parser.*;
-import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
@@ -42,15 +41,15 @@ public final class Manager {
                     Categories.reloadSelected(parser);
                     Plugins.reloadSelected(parser);
 
-                    Console.log(Type.EXTRA, "Running command " + cmd.name() + " with args " + parser.args() + " and flags " + parser.flags() + "\n");
+                    Console.log(Type.EXTRA, "Running command " + cmd.displayName() + " with args " + parser.args() + " and flags " + parser.flags() + "\n");
 
-                    if (Flag.help.isSelected()) {
+                    if (Flag.HELP.isSelected()) {
                         cmd.help(parser);
                         continue;
                     }
 
                     cmd.run(parser);
-                    Console.log(Type.EXTRA, "Finished running command " + cmd.name() + "\n");
+                    Console.log(Type.EXTRA, "Finished running command " + cmd.displayName() + "\n");
                 }
             } catch (InputException e) {
                 Console.log(Type.ERR, e.getMessage() + "\n");
@@ -100,7 +99,7 @@ public final class Manager {
         Collections.sort(flags);
         for (Flag f : flags) {
             Console.logF(Type.REQUESTED, Style.HELP, "%2s %-13s | %-32s | %-33s\n", "-" + f.ref(),
-                    "--" + f.name(), f.info(), Objects.requireNonNullElse(f.usage(), ""));
+                    "--" + f.displayName(), f.info(), Objects.requireNonNullElse(f.usage(), ""));
         }
     }
 }
