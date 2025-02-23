@@ -1,6 +1,5 @@
 package com.cavetale.manager.data;
 
-import com.cavetale.manager.data.plugin.Plugin;
 import com.cavetale.manager.download.Source;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.util.Util;
@@ -30,7 +29,7 @@ public interface Installable {
 
         try {
             String name = this.displayName() + "-" + this.source().ver() + ".jar";
-            Util.download(this.source().uri(), Plugin.FOLDER, name);
+            Util.download(this.source().uri(), this.downloads(), name);
             this.installations().add(name);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
@@ -54,10 +53,10 @@ public interface Installable {
             return;
         }
 
-        // Uninstall plugin
+        // Uninstall
         for (String inst : this.installations()) {
             Console.log(Type.DEBUG, "Uninstalling " + inst);
-            File f = new File(Plugin.FOLDER, inst);
+            File f = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
                 Console.log(Type.EXTRA, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
@@ -68,9 +67,9 @@ public interface Installable {
         }
         this.installations().clear();
 
-        // Install stashed plugin
+        // Install stashed
         try {
-            Util.finalise(file, Plugin.FOLDER, name);
+            Util.finalise(file, this.downloads(), name);
             this.installations().add(name);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
@@ -82,7 +81,7 @@ public interface Installable {
     default void uninstall() {
         for (String inst : this.installations()) {
             Console.log(Type.INFO, "Uninstalling " + inst);
-            File file = new File(Plugin.FOLDER, inst);
+            File file = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) {
                     this.installations().remove(inst);
