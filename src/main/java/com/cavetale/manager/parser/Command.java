@@ -17,6 +17,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public enum Command {
+    // TODO: Compare only
+    COMPARE("Compare installed to selected software", "VERIFY", "CHECK"){
+        @Override
+        public
+        void run(@NotNull Parser parser) {
+            Plugins.summarize();
+            Softwares.summarize();
+        }
+    },
+
     CONNECT("Link this tool to a server installation") {
         @Override
         public void run(@NotNull Parser parser) {
