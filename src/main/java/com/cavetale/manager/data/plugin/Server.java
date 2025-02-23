@@ -1,41 +1,50 @@
 package com.cavetale.manager.data.plugin;
 
+import com.cavetale.manager.data.Sel;
+import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
+import com.cavetale.manager.parser.container.ServerContainer;
+import com.cavetale.manager.util.Util;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.cavetale.manager.data.plugin.Category.Base;
-import static com.cavetale.manager.data.plugin.Category.Survival;
+import static com.cavetale.manager.data.plugin.Category.BASE;
+import static com.cavetale.manager.data.plugin.Category.SURVIVAL;
 
 /**
  * Servers, used to group plugins by installed server
  */
 public enum Server implements Provider {
-    Build("Plugins for build servers", Base, Survival, Category.Build, Category.Home),
-    Classic("Plugins for classic servers", Base, Survival, Category.Build),
-    Creative("Plugins for creative servers", Base, Category.Creative, Category.Build,
-            Plugin.Enemy, Plugin.Festival, Plugin.Pictionary, Plugin.Race, Plugin.Resident),
-    Event("Plugins for event servers", Base, Plugin.Worlds),
-    Hub("Plugins for hub servers", Base, Survival, Category.Build, Category.Hub,
-            Plugin.Structure, Plugin.ExtremeGrassGrowing, Plugin.KingOfTheLadder, Plugin.RedGreenLight),
-    Mine("Plugins for mine servers", Base, Survival, Category.Build, Category.Mine),
-    Void("Plugins for void servers", Base);
+    BUILD("Plugins for build servers", BASE, SURVIVAL, Category.BUILD, Category.HOME),
+    CLASSIC("Plugins for classic servers", BASE, SURVIVAL, Category.BUILD),
+    CREATIVE("Plugins for creative servers", BASE, Category.CREATIVE, Category.BUILD,
+            Plugin.ENEMY, Plugin.FESTIVAL, Plugin.PICTIONARY, Plugin.RACE, Plugin.RESIDENT),
+    EVENT("Plugins for event servers", BASE, Plugin.WORLDS),
+    HUB("Plugins for hub servers", BASE, SURVIVAL, Category.BUILD, Category.HUB,
+            Plugin.STRUCTURE, Plugin.EXTREME_GRASS_GROWING, Plugin.KING_OF_THE_LADDER, Plugin.RED_GREEN_LIGHT),
+    MINE("Plugins for mine servers", BASE, SURVIVAL, Category.BUILD, Category.MINE),
+    VOID("Plugins for void servers", BASE);
 
+    private final @NotNull String name;
     private final @NotNull String info;
     private final @NotNull Server[] servers;
     private final @NotNull Category[] categories;
     private final @NotNull Plugin[] plugins;
 
-    private boolean selected = false;
-    private boolean installed = false;
+    // TODO: Custom printing
+    private @Nullable Sel sel = null;
+    private @Nullable Boolean inst = null;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
+        this.name = Util.capsToCamel(this.name());
         this.info = info;
+
         Set<Server> servers = new HashSet<>();
         Set<Category> categories = new HashSet<>();
         for (Provider p : providers) {
@@ -55,6 +64,15 @@ public enum Server implements Provider {
         }
     }
 
+    public @NotNull String displayName() {
+        return this.name;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return this.displayName();
+    }
+
     public @NotNull Server[] servers() {
         return this.servers;
     }
@@ -68,44 +86,159 @@ public enum Server implements Provider {
         return this.plugins;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void revert() {
+        this.sel = null;
+        this.inst = null;
+    }
+
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
+    }
+
+    public void deselect() {
+        this.sel = Sel.OFF;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        if (this.sel == null) Server.loadSelection();
+        return this.sel != Sel.OFF;
     }
 
-    public void setInstalled() {
-        this.installed = true;
-
-        for (Plugin p : this.plugins) {
-            if (!p.isInstalled()) {
-                this.installed = false;
-                return;
-            }
-        }
-
-        for (Category c : this.categories) {
-            if (!c.isInstalled()) {
-                this.installed = false;
-                return;
-            }
-        }
-    }
+    //= Installation ==
 
     public boolean isInstalled() {
-        return this.installed;
+        if (this.inst == null) this.checkInstalled();
+        return this.inst;
     }
 
+    private void checkInstalled() {
+        this.inst = true;
+
+        for (Plugin p : this.plugins) if (!p.isInstalled()) {
+            this.inst = false;
+            return;
+        }
+
+        for (Category c : this.categories) if (!c.isInstalled()) {
+            this.inst = false;
+            return;
+        }
+    }
+
+    //= Finder ==
+
     public static @NotNull Server get(@NotNull String ref) throws NotFoundException {
-        for (Server s : Server.values()) if (s.name().equalsIgnoreCase(ref)) return s;
+        for (Server s : Server.values()) if (s.displayName().equalsIgnoreCase(ref)) return s;
         throw new NotFoundException(ref);
     }
 
-    public static void list() {
+    //= Indexing ==
+
+    private static @Nullable List<Server> selected = null;
+    private static @Nullable List<Server> installed = null;
+
+    public static @NotNull List<Server> installed() {
+        if (Server.installed == null) Server.loadInstallation();
+        return Server.installed;
+    }
+
+    public static @NotNull List<Server> selected() {
+        if (Server.selected == null) Server.loadSelection();
+        return Server.selected;
+    }
+
+    public static void reset() {
+        Console.log(Type.DEBUG, "Resetting servers\n");
+        for (Server s : Server.values()) s.revert();
+        Server.selected = null;
+        Server.installed = null;
+    }
+
+    public static void loadSelection() {
+        Console.log(Type.EXTRA, "Reloading selected servers\n");
+        for (Server s : Server.values()) s.deselect();
+        Server.selected = new LinkedList<>();
+
+        ServerContainer servers = (ServerContainer) Flag.SERVER.container();
+        if (Flag.INSTALLED.isSelected()) {
+            for (Server s : Server.installed()) s.target();
+            Console.log(Type.DEBUG, "Selecting installed servers\n");
+        } else if (Flag.ALL.isSelected() || (Flag.SERVER.isSelected() && servers.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting all servers\n");
+            for (Server s : Server.values()) s.target();
+        } else {
+            Console.log(Type.DEBUG, "Selecting servers " + servers.get() + "\n");
+            for (Server s : servers.get()) s.target(); // Select by server
+        }
+
+        for (Server s : Server.values()) if (s.isSelected()) Server.selected.add(s); // Update selection
+    }
+
+    public static void loadInstallation() {
+        Console.log(Type.EXTRA, "Reloading installed servers\n");
+        Server.installed = new LinkedList<>();
+
+        for (Server s : Server.values()) if (s.isInstalled()) Server.installed().add(s); // Update installation
+    }
+
+    public static @NotNull List<Server> get(@Nullable Boolean installed, @Nullable Boolean selected) {
+        List<Server> servers = new LinkedList<>();
+        for (Server s : Server.values()) {
+            if ((installed == null || installed == s.isInstalled()) &&
+                    (selected == null || selected == s.isSelected())) {
+                servers.add(s);
+            }
+        }
+        return servers;
+    }
+
+    //= Cosmetics ==
+
+    public static void requestAll() {
         Console.sep();
-        Console.log(Type.REQUESTED, Style.SERVER, XCode.BOLD +
+
+        if (Server.values().length == 0) {
+            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers available\n");
+            return;
+        }
+
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.values().length +
+                " server(s) available", 4, 21, (Object[]) Server.values());
+    }
+
+    public static void listSelected() {
+        if (Server.selected().isEmpty()) {
+            Console.sep();
+            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers selected\n");
+            return;
+        }
+
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.selected().size() +
+                " server(s) selected", 4, 21, Server.selected().toArray());
+    }
+
+    public static void requestInstalled() {
+        Console.sep();
+
+        if (Server.installed().isEmpty()) {
+            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers installed\n");
+            return;
+        }
+
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.installed().size() +
+                " server(s) installed", 4, 21, Server.installed().toArray());
+    }
+
+    public static void details() {
+        Console.sep();
+        Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD +
                 "--------------------------------------- " +
                 "Servers ---------------------------------------\n");
         Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", "Server", "Info");
@@ -114,7 +247,7 @@ public enum Server implements Provider {
         ArrayList<Server> servers = new ArrayList<>(List.of(Server.values()));
         Collections.sort(servers);
         for (Server s : servers) {
-            Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", s.name(), s.info);
+            Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", s.displayName(), s.info);
         }
     }
 

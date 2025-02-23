@@ -11,38 +11,39 @@ Command: <flag(s)> <command(s)> <flag(s)>
 -------------------------------------- Commands ---------------------------------------
 Command          | Info                                                                
 ---------------------------------------------------------------------------------------
-connect          | Link this tool to a server installation                             
-eula             | Agree to the Minecraft EULA                                         
-exit             | Exit interactive mode                                               
-find             | Find anything                                                       
-help             | Show usage help                                                     
-install          | Install plugins and server software                                 
-link             | Link any jar archive path to the plugins directory                  
-list             | List plugins, categories, servers and server software               
-run              | Run installed server software                                       
-status           | View installation status                                            
-uninstall        | Uninstall plugins, server software and files                        
-update           | Update plugins and software                                         
+Compare          | Compare installed to selected software                              
+Connect          | Link this tool to a server installation                             
+Eula             | Agree to the Minecraft EULA                                         
+Exit             | Exit interactive mode                                               
+Find             | Find anything                                                       
+Help             | Show usage help                                                     
+Install          | Install plugins and server software                                 
+Link             | Link any jar archive path to the plugins directory                  
+List             | List plugins, categories, servers and server software               
+Run              | Run installed server software                                       
+Status           | View installation status                                            
+Uninstall        | Uninstall plugins, server software and files                        
+Update           | Update plugins and software                                         
 
 --------------------------------------- Flags -----------------------------------------
 Flag             | Info                             | Usage                            
 ---------------------------------------------------------------------------------------
--a --all         | Select all                       |                                  
--c --category    | Specify categor(y/ies)           | -s []:all | [categories]         
--C --command     | Filter by commands               |                                  
--d --debug       | Debug console output             |                                  
--x --execute     | Run the command after the flag   |                                  
--e --error       | Detailed error output            |                                  
--f --flag        | Filter by flags                  |                                  
--h --help        | Show command help                |                                  
--I --installed   | Select installed                 |                                  
--i --interactive | Enter command prompt mode        |                                  
--n --normal      | Normal console output            |                                  
--p --plugin      | Specify plugins(s)               | -p []:all | [plugins]         
--q --quiet       | Reduced console output           |                                  
--s --server      | Specify server(s)                | -s []:all | [servers]            
--S --software    | Specify server software          | -S []:all | [software]           
--v --verbose     | Detailed console output          |                                  
+-a --All         | Select all                       |                                  
+-c --Category    | Specify categor(y/ies)           | -s []:all | [categories]         
+-C --Command     | Filter by commands               |                                  
+-d --Debug       | Debug console output             |                                  
+-x --Execute     | Run the command after the flag   |                                  
+-e --Error       | Detailed error output            |                                  
+-f --Flag        | Filter by flags                  |                                  
+-h --Help        | Show command help                |                                  
+-I --Installed   | Select installed                 |                                  
+-i --Interactive | Enter command prompt mode        |                                  
+-n --Normal      | Normal console output            |                                  
+-p --Plugin      | Specify plugins(s)               | -p []:all | [plugins]            
+-q --Quiet       | Reduced console output           |                                  
+-s --Server      | Specify server(s)                | -s []:all | [servers]            
+-S --Software    | Specify server software          | -S []:all | [software]           
+-v --Verbose     | Detailed console output          |                                  
 ```
 
 ##### Adding commands

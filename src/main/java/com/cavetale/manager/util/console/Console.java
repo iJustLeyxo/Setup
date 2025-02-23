@@ -23,7 +23,7 @@ public final class Console {
     public static boolean log(@NotNull Type type, @NotNull Style style, @NotNull String msg) {
         if (!Console.logs(type.detail)) return false;
         Console.sep(type);
-        System.out.print(XCode.RESET + style.toString() + msg);
+        System.out.print(Code.RESET + style.toString() + msg);
         Console.empty = false;
         return true;
     }
@@ -39,7 +39,7 @@ public final class Console {
     public static boolean logF(@NotNull Type type, @NotNull Style style, @NotNull String format, @NotNull String... params) {
         if (!Console.logs(type.detail)) return false;
         Console.sep(type);
-        System.out.printf(XCode.RESET + style.toString() + format, (Object[]) params);
+        System.out.printf(Code.RESET + style.toString() + format, (Object[]) params);
         Console.empty = false;
         return true;
     }
@@ -57,8 +57,8 @@ public final class Console {
                                int cols, int colSize, @NotNull Object... objects) {
         if (!Console.logs(type.detail)) return false;
         int dashes = (cols * colSize + cols - 1) - header.length() - 2;
-        StringBuilder b = new StringBuilder(XCode.BOLD + "-".repeat(dashes / 2) + " " + header + " "
-                + "-".repeat(dashes / 2 + dashes % 2) + "\n" + XCode.WEIGHT_OFF);
+        StringBuilder b = new StringBuilder(Code.BOLD + "-".repeat(dashes / 2) + " " + header + " "
+                + "-".repeat(dashes / 2 + dashes % 2) + "\n" + Code.WEIGHT_OFF);
         Arrays.sort(objects);
         int i = 1;
         for (Object o : objects) {
@@ -123,7 +123,7 @@ public final class Console {
     private static void logR(@NotNull Throwable t) {
         if (t instanceof Error) Console.log(Type.ERR);
         else Console.log(Type.WARN);
-        System.out.println(XCode.BOLD + t.getClass().getSimpleName() + ": " + XCode.WEIGHT_OFF + t.getMessage());
+        System.out.println(Code.BOLD + t.getClass().getSimpleName() + ": " + Code.WEIGHT_OFF + t.getMessage());
         for (StackTraceElement e : t.getStackTrace()) {
             StringBuilder b = new StringBuilder("\t");
             String moduleName = e.getModuleName();

@@ -1,22 +1,84 @@
 package com.cavetale.manager.parser;
 
 import com.cavetale.manager.Manager;
-import com.cavetale.manager.data.plugin.*;
+import com.cavetale.manager.data.Sel;
+import com.cavetale.manager.data.plugin.Category;
+import com.cavetale.manager.data.plugin.Plugin;
+import com.cavetale.manager.data.plugin.Server;
 import com.cavetale.manager.data.server.Software;
-import com.cavetale.manager.data.server.Softwares;
 import com.cavetale.manager.util.Util;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public enum Command {
+    COMPARE("Compare installed to selected software", "VERIFY", "CHECK"){
+        @Override
+        public
+        void run(@NotNull Parser parser) {
+            boolean out = false;
+
+            if (Plugin.listSelected()) {
+                out = true;
+
+                List<Plugin> selected = Plugin.get(true, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
+                            " plugin(s) installed", 4, 21, selected.toArray());
+                }
+                selected = Plugin.get(true, false);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
+                            " plugin(s) superfluous", 4, 21, selected.toArray());
+                }
+                selected = Plugin.get(false, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
+                            " plugin(s) missing", 4, 21, selected.toArray());
+                }
+            }
+
+            if (Software.listSelected()) {
+                out = true;
+
+                List<Software> selected = Software.get(true, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.INSTALL, selected.size() +
+                            " software installed", 4, 21, selected.toArray());
+                }
+                selected = Software.get(true, false);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.SUPERFLUOUS, selected.size() +
+                            " software superfluous", 4, 21, selected.toArray());
+                }
+                selected = Software.get(false, true);
+                if (!selected.isEmpty()) {
+                    Console.sep();
+                    Console.logL(Type.REQUESTED, Style.MISSING, selected.size() +
+                            " software missing", 4, 21, selected.toArray());
+                }
+            }
+
+            if (!out) {
+                Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "Nothing selected for comparison\n");
+            }
+        }
+    },
+
     CONNECT("Link this tool to a server installation") {
         @Override
         public void run(@NotNull Parser parser) {
@@ -71,7 +133,7 @@ public enum Command {
                     if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
                         Console.log(Type.ERR, "Linking to " + dest.getName() + " failed (" + e.getMessage() + ")\n");
                     }
-                    if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+                    if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
                 }
             }
         }
@@ -106,7 +168,7 @@ public enum Command {
                 }
             } catch (IOException e) {
                 Console.log(Type.ERR, "Failed to read eula (" + e.getMessage() + ")\n");
-                if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+                if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
                 return;
             }
 
@@ -115,34 +177,34 @@ public enum Command {
                 writer.flush();
             } catch (IOException e) {
                 Console.log(Type.ERR, "Failed to write eula (" + e.getMessage() + ")\n");
-                if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+                if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
             }
         }
     },
 
-    Exit("Exit interactive mode", "E", "Quit", "Q", "Stop") {
+    EXIT("Exit interactive mode", "E", "QUIT", "Q", "STOP") {
         @Override
         public void run(@NotNull Parser parser) {
             Manager.exit();
         }
     },
 
-    Find("Find anything", "Search") {
-        private static double MIN = 0.33;
+    FIND("Find anything", "Search") {
+        private static final double MIN = 0.33;
 
         @Override
         public void run(@NotNull Parser parser) {
             String arg = String.join(" ", parser.args()).toLowerCase();
 
-            boolean all = Flag.all.isSelected() || (!Flag.command.isSelected() && !Flag.flag.isSelected() && !Flag.plugin.isSelected() && !Flag.category.isSelected() && !Flag.server.isSelected() && !Flag.software.isSelected());
+            boolean all = Flag.ALL.isSelected() || (!Flag.COMMAND.isSelected() && !Flag.FLAG.isSelected() && !Flag.PLUGIN.isSelected() && !Flag.CATEGORY.isSelected() && !Flag.SERVER.isSelected() && !Flag.SOFTWARE.isSelected());
             boolean found = false;
 
-            if (all || Flag.command.isSelected()) found = commands(arg);
-            if (all || Flag.flag.isSelected()) found = flags(arg);
-            if (all || Flag.plugin.isSelected()) found = plugins(arg) || found;
-            if (all || Flag.category.isSelected()) found = categories(arg) || found;
-            if (all || Flag.server.isSelected()) found = servers(arg) || found;
-            if (all || Flag.software.isSelected()) found = software(arg) || found;
+            if (all || Flag.COMMAND.isSelected()) found = commands(arg);
+            if (all || Flag.FLAG.isSelected()) found = flags(arg);
+            if (all || Flag.PLUGIN.isSelected()) found = plugins(arg) || found;
+            if (all || Flag.CATEGORY.isSelected()) found = categories(arg) || found;
+            if (all || Flag.SERVER.isSelected()) found = servers(arg) || found;
+            if (all || Flag.SOFTWARE.isSelected()) found = software(arg) || found;
 
             if (!found) Console.log(Type.REQUESTED, Style.WARN, "Nothing found to match \"" + arg + "\"\n");
         }
@@ -165,7 +227,7 @@ public enum Command {
 
         private boolean flags(@NotNull String arg) {
             HashMap<Flag, Double> flags = new HashMap<>();
-            for (Flag flag : Flag.values()) flags.put(flag, Util.similarity(arg, flag.name().toLowerCase()));
+            for (Flag flag : Flag.values()) flags.put(flag, Util.similarity(arg, flag.displayName().toLowerCase()));
             List<Flag> result = flags.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             Console.sep();
@@ -175,7 +237,7 @@ public enum Command {
 
         private boolean plugins(@NotNull String arg) {
             HashMap<Plugin, Double> plugins = new HashMap<>();
-            for (Plugin plugin : Plugin.values()) plugins.put(plugin, Util.similarity(arg, plugin.name().toLowerCase()));
+            for (Plugin plugin : Plugin.values()) plugins.put(plugin, Util.similarity(arg, plugin.displayName().toLowerCase()));
             List<Plugin> result = plugins.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             Console.sep();
@@ -185,7 +247,7 @@ public enum Command {
 
         private boolean categories(@NotNull String arg) {
             HashMap<Category, Double> categories = new HashMap<>();
-            for (Category category : Category.values()) categories.put(category, Util.similarity(arg, category.name().toLowerCase()));
+            for (Category category : Category.values()) categories.put(category, Util.similarity(arg, category.displayName().toLowerCase()));
             List<Category> result = categories.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             Console.sep();
@@ -195,7 +257,7 @@ public enum Command {
 
         private boolean servers(@NotNull String arg) {
             HashMap<Server, Double> servers = new HashMap<>();
-            for (Server server : Server.values()) servers.put(server, Util.similarity(arg, server.name().toLowerCase()));
+            for (Server server : Server.values()) servers.put(server, Util.similarity(arg, server.displayName().toLowerCase()));
             List<Server> result = servers.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             Console.sep();
@@ -205,7 +267,7 @@ public enum Command {
 
         private boolean software(@NotNull String arg) {
             HashMap<Software, Double> software = new HashMap<>();
-            for (Software soft : Software.values()) software.put(soft, Util.similarity(arg, soft.name().toLowerCase()));
+            for (Software soft : Software.values()) software.put(soft, Util.similarity(arg, soft.displayName().toLowerCase()));
             List<Software> result = software.entrySet().stream().filter(e -> MIN <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             Console.sep();
@@ -214,18 +276,18 @@ public enum Command {
         }
     },
 
-    Help("Show usage help") {
+    HELP("Show usage help") {
         @Override
         public void run(@NotNull Parser parser) {
             Manager.help();
         }
     },
 
-    Install("Install plugins and server software", "Add") {
+    INSTALL("Install plugins and server software", "ADD") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Plugin> plugins = Plugins.selected();
-            List<Software> software = Softwares.selected();
+            List<Plugin> plugins = Plugin.selected();
+            List<Software> software = Software.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
@@ -238,7 +300,7 @@ public enum Command {
         }
     },
 
-    Link("Link any jar archive path to the plugins directory") {
+    LINK("Link any jar archive path to the plugins directory") {
         @Override
         public
         void run(@NotNull Parser parser) {
@@ -264,7 +326,7 @@ public enum Command {
 
             for (File origin : files) {
                 Console.log(Type.INFO, "Linking " + origin.getName());
-                File folder = Plugins.FOLDER;
+                File folder = Plugin.FOLDER;
                 folder.mkdirs();
                 File link = new File(folder, origin.getName());
                 if (link.exists()) {
@@ -280,59 +342,59 @@ public enum Command {
                     if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
                         Console.log(Type.ERR, "Linking " + origin.getName() + " failed (" + e.getMessage() + ")\n");
                     }
-                    if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+                    if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
                 }
             }
         }
     },
 
-    List("List plugins, categories, servers and server software", "Show", "Resolve") {
+    LIST("List plugins, categories, servers and server software", "SHOW", "RESOLVE") {
         @Override
         public void run(@NotNull Parser parser) {
-            if (Flag.installed.isSelected()) {
-                if (Flag.all.isSelected()) {
-                    Plugins.listInstalled();
-                    Categories.listInstalled();
-                    Servers.listInstalled();
-                    Softwares.listInstalled();
+            if (Flag.INSTALLED.isSelected()) {
+                if (Flag.ALL.isSelected()) {
+                    Plugin.requestInstalled();
+                    Category.requestInstalled();
+                    Server.requestInstalled();
+                    Software.requestInstalled();
                 } else {
                     boolean selected = false;
-                    if (Flag.plugin.isSelected()) {
-                        Plugins.listInstalled();
+                    if (Flag.PLUGIN.isSelected()) {
+                        Plugin.requestInstalled();
                         selected = true;
                     }
-                    if (Flag.category.isSelected()) {
-                        Categories.listInstalled();
+                    if (Flag.CATEGORY.isSelected()) {
+                        Category.requestInstalled();
                         selected = true;
                     }
-                    if (Flag.server.isSelected()) {
-                        Servers.listInstalled();
+                    if (Flag.SERVER.isSelected()) {
+                        Server.requestInstalled();
                         selected = true;
                     }
-                    if (Flag.software.isSelected()) {
-                        Softwares.listInstalled();
+                    if (Flag.SOFTWARE.isSelected()) {
+                        Software.requestInstalled();
                         selected = true;
                     }
-                    if (!selected) Plugins.listInstalled();
+                    if (!selected) Plugin.requestInstalled();
                 }
             } else {
-                if (Flag.all.isSelected() || (!Flag.plugin.isSelected() && !Flag.category.isSelected() && !Flag.server.isSelected() && !Flag.software.isSelected())) {
-                    Plugins.list();
-                    Categories.list();
-                    Servers.list();
-                    Softwares.list();
-                } else if (Plugins.selected().isEmpty() && Categories.selected().isEmpty() && Servers.selected().isEmpty() && Softwares.selected().isEmpty()) {
-                    if (Flag.plugin.isSelected()) Plugins.list();
-                    if (Flag.category.isSelected()) Categories.list();
-                    if (Flag.server.isSelected()) Servers.list();
-                    if (Flag.software.isSelected()) Softwares.list();
+                if (Flag.ALL.isSelected() || (!Flag.PLUGIN.isSelected() && !Flag.CATEGORY.isSelected() && !Flag.SERVER.isSelected() && !Flag.SOFTWARE.isSelected())) {
+                    Plugin.requestAll();
+                    Category.requestAll();
+                    Server.requestAll();
+                    Software.requestAll();
+                } else if (Plugin.selected().isEmpty() && Category.selected().isEmpty() && Server.selected().isEmpty() && Software.selected().isEmpty()) {
+                    if (Flag.PLUGIN.isSelected()) Plugin.requestAll();
+                    if (Flag.CATEGORY.isSelected()) Category.requestAll();
+                    if (Flag.SERVER.isSelected()) Server.requestAll();
+                    if (Flag.SOFTWARE.isSelected()) Software.requestAll();
                 } else {
-                    if (Flag.plugin.isSelected() || Flag.category.isSelected() || Flag.server.isSelected()) {
-                        Plugins.listSelected();
-                        if (Flag.category.isSelected()) Categories.listSelected();
-                        if (Flag.server.isSelected()) Servers.listSelected();
+                    if (Flag.PLUGIN.isSelected() || Flag.CATEGORY.isSelected() || Flag.SERVER.isSelected()) {
+                        Plugin.listSelected();
+                        if (Flag.CATEGORY.isSelected()) Category.listSelected();
+                        if (Flag.SERVER.isSelected()) Server.listSelected();
                     }
-                    if (Flag.software.isSelected()) Softwares.listSelected();
+                    if (Flag.SOFTWARE.isSelected()) Software.listSelected();
                 }
             }
         }
@@ -341,21 +403,21 @@ public enum Command {
     RUN("Run installed server software") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Software> selected = Softwares.selected();
-            if (!Flag.software.isSelected() || Softwares.selected().isEmpty()) {
+            List<Software> selected = Software.selected();
+            if (!Flag.SOFTWARE.isSelected() || Software.selected().isEmpty()) {
                 selected = Arrays.asList(Software.values());
             }
             if (selected.size() > 1) Console.log(Type.WARN, "Multiple software selected\n");
             for (Software software : selected) {
                 List<String> installations = software.installations();
                 if (!installations.isEmpty()) {
-                    if (installations.size() > 1) Console.log(Type.WARN, software.name() + " has multiple installations\n");
+                    if (installations.size() > 1) Console.log(Type.WARN, software.displayName() + " has multiple installations\n");
                     String installation = installations.getFirst();
-                    Console.log(Type.INFO, "Running " + installation + "\n\n" + XCode.RESET);
+                    Console.log(Type.INFO, "Running " + installation + "\n\n" + Code.RESET);
 
                     try {
                         ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
-                        builder.directory(Softwares.FOLDER);
+                        builder.directory(Software.FOLDER);
                         builder.redirectErrorStream(true);
                         Process process = builder.start();
 
@@ -378,12 +440,12 @@ public enum Command {
 
                         Thread outThread = new Thread(() -> {
                             try {
-                                System.out.print(XCode.GRAY + "[" + software.name() + "] " + XCode.RESET);
+                                System.out.print(Code.DARK_GRAY_FG + "[" + software.displayName() + "] " + Code.RESET);
                                 int i = outStream.read(); // i: current char
                                 while(0 <= i) {
                                     System.out.write(i);
                                     System.out.flush();
-                                    if (i == '\n') System.out.print(XCode.GRAY + "[" + software.name() + "] " + XCode.RESET);
+                                    if (i == '\n') System.out.print(Code.DARK_GRAY_FG + "[" + software.displayName() + "] " + Code.RESET);
                                     i = outStream.read();
                                 }
                                 inThread.interrupt();
@@ -397,10 +459,10 @@ public enum Command {
                         else Console.log(Type.WARN, "\n\n" + installation + " exited with code " + exit + "\n");
                     } catch (IOException e) {
                         Console.log(Type.ERR, "\n\nFailed to run " + installation + " (" + e.getMessage() + ")\n");
-                        if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+                        if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
                     } catch (InterruptedException e) {
                         Console.log(Type.WARN, "\n\n" + installation + " was interrupted\n");
-                        if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+                        if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
                     }
 
                     return;
@@ -410,20 +472,27 @@ public enum Command {
         }
     },
 
-    Status("View installation status", "Info", "Verify", "Check") {
+    STATUS("View installation status", "STATE", "INFO") {
         @Override
         public
         void run(@NotNull Parser parser) {
-            Plugins.summarize();
-            Softwares.summarize();
+            boolean out = Plugin.listInstalled();
+            out = Plugin.listLinked() || out;
+            out = Plugin.listUnknown() || out;
+            out = Software.listInstalled() || out;
+            out = Software.listUnknown() || out;
+
+            if (!out) {
+                Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "Nothing installed to show\n");
+            }
         }
     },
 
-    Uninstall("Uninstall plugins, server software and files", "Remove", "Delete") {
+    UNINSTALL("Uninstall plugins, server software and files", "Remove", "Delete") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Plugin> plugins = Plugins.selected();
-            List<Software> software = Softwares.selected();
+            List<Plugin> plugins = Plugin.selected();
+            List<Software> software = Software.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
@@ -436,14 +505,14 @@ public enum Command {
         }
     },
 
-    Update("Update plugins and software", "Upgrade") {
+    UPDATE("Update plugins and software", "Upgrade") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Plugin> plugins = Plugins.selected();
-            List<Software> software = Softwares.selected();
+            List<Plugin> plugins = Plugin.selected();
+            List<Software> software = Software.selected();
             if (plugins.isEmpty() && software.isEmpty()) { // Auto select installed if nothing specified
-                plugins = Plugins.installed();
-                software = Softwares.installed();
+                plugins = Plugin.installed();
+                software = Software.installed();
             }
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
@@ -460,13 +529,22 @@ public enum Command {
     public final @NotNull String[] refs;
     public final @NotNull String info;
 
-    private boolean selected = false;
+    private @NotNull Sel sel = Sel.OFF;
 
     Command(@NotNull String info, @NotNull String @NotNull ... refs) {
         this.refs = new String[refs.length + 1];
-        this.refs[0] = this.name().toLowerCase();
+        this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(refs, 0, this.refs, 1, refs.length);
         this.info = info;
+    }
+
+    public @NotNull String displayName() {
+        return this.refs[0];
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return this.displayName();
     }
 
     public abstract void run(@NotNull Parser parser);
@@ -480,12 +558,26 @@ public enum Command {
         throw new NotFoundException(ref);
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public boolean isTargeted() {
+        return this.sel == Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.OFF;
+    }
+
+    public void reset() {
+        this.sel = Sel.OFF;
     }
 
     public static class NotFoundException extends InputException {

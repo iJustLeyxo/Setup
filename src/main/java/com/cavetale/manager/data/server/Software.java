@@ -1,15 +1,20 @@
 package com.cavetale.manager.data.server;
 
 import com.cavetale.manager.data.DataException;
+import com.cavetale.manager.data.Sel;
+import com.cavetale.manager.data.plugin.Plugin;
 import com.cavetale.manager.download.Source;
 import com.cavetale.manager.download.Ver;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
+import com.cavetale.manager.parser.container.SoftwareContainer;
 import com.cavetale.manager.util.Util;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,101 +26,116 @@ import java.util.List;
  * Server software, used to register downloadable server software
  */
 public enum Software {
-    Paper(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
+    PAPER(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
 
-    private final @NotNull Source source;
     private final @NotNull String[] refs;
+    private final @NotNull Source source;
 
-    private boolean selected = false;
-    private final @NotNull List<String> installations = new LinkedList<>();
+    private @Nullable Sel sel = null;
+    private @Nullable List<String> inst = null;
 
     Software(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this.source = new Source.Other(uri, ver);
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = this.name();
+        this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
+
+        this.source = new Source.Other(uri, ver);
+    }
+
+    public @NotNull String displayName() {
+        return this.refs[0];
     }
 
     @Override
     public @NotNull String toString() {
-        return this.refs[0];
+        return this.displayName();
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void revert() {
+        this.sel = null;
+        this.inst = null;
+    }
+
+    //= Selection ==
+
+    public void target() {
+        this.sel = Sel.TARGET;
+    }
+
+    public void select() {
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
+    }
+
+    public void deselect() {
+        this.sel = Sel.OFF;
     }
 
     public boolean isSelected() {
-        return this.selected;
+        return this.sel != Sel.OFF;
     }
 
-    public void clearInstallations() {
-        this.installations.clear();
-    }
+    //= Installation ==
 
-    public void addInstallation(@NotNull String file) {
-        this.installations.add(file);
+    public @NotNull List<String> installations() {
+        if (this.inst == null) Software.loadInstallation();
+        return this.inst;
     }
 
     public boolean isInstalled() {
-        return !this.installations.isEmpty();
+        return !this.installations().isEmpty();
     }
 
-    public @NotNull List<String> installations() {
-        return this.installations;
-    }
+    //= Actions ==
 
     public void install() {
-        Console.log(Type.INFO, "Installing " + this.name() + " software");
+        Console.log(Type.INFO, "Installing " + this.displayName() + " software");
         if (this.isInstalled()) {
             if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
-                Console.log(Type.WARN, "Installing " + this.name() + " software skipped (already installed)\n");
+                Console.log(Type.WARN, "Installing " + this.displayName() + " software skipped (already installed)\n");
             }
             return;
         }
         try {
-            String file = this.name() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Softwares.FOLDER, file));
-            this.installations.add(file);
+            String file = this.displayName() + "-" + this.source.ver() + ".jar";
+            Util.download(this.source.uri(), new File(Software.FOLDER, file));
+            this.installations().add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Installing " + this.name() + " software failed (" + e.getMessage() + ")\n");
+                Console.log(Type.ERR, "Installing " + this.displayName() + " software failed (" + e.getMessage() + ")\n");
             }
-            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
     public void update() {
-        Console.log(Type.INFO, "Updating " + this.name() + " software"); // Uninstall software
-        File folder = Softwares.FOLDER;
-        for (String file : this.installations) {
-            if (new File(folder, file).delete()) continue;
+        Console.log(Type.INFO, "Updating " + this.displayName() + " software"); // Uninstall software
+        for (String file : this.installations()) {
+            if (new File(Software.FOLDER, file).delete()) continue;
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                Console.log(Type.ERR, "Updating " + this.name() + " software failed - failed to delete " + file + "\n");
+                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to delete " + file + "\n");
             }
             return;
         }
-        this.installations.clear();
+        this.installations().clear();
 
         try { // Install software
-            String file = this.name() + "-" + source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Softwares.FOLDER, file));
-            this.installations.add(file);
+            String file = this.displayName() + "-" + source.ver() + ".jar";
+            Util.download(this.source.uri(), new File(Software.FOLDER, file));
+            this.installations().add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Updating " + this.name() + " software failed - failed to download (" + e.getMessage() + ")\n");
+                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to download (" + e.getMessage() + ")\n");
             }
-            if (Flag.error.isSelected()) Console.log(Type.REQUESTED, e);
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
 
     public void uninstall() {
-        File folder = Softwares.FOLDER;
-        for (String f : this.installations) {
+        for (String f : this.installations()) {
             Console.log(Type.INFO, "Uninstalling " + f + " software");
-            if (new File(folder, f).delete()) {
+            if (new File(Software.FOLDER, f).delete()) {
                 Console.log(Type.INFO, Style.DONE, " done\n");
                 continue;
             }
@@ -123,7 +143,7 @@ public enum Software {
                 Console.log(Type.ERR, "Uninstalling " + f + " software failed\n");
             }
         }
-        this.installations.clear();
+        this.installations().clear();
     }
 
     public static @NotNull Software get(@NotNull String ref) throws SoftwareNotFoundException {
@@ -142,6 +162,144 @@ public enum Software {
         ref = ref.substring(0, endStart);
         for (Software s : Software.values()) for (String r : s.refs) if (ref.equalsIgnoreCase(r)) return s;
         throw new SoftwareNotFoundException(ref);
+    }
+
+    //= Indexing ==
+
+    public static final @NotNull File FOLDER = new File("./");
+
+    private static @Nullable List<Software> selected = null;
+    private static @Nullable List<Software> installed = null;
+    private static @Nullable List<String> unknown = null;
+
+    public static @NotNull List<Software> selected() {
+        if (Software.selected == null) Software.loadSelection();
+        return Software.selected;
+    }
+
+    public static @NotNull List<Software> installed() {
+        if (Software.installed == null) Software.loadInstallation();
+        return Software.installed;
+    }
+
+    public static @NotNull List<String> unknown() {
+        if (Software.unknown == null) Software.loadInstallation();
+        return Software.unknown;
+    }
+
+    public static void reset() {
+        Console.log(Type.DEBUG, "Resetting software\n");
+        for (Software s : Software.values()) s.revert();
+        Software.selected = null;
+        Software.installed = null;
+        Software.unknown = null;
+    }
+
+    public static void loadSelection() {
+        Console.log(Type.EXTRA, "Reloading selected software\n");
+        for (Software s : Software.values()) s.deselect();
+        Software.selected = new LinkedList<>();
+
+        SoftwareContainer softwares = (SoftwareContainer) Flag.SOFTWARE.container();
+        if (Flag.INSTALLED.isSelected()) {
+            Console.log(Type.DEBUG, "Selecting installed software\n");
+            for (Software s : Software.installed()) s.target();
+        } else if (Flag.ALL.isSelected() || (Flag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
+            Console.log(Type.DEBUG, "Selecting all software\n");
+            for (Software s : Software.values()) s.target();
+        } else {
+            Console.log(Type.DEBUG, "Selecting servers " + softwares.get() + "\n");
+            for (Software s : softwares.get()) s.target(); // Select by software
+        }
+
+        for (Software s : Software.values()) if (s.isSelected()) Software.selected.add(s); // Update selection
+    }
+
+    public static void loadInstallation() {
+        Console.log(Type.EXTRA, "Reloading installed software\n");
+        for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
+        Software.installed = new LinkedList<>();
+        Software.unknown = new LinkedList<>();
+        // Scan installations
+        File[] files = Software.FOLDER.listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (f.getName().startsWith("Setup")) continue;
+            Software s = null;
+            try {
+                s = Software.get(f);
+            } catch (Software.NotASoftwareException e) {
+                continue;
+            } catch (Software.SoftwareNotFoundException ignored) {}
+            if (s != null) s.installations().add(f.getName());
+            else Software.unknown.add(f.getName());
+        }
+
+        for (Software s : Software.values()) if (s.isInstalled()) Software.installed.add(s); // Update installations
+    }
+
+    public static @NotNull List<Software> get(@Nullable Boolean installed, @Nullable Boolean selected) {
+        List<Software> software = new LinkedList<>();
+        for (Software s : Software.values()) {
+            if ((installed == null || installed == s.isInstalled()) &&
+                    (selected == null || selected == s.isSelected())) {
+                software.add(s);
+            }
+        }
+        return software;
+    }
+
+    //= Cosmetics ==
+
+    public static void requestAll() {
+        Console.sep();
+
+        if (Software.values().length == 0) {
+            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software available\n");
+            return;
+        }
+
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.values().length +
+                " software available", 4, 21, (Object[]) Software.values());
+    }
+
+    public static boolean listSelected() {
+        List<Software> selected = Software.selected();
+        if (selected.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, selected.size() +
+                " software selected", 4, 21, selected.toArray());
+        return true;
+    }
+
+    public static boolean listInstalled() {
+        List<Software> software = Software.installed();
+        if (software.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, software.size() +
+                " software installed", 4, 21, software.toArray());
+        return true;
+    }
+
+    public static void requestInstalled() {
+        Console.sep();
+
+        if (Software.installed().isEmpty()) {
+            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software installed\n");
+            return;
+        }
+
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.installed().size() +
+                " software installed", 4, 21, Software.installed().toArray());
+    }
+
+    public static boolean listUnknown() {
+        List<String> unknown = Software.unknown();
+        if (unknown.isEmpty()) return false;
+        Console.sep();
+        Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
+                " software unknown", 4, 21, unknown.toArray());
+        return true;
     }
 
     public static final class SoftwareNotFoundException extends InputException {
