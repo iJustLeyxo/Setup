@@ -64,10 +64,10 @@ public final class Util {
         return file;
     }
 
-    public static void finalise(@NotNull File file, @NotNull File folder, @NotNull String name) throws IOException {
+    public static void finalise(@NotNull File stash, @NotNull File folder, @NotNull String name) throws IOException {
         folder.mkdirs();
-        Files.copy(file.toPath(), new File(folder, name).toPath());
-        file.delete();
+        Files.copy(stash.toPath(), new File(folder, name).toPath());
+        stash.delete();
     }
 
     public static double similarity(@NotNull String s1, @NotNull String s2) {
