@@ -124,6 +124,8 @@ public enum Flag {
 
     public void reset() {
         this.sel = Sel.OFF;
+        Container<?> container = this.container();
+        if (container != null) container.clear();
     }
 
     public @Nullable Container<?> container() {

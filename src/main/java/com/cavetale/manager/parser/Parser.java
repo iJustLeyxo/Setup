@@ -28,12 +28,8 @@ public final class Parser {
     public Parser(@NotNull String arg) throws InputException {
         Console.log(Type.EXTRA, "Parsing input\n");
 
-        for (Command c : Command.values()) c.target(); // Reset commands and flags
-        for (Flag f : Flag.values()) {
-            f.target();
-            Container<?> container = f.container();
-            if (container != null) container.clear();
-        }
+        for (Command c : Command.values()) c.reset(); // Reset commands and flags
+        for (Flag f : Flag.values()) f.reset();
 
         chars = arg.toCharArray(); // Parse
         i = 0;
