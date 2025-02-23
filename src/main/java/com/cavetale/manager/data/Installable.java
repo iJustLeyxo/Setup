@@ -24,9 +24,7 @@ public interface Installable {
     default void install() {
         Console.log(Type.INFO, "Installing " + this.displayName());
         if (this.isInstalled()) {
-            if (!Console.log(Type.INFO, Style.WARN, " skipped (already installed)\n")) {
-                Console.log(Type.WARN, "Installing " + this.displayName() + " skipped (already installed)\n");
-            }
+            Console.log(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)");
             return;
         }
 
@@ -36,9 +34,7 @@ public interface Installable {
             this.installations().add(name);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Installing " + this.displayName() + " failed (" + e.getMessage() + ")\n");
-            }
+            Console.log(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed (" + e.getMessage() + ")\n");
             if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
@@ -53,9 +49,7 @@ public interface Installable {
         try {
             file = Util.stash(this.source().uri());
         } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " failed - failed to download (" + e.getMessage() + ")\n");
-            }
+            Console.log(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download (" + e.getMessage() + ")\n");
             if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
             return;
         }
@@ -66,9 +60,7 @@ public interface Installable {
             File f = new File(Plugin.FOLDER, inst);
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
-                if (!Console.log(Type.EXTRA, Style.ERR, " failed - failed to delete " + f + "\n")) {
-                    Console.log(Type.ERR, "Updating " + this.displayName() + " failed - failed to delete " + f + "\n");
-                }
+                Console.log(Type.EXTRA, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
             } else if (!Console.log(Type.EXTRA, Style.ERR, " failed - skipped " + f + " (linked)\n")) {
                 Console.log(Type.ERR, "Updating " + this.displayName() + " failed - skipped " + f + " (linked)\n");
             }
@@ -82,9 +74,7 @@ public interface Installable {
             this.installations().add(name);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
-            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " failed - failed to download (" + e.getMessage() + ")\n");
-            }
+            Console.log(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download (" + e.getMessage() + ")\n");
             if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
         }
     }
@@ -97,12 +87,8 @@ public interface Installable {
                 if (file.delete()) {
                     this.installations().remove(inst);
                     Console.log(Type.INFO, Style.DONE, " done\n");
-                } else if (!Console.log(Type.EXTRA, Style.ERR, " failed\n")) {
-                    Console.log(Type.ERR, "Uninstalling " + file + " failed\n");
-                }
-            } else if (!Console.log(Type.EXTRA, Style.WARN, " skipped (linked)\n")) {
-                Console.log(Type.WARN, "Uninstalling " + file + " skipped (linked)\n");
-            }
+                } else Console.log(Type.EXTRA, Type.ERR, "Uninstalling " + file, " failed\n");
+            } else Console.log(Type.EXTRA, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
         }
     }
 }

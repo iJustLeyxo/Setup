@@ -113,26 +113,21 @@ public enum Command {
             for (File dest : files) {
                 Console.log(Type.INFO, "Linking to " + dest.getName());
                 if (!dest.isDirectory()) {
-                    if (!Console.log(Type.INFO, Style.ERR, " failed (not a folder)\n")) {
-                        Console.log(Type.ERR, "Linking to " + dest.getName() + " failed (not a folder)\n");
-                    }
+                    Console.log(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (not a folder)\n");
                     continue;
                 }
                 dest.mkdirs();
                 File file = new File(dest, installation.getName());
                 if (file.exists()) {
-                    if (!Console.log(Type.INFO, Style.ERR, " failed (already exists)\n")) {
-                        Console.log(Type.ERR, "Linking to " + dest.getName() + " failed (already exists)\n");
-                    }
+                    Console.log(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (already exists)\n");
                     return;
                 }
+
                 try {
                     Files.createSymbolicLink(file.toPath(), installation.toPath());
                     Console.log(Type.INFO, Style.DONE, " done\n");
                 } catch (IOException e) {
-                    if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                        Console.log(Type.ERR, "Linking to " + dest.getName() + " failed (" + e.getMessage() + ")\n");
-                    }
+                    Console.log(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (" + e.getMessage() + ")\n");
                     if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
                 }
             }
@@ -339,9 +334,7 @@ public enum Command {
                     Files.createSymbolicLink(link.getAbsoluteFile().toPath(), origin.getAbsoluteFile().toPath());
                     Console.log(Type.INFO, Style.DONE, " done\n");
                 } catch (IOException e) {
-                    if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
-                        Console.log(Type.ERR, "Linking " + origin.getName() + " failed (" + e.getMessage() + ")\n");
-                    }
+                    Console.log(Type.INFO, Type.ERR, "Linking " + origin.getName(), " failed (" + e.getMessage() + ")\n");
                     if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
                 }
             }
