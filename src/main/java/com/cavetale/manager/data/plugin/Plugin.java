@@ -166,8 +166,6 @@ public enum Plugin implements Provider {
 
     // TODO: Custom printing
     private @NotNull Sel sel = Sel.NONE;
-    // TODO: Compute on request
-    private boolean installed = false;
     // TODO: Linked?
     private final @NotNull List<String> installations = new LinkedList<>();
 
@@ -256,17 +254,15 @@ public enum Plugin implements Provider {
     }
 
     public void clearInstallations() {
-        this.installed = false;
         this.installations.clear();
     }
 
     public void addInstallation(@NotNull String file) {
-        this.installed = true;
         this.installations.add(file);
     }
 
     public boolean isInstalled() {
-        return this.installed;
+        return !this.installations.isEmpty();
     }
 
     public void install() {

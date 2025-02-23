@@ -42,8 +42,6 @@ public final class Servers {
         Console.log(Type.EXTRA, "Reloading installed servers\n");
         Servers.installed.clear(); // Reset installations
 
-        for (Server s : Server.values()) s.setInstalled(); // Update installations
-
         for (Server s : Server.values()) if (s.isInstalled()) Servers.installed.add(s); // Update installation
     }
 

@@ -43,8 +43,6 @@ public final class Categories {
         Console.log(Type.EXTRA, "Reloading installed categories\n");
         Categories.installed.clear(); // Reset installations
 
-        for (Category c : Category.values()) c.setInstalled(); // Update installations
-
         for (Category c : Category.values()) if (c.isInstalled()) Categories.installed.add(c); // Update installation
     }
 

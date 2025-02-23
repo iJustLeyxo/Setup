@@ -7,6 +7,7 @@ import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
 import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,8 +49,7 @@ public enum Category implements Provider {
 
     // TODO: Custom printing
     private @NotNull Sel sel = Sel.NONE;
-    // TODO: Compute on request
-    private boolean installed = false;
+    private @Nullable Boolean inst = null;
 
     Category(@NotNull String info, @NotNull Plugin @NotNull ... plugins) {
         this.info = info;
@@ -79,6 +79,11 @@ public enum Category implements Provider {
         return this.name();
     }
 
+    public void reset() {
+        this.sel = Sel.NONE;
+        this.inst = null;
+    }
+
     //= Selection ==
 
     public void target() {
@@ -97,23 +102,22 @@ public enum Category implements Provider {
         return this.sel != Sel.NONE;
     }
 
-    public void reset() {
-        this.sel = Sel.NONE;
-    }
-
-    public void setInstalled() {
-        this.installed = true;
-
-        for (Plugin p : this.plugins) {
-            if (!p.isInstalled()) {
-                this.installed = false;
-                return;
-            }
-        }
-    }
+    //= Installation ==
 
     public boolean isInstalled() {
-        return this.installed;
+        if (this.inst != null) return this.inst;
+        return this.checkInstalled();
+    }
+
+    private boolean checkInstalled() {
+        this.inst = true;
+
+        for (Plugin p : this.plugins) if (!p.isInstalled()) {
+            this.inst = false;
+            return false;
+        }
+
+        return true;
     }
 
     public static @NotNull Category get(@NotNull String ref) throws NotFoundException {

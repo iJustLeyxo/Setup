@@ -7,6 +7,7 @@ import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
 import com.cavetale.manager.util.console.XCode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -34,8 +35,7 @@ public enum Server implements Provider {
 
     // TODO: Custom printing
     private @NotNull Sel sel = Sel.NONE;
-    // TODO: Compute on request
-    private boolean installed = false;
+    private @Nullable Boolean inst = null;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
         this.info = info;
@@ -71,6 +71,11 @@ public enum Server implements Provider {
         return this.plugins;
     }
 
+    public void reset() {
+        this.sel = Sel.NONE;
+        this.inst = null;
+    }
+
     //= Selection ==
 
     public void target() {
@@ -89,30 +94,27 @@ public enum Server implements Provider {
         return this.sel != Sel.NONE;
     }
 
-    public void reset() {
-        this.sel = Sel.NONE;
-    }
-
-    public void setInstalled() {
-        this.installed = true;
-
-        for (Plugin p : this.plugins) {
-            if (!p.isInstalled()) {
-                this.installed = false;
-                return;
-            }
-        }
-
-        for (Category c : this.categories) {
-            if (!c.isInstalled()) {
-                this.installed = false;
-                return;
-            }
-        }
-    }
+    //= Installation ==
 
     public boolean isInstalled() {
-        return this.installed;
+        if (this.inst != null) return this.inst;
+        return this.checkInstalled();
+    }
+
+    private boolean checkInstalled() {
+        this.inst = true;
+
+        for (Plugin p : this.plugins) if (!p.isInstalled()) {
+            this.inst = false;
+            return false;
+        }
+
+        for (Category c : this.categories) if (!c.isInstalled()) {
+            this.inst = false;
+            return false;
+        }
+
+        return true;
     }
 
     public static @NotNull Server get(@NotNull String ref) throws NotFoundException {
