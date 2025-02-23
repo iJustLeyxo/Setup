@@ -6,7 +6,6 @@ import com.cavetale.manager.download.Source;
 import com.cavetale.manager.download.Ver;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
-import com.cavetale.manager.parser.Parser;
 import com.cavetale.manager.parser.container.SoftwareContainer;
 import com.cavetale.manager.util.Util;
 import com.cavetale.manager.util.console.Code;
@@ -31,8 +30,8 @@ public enum Software {
     private final @NotNull String[] refs;
     private final @NotNull Source source;
 
-    private @NotNull Sel sel = Sel.OFF;
-    private final @NotNull List<String> installations = new LinkedList<>();
+    private @Nullable Sel sel = null;
+    private @Nullable List<String> inst = null;
 
     Software(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
@@ -51,43 +50,41 @@ public enum Software {
         return this.displayName();
     }
 
+    public void revert() {
+        this.sel = null;
+        this.inst = null;
+    }
+
     //= Selection ==
 
     public void target() {
         this.sel = Sel.TARGET;
     }
 
-    public boolean isTargeted() {
-        return this.sel == Sel.TARGET;
+    public void select() {
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
     }
 
-    public void select() {
-        if (this.sel == Sel.OFF) this.sel = Sel.ON;
+    public void deselect() {
+        this.sel = Sel.OFF;
     }
 
     public boolean isSelected() {
         return this.sel != Sel.OFF;
     }
 
-    public void reset() {
-        this.sel = Sel.OFF;
-    }
+    //= Installation ==
 
-    public void clearInstallations() {
-        this.installations.clear();
-    }
-
-    public void addInstallation(@NotNull String file) {
-        this.installations.add(file);
+    public @NotNull List<String> installations() {
+        if (this.inst == null) Software.loadInstallation();
+        return this.inst;
     }
 
     public boolean isInstalled() {
-        return !this.installations.isEmpty();
+        return !this.installations().isEmpty();
     }
 
-    public @NotNull List<String> installations() {
-        return this.installations;
-    }
+    //= Actions ==
 
     public void install() {
         Console.log(Type.INFO, "Installing " + this.displayName() + " software");
@@ -100,7 +97,7 @@ public enum Software {
         try {
             String file = this.displayName() + "-" + this.source.ver() + ".jar";
             Util.download(this.source.uri(), new File(Software.FOLDER, file));
-            this.installations.add(file);
+            this.installations().add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
@@ -112,20 +109,19 @@ public enum Software {
 
     public void update() {
         Console.log(Type.INFO, "Updating " + this.displayName() + " software"); // Uninstall software
-        File folder = Software.FOLDER;
-        for (String file : this.installations) {
-            if (new File(folder, file).delete()) continue;
+        for (String file : this.installations()) {
+            if (new File(Software.FOLDER, file).delete()) continue;
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to delete " + file + "\n")) {
                 Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to delete " + file + "\n");
             }
             return;
         }
-        this.installations.clear();
+        this.installations().clear();
 
         try { // Install software
             String file = this.displayName() + "-" + source.ver() + ".jar";
             Util.download(this.source.uri(), new File(Software.FOLDER, file));
-            this.installations.add(file);
+            this.installations().add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
@@ -136,10 +132,9 @@ public enum Software {
     }
 
     public void uninstall() {
-        File folder = Software.FOLDER;
-        for (String f : this.installations) {
+        for (String f : this.installations()) {
             Console.log(Type.INFO, "Uninstalling " + f + " software");
-            if (new File(folder, f).delete()) {
+            if (new File(Software.FOLDER, f).delete()) {
                 Console.log(Type.INFO, Style.DONE, " done\n");
                 continue;
             }
@@ -147,17 +142,8 @@ public enum Software {
                 Console.log(Type.ERR, "Uninstalling " + f + " software failed\n");
             }
         }
-        this.installations.clear();
+        this.installations().clear();
     }
-
-    //= Static ==
-
-    // TODO: Only resolve when requested
-    public static final @NotNull File FOLDER = new File("./");
-
-    private static final @NotNull List<Software> selected = new LinkedList<>();
-    private static final @NotNull List<Software> installed = new LinkedList<>();
-    private static final @NotNull List<String> unknown = new LinkedList<>();
 
     public static @NotNull Software get(@NotNull String ref) throws SoftwareNotFoundException {
         for (Software s : Software.values()) for (String r : s.refs) if (r.equalsIgnoreCase(ref)) return s;
@@ -177,15 +163,46 @@ public enum Software {
         throw new SoftwareNotFoundException(ref);
     }
 
-    public static void reloadSelected(@NotNull Parser parser) {
+    //= Indexing ==
+
+    public static final @NotNull File FOLDER = new File("./");
+
+    private static @Nullable List<Software> selected = null;
+    private static @Nullable List<Software> installed = null;
+    private static @Nullable List<String> unknown = null;
+
+    public static @NotNull List<Software> selected() {
+        if (Software.selected == null) Software.loadSelection();
+        return Software.selected;
+    }
+
+    public static @NotNull List<Software> installed() {
+        if (Software.installed == null) Software.loadInstallation();
+        return Software.installed;
+    }
+
+    public static @NotNull List<String> unknown() {
+        if (Software.unknown == null) Software.loadInstallation();
+        return Software.unknown;
+    }
+
+    public static void reset() {
+        Console.log(Type.DEBUG, "Resetting software\n");
+        for (Software s : Software.values()) s.revert();
+        Software.selected = null;
+        Software.installed = null;
+        Software.unknown = null;
+    }
+
+    public static void loadSelection() {
         Console.log(Type.EXTRA, "Reloading selected software\n");
-        for (Software s : Software.values()) s.reset(); // Reset selections
-        Software.selected.clear();
+        for (Software s : Software.values()) s.deselect();
+        Software.selected = new LinkedList<>();
 
         SoftwareContainer softwares = (SoftwareContainer) Flag.SOFTWARE.container();
         if (Flag.INSTALLED.isSelected()) {
             Console.log(Type.DEBUG, "Selecting installed software\n");
-            for (Software s : Software.installed) s.target();
+            for (Software s : Software.installed()) s.target();
         } else if (Flag.ALL.isSelected() || (Flag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all software\n");
             for (Software s : Software.values()) s.target();
@@ -197,11 +214,11 @@ public enum Software {
         for (Software s : Software.values()) if (s.isSelected()) Software.selected.add(s); // Update selection
     }
 
-    public static void reloadInstallations() {
+    public static void loadInstallation() {
         Console.log(Type.EXTRA, "Reloading installed software\n");
-        for (Software s : Software.values()) s.clearInstallations(); // Reset installations
-        Software.installed.clear();
-        Software.unknown.clear();
+        for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
+        Software.installed = new LinkedList<>();
+        Software.unknown = new LinkedList<>();
         // Scan installations
         File[] files = Software.FOLDER.listFiles();
         if (files == null) return;
@@ -213,7 +230,7 @@ public enum Software {
             } catch (Software.NotASoftwareException e) {
                 continue;
             } catch (Software.SoftwareNotFoundException ignored) {}
-            if (s != null) s.addInstallation(f.getName());
+            if (s != null) s.installations().add(f.getName());
             else Software.unknown.add(f.getName());
         }
 
@@ -231,20 +248,8 @@ public enum Software {
         return software;
     }
 
-    public static @NotNull List<Software> installed() {
-        return Software.installed;
-    }
-
-    public static @NotNull List<Software> selected() {
-        return Software.selected;
-    }
-
-    public static @NotNull List<String> unknown() {
-        return Software.unknown;
-    }
-
     public static void summarize() {
-        if (!Software.selected.isEmpty()) Software.summarizeSelected(); // Compare selected to installed software
+        if (!Software.selected().isEmpty()) Software.summarizeSelected(); // Compare selected to installed software
         else if (!Software.installed().isEmpty()) Software.summarizeInstalled(); // Show installed software if nothing is selected
         else {
             Console.sep();
@@ -254,7 +259,7 @@ public enum Software {
 
     private static void summarizeSelected() {
         Console.sep();
-        List<Software> selected = Software.selected;
+        List<Software> selected = Software.selected();
         Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
                 " software selected", 4, 21, selected.toArray());
         selected = Software.get(true, true);
@@ -279,11 +284,10 @@ public enum Software {
 
     private static void summarizeInstalled() {
         Console.sep();
-        List<Software> installed = Software.installed;
-        installed.remove(null);
+        List<Software> installed = Software.installed();
         Console.logL(Type.REQUESTED, Style.SOFTWARE, installed.size() +
                 " software installed", 4, 21, installed.toArray());
-        List<String> unknown = Software.unknown; // Always show unknown software
+        List<String> unknown = Software.unknown(); // Always show unknown software
         if (!unknown.isEmpty()) {
             Console.sep();
             Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
@@ -292,25 +296,25 @@ public enum Software {
     }
 
     public static void listSelected() {
-        if (Software.selected.isEmpty()) {
+        if (Software.selected().isEmpty()) {
             Console.sep();
             Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software selected\n");
             return;
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.selected.size() + " software selected", 4, 21, Software.selected.toArray());
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.selected().size() + " software selected", 4, 21, Software.selected().toArray());
     }
 
     public static void listInstalled() {
-        if (Software.installed.isEmpty()) {
+        if (Software.installed().isEmpty()) {
             Console.sep();
             Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software installed\n");
             return;
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.installed.size() + " software installed", 4, 21, Software.installed.toArray());
+        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.installed().size() + " software installed", 4, 21, Software.installed().toArray());
     }
 
     public static void list() {

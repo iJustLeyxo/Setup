@@ -4,13 +4,19 @@ import com.cavetale.manager.data.plugin.Category;
 import com.cavetale.manager.data.plugin.Plugin;
 import com.cavetale.manager.data.plugin.Server;
 import com.cavetale.manager.data.server.Software;
-import com.cavetale.manager.parser.*;
+import com.cavetale.manager.parser.Command;
+import com.cavetale.manager.parser.Flag;
+import com.cavetale.manager.parser.InputException;
+import com.cavetale.manager.parser.Parser;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.Code;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Cavetale installation manager, used to manage plugins and server software for testing servers
@@ -34,14 +40,10 @@ public final class Manager {
                 if (cmd == null) {
                     if (!changed) Console.log(Type.WARN, "Nothing to do. Try typing \"help\".\n");
                 } else {
-                    Plugin.reloadInstallations();
-                    Category.reloadInstallations();
-                    Server.reloadInstallations();
-                    Software.reloadInstallations();
-                    Software.reloadSelected(parser);
-                    Server.reloadSelected(parser);
-                    Category.reloadSelected(parser);
-                    Plugin.reloadSelected(parser);
+                    Plugin.reset();
+                    Category.reset();
+                    Server.reset();
+                    Software.reset();
 
                     Console.log(Type.EXTRA, "Running command " + cmd.displayName() + " with args " + parser.args() + " and flags " + parser.flags() + "\n");
 

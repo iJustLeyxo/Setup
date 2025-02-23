@@ -2,18 +2,23 @@ package com.cavetale.manager.parser;
 
 import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.Sel;
-import com.cavetale.manager.data.plugin.*;
+import com.cavetale.manager.data.plugin.Category;
+import com.cavetale.manager.data.plugin.Plugin;
+import com.cavetale.manager.data.plugin.Server;
 import com.cavetale.manager.data.server.Software;
 import com.cavetale.manager.util.Util;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public enum Command {
     // TODO: Compare only
@@ -137,7 +142,7 @@ public enum Command {
     },
 
     FIND("Find anything", "Search") {
-        private static double MIN = 0.33;
+        private static final double MIN = 0.33;
 
         @Override
         public void run(@NotNull Parser parser) {

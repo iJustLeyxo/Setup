@@ -3,13 +3,12 @@ package com.cavetale.manager.data.plugin;
 import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
-import com.cavetale.manager.parser.Parser;
 import com.cavetale.manager.parser.container.CategoryContainer;
 import com.cavetale.manager.util.Util;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +52,7 @@ public enum Category implements Provider {
     private final @NotNull String info;
     private final @NotNull Plugin[] plugins;
 
-    private @NotNull Sel sel = Sel.OFF;
+    private @Nullable Sel sel = null;
     private @Nullable Boolean inst = null;
 
     Category(@NotNull String info, @NotNull Plugin @NotNull ... plugins) {
@@ -90,8 +89,8 @@ public enum Category implements Provider {
         return this.plugins;
     }
 
-    public void reset() {
-        this.sel = Sel.OFF;
+    public void revert() {
+        this.sel = null;
         this.inst = null;
     }
 
@@ -101,55 +100,74 @@ public enum Category implements Provider {
         this.sel = Sel.TARGET;
     }
 
-    public boolean isTargeted() {
-        return this.sel == Sel.TARGET;
+    public void select() {
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
     }
 
-    public void select() {
-        if (this.sel == Sel.OFF) this.sel = Sel.ON;
+    public void deselect() {
+        this.sel = Sel.OFF;
     }
 
     public boolean isSelected() {
+        if (this.sel == null) Category.loadSelection();
         return this.sel != Sel.OFF;
     }
 
     //= Installation ==
 
     public boolean isInstalled() {
-        if (this.inst != null) return this.inst;
-        return this.checkInstalled();
+        if (this.inst == null) this.checkInstalled();
+        return this.inst;
     }
 
-    private boolean checkInstalled() {
+    private void checkInstalled() {
         this.inst = true;
 
         for (Plugin p : this.plugins) if (!p.isInstalled()) {
             this.inst = false;
-            return false;
+            return;
         }
-
-        return true;
     }
 
-    //= Static ==
+    //= Finder ==
 
     public static @NotNull Category get(@NotNull String ref) throws NotFoundException {
         for (Category c : values()) if (c.displayName().equalsIgnoreCase(ref)) return c;
         throw new NotFoundException(ref);
     }
 
-    private static final @NotNull List<Category> selected = new LinkedList<>();
-    private static final @NotNull List<Category> installed = new LinkedList<>();
+    //= Indexing ==
 
-    public static void reloadSelected(@NotNull Parser parser) {
+    private static @Nullable List<Category> selected = null;
+    private static @Nullable List<Category> installed = null;
+
+    public static @NotNull List<Category> installed() {
+        if (Category.installed == null) Category.loadInstallation();
+        return Category.installed;
+    }
+
+    public static @NotNull List<Category> selected() {
+        if (Category.selected == null) Category.loadSelection();
+        return Category.selected;
+    }
+
+    public static void reset() {
+        Console.log(Type.DEBUG, "Resetting categories\n");
+        for (Category c : Category.values()) c.revert();
+        Category.selected = null;
+        Category.installed = null;
+    }
+
+    public static void loadSelection() {
         Console.log(Type.EXTRA, "Reloading selected categories\n");
-        for (Category c : Category.values()) c.reset(); // Reset category states
-        Category.selected.clear();
+        for (Category c : Category.values()) c.deselect();
+        Category.selected = new LinkedList<>();
 
         CategoryContainer categories = (CategoryContainer) Flag.CATEGORY.container();
         if (Flag.INSTALLED.isSelected()) {
+            Category.loadInstallation();
             Console.log(Type.DEBUG, "Selecting installed categories\n");
-            for (Category c : Category.installed) c.target();
+            for (Category c : Category.installed()) c.target();
         } else if (Flag.ALL.isSelected() || (Flag.CATEGORY.isSelected() && categories.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all categories\n");
             for (Category c : Category.values()) c.target();
@@ -163,9 +181,9 @@ public enum Category implements Provider {
         for (Category c : Category.values()) if (c.isSelected()) Category.selected.add(c); // Update selection
     }
 
-    public static void reloadInstallations() {
+    public static void loadInstallation() {
         Console.log(Type.EXTRA, "Reloading installed categories\n");
-        Category.installed.clear(); // Reset installations
+        Category.installed = new LinkedList<>();
 
         for (Category c : Category.values()) if (c.isInstalled()) Category.installed.add(c); // Update installation
     }
@@ -181,17 +199,9 @@ public enum Category implements Provider {
         return categories;
     }
 
-    public static @NotNull List<Category> installed() {
-        return Category.installed;
-    }
-
-    public static @NotNull List<Category> selected() {
-        return Category.selected;
-    }
-
     public static void summarize() {
-        if (!Category.selected.isEmpty()) Category.summarizeSelected();
-        else if (!Category.installed.isEmpty()) Category.summarizeInstalled();
+        if (!Category.selected().isEmpty()) Category.summarizeSelected();
+        else if (!Category.installed().isEmpty()) Category.summarizeInstalled();
         else {
             Console.sep();
             Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD +  "No categories selected or installed\n");
@@ -200,7 +210,7 @@ public enum Category implements Provider {
 
     private static void summarizeSelected() {
         Console.sep();
-        List<Category> selected = Category.selected;
+        List<Category> selected = Category.selected();
         Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
                 " categor(y/ies) selected", 4, 21, selected.toArray());
         selected = Category.get(true, true);
@@ -224,7 +234,7 @@ public enum Category implements Provider {
     }
 
     private static void summarizeInstalled() {
-        List<Category> installed = Category.installed;
+        List<Category> installed = Category.installed();
         installed.remove(null);
         Console.sep();
         Console.logL(Type.REQUESTED, Style.INSTALL, installed.size() +
@@ -232,25 +242,25 @@ public enum Category implements Provider {
     }
 
     public static void listSelected() {
-        if (Category.selected.isEmpty()) {
+        if (Category.selected().isEmpty()) {
             Console.sep();
             Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories selected\n");
             return;
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.selected.size() + " categor(y/ies) selected", 4, 21, Category.selected.toArray());
+        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.selected().size() + " categor(y/ies) selected", 4, 21, Category.selected().toArray());
     }
 
     public static void listInstalled() {
-        if (Category.installed.isEmpty()) {
+        if (Category.installed().isEmpty()) {
             Console.sep();
             Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories installed\n");
             return;
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.installed.size() + " categor(y/ies) installed", 4, 21, Category.installed.toArray());
+        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.installed().size() + " categor(y/ies) installed", 4, 21, Category.installed().toArray());
     }
 
     public static void list() {

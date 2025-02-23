@@ -3,13 +3,12 @@ package com.cavetale.manager.data.plugin;
 import com.cavetale.manager.data.Sel;
 import com.cavetale.manager.parser.Flag;
 import com.cavetale.manager.parser.InputException;
-import com.cavetale.manager.parser.Parser;
 import com.cavetale.manager.parser.container.ServerContainer;
 import com.cavetale.manager.util.Util;
+import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
-import com.cavetale.manager.util.console.Code;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +38,7 @@ public enum Server implements Provider {
     private final @NotNull Plugin[] plugins;
 
     // TODO: Custom printing
-    private @NotNull Sel sel = Sel.OFF;
+    private @Nullable Sel sel = null;
     private @Nullable Boolean inst = null;
 
     Server(@NotNull String info, @NotNull Provider @NotNull ... providers) {
@@ -87,8 +86,8 @@ public enum Server implements Provider {
         return this.plugins;
     }
 
-    public void reset() {
-        this.sel = Sel.OFF;
+    public void revert() {
+        this.sel = null;
         this.inst = null;
     }
 
@@ -98,60 +97,77 @@ public enum Server implements Provider {
         this.sel = Sel.TARGET;
     }
 
-    public boolean isTargeted() {
-        return this.sel == Sel.TARGET;
+    public void select() {
+        if (this.sel != Sel.TARGET) this.sel = Sel.ON;
     }
 
-    public void select() {
-        if (this.sel == Sel.OFF) this.sel = Sel.ON;
+    public void deselect() {
+        this.sel = Sel.OFF;
     }
 
     public boolean isSelected() {
+        if (this.sel == null) Server.loadSelection();
         return this.sel != Sel.OFF;
     }
 
     //= Installation ==
 
     public boolean isInstalled() {
-        if (this.inst != null) return this.inst;
-        return this.checkInstalled();
+        if (this.inst == null) this.checkInstalled();
+        return this.inst;
     }
 
-    private boolean checkInstalled() {
+    private void checkInstalled() {
         this.inst = true;
 
         for (Plugin p : this.plugins) if (!p.isInstalled()) {
             this.inst = false;
-            return false;
+            return;
         }
 
         for (Category c : this.categories) if (!c.isInstalled()) {
             this.inst = false;
-            return false;
+            return;
         }
-
-        return true;
     }
 
-    //= Static ==
-
-    // TODO: Only resolve when requested
-    private static final @NotNull List<Server> selected = new LinkedList<>();
-    private static final @NotNull List<Server> installed = new LinkedList<>();
+    //= Finder ==
 
     public static @NotNull Server get(@NotNull String ref) throws NotFoundException {
         for (Server s : Server.values()) if (s.displayName().equalsIgnoreCase(ref)) return s;
         throw new NotFoundException(ref);
     }
 
-    public static void reloadSelected(@NotNull Parser parser) {
+    //= Indexing ==
+
+    private static @Nullable List<Server> selected = null;
+    private static @Nullable List<Server> installed = null;
+
+    public static @NotNull List<Server> installed() {
+        if (Server.installed == null) Server.loadInstallation();
+        return Server.installed;
+    }
+
+    public static @NotNull List<Server> selected() {
+        if (Server.selected == null) Server.loadSelection();
+        return Server.selected;
+    }
+
+    public static void reset() {
+        Console.log(Type.DEBUG, "Resetting servers\n");
+        for (Server s : Server.values()) s.revert();
+        Server.selected = null;
+        Server.installed = null;
+    }
+
+    public static void loadSelection() {
         Console.log(Type.EXTRA, "Reloading selected servers\n");
-        for (Server s : Server.values()) s.reset(); // Reset selections
-        Server.selected.clear();
+        for (Server s : Server.values()) s.deselect();
+        Server.selected = new LinkedList<>();
 
         ServerContainer servers = (ServerContainer) Flag.SERVER.container();
         if (Flag.INSTALLED.isSelected()) {
-            for (Server s : Server.installed) s.target();
+            for (Server s : Server.installed()) s.target();
             Console.log(Type.DEBUG, "Selecting installed servers\n");
         } else if (Flag.ALL.isSelected() || (Flag.SERVER.isSelected() && servers.isEmpty())) { // Select all
             Console.log(Type.DEBUG, "Selecting all servers\n");
@@ -164,11 +180,11 @@ public enum Server implements Provider {
         for (Server s : Server.values()) if (s.isSelected()) Server.selected.add(s); // Update selection
     }
 
-    public static void reloadInstallations() {
+    public static void loadInstallation() {
         Console.log(Type.EXTRA, "Reloading installed servers\n");
-        Server.installed.clear(); // Reset installations
+        Server.installed = new LinkedList<>();
 
-        for (Server s : Server.values()) if (s.isInstalled()) Server.installed.add(s); // Update installation
+        for (Server s : Server.values()) if (s.isInstalled()) Server.installed().add(s); // Update installation
     }
 
     public static @NotNull List<Server> get(@Nullable Boolean installed, @Nullable Boolean selected) {
@@ -182,17 +198,9 @@ public enum Server implements Provider {
         return servers;
     }
 
-    public static @NotNull List<Server> installed() {
-        return Server.installed;
-    }
-
-    public static @NotNull List<Server> selected() {
-        return Server.selected;
-    }
-
     public static void summarize() {
-        if (!Server.selected.isEmpty()) Server.summarizeSelected();
-        else if (!Server.installed.isEmpty()) Server.summarizeInstalled();
+        if (!Server.selected().isEmpty()) Server.summarizeSelected();
+        else if (!Server.installed().isEmpty()) Server.summarizeInstalled();
         else {
             Console.sep();
             Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers selected or installed\n");
@@ -201,7 +209,7 @@ public enum Server implements Provider {
 
     private static void summarizeSelected() {
         Console.sep();
-        List<Server> selected = Server.selected;
+        List<Server> selected = Server.selected();
         Console.logL(Type.REQUESTED, Style.SELECT, selected.size() +
                 " server(s) selected", 4, 21, selected.toArray());
         selected = Server.get(true, true);
@@ -226,29 +234,29 @@ public enum Server implements Provider {
 
     private static void summarizeInstalled() {
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.INSTALL, Server.installed.size() + " server(s) installed", 4, 21, Server.installed.toArray());
+        Console.logL(Type.REQUESTED, Style.INSTALL, Server.installed().size() + " server(s) installed", 4, 21, Server.installed().toArray());
     }
 
     public static void listSelected() {
-        if (Server.selected.isEmpty()) {
+        if (Server.selected().isEmpty()) {
             Console.sep();
             Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers selected\n");
             return;
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.selected.size() + " server(s) selected", 4, 21, Server.selected.toArray());
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.selected().size() + " server(s) selected", 4, 21, Server.selected().toArray());
     }
 
     public static void listInstalled() {
-        if (Server.installed.isEmpty()) {
+        if (Server.installed().isEmpty()) {
             Console.sep();
             Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers installed\n");
             return;
         }
 
         Console.sep();
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.installed.size() + " server(s) installed", 4, 21, Server.installed.toArray());
+        Console.logL(Type.REQUESTED, Style.SERVER, Server.installed().size() + " server(s) installed", 4, 21, Server.installed().toArray());
     }
 
     public static void list() {
