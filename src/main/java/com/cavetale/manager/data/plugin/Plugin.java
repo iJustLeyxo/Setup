@@ -1,5 +1,6 @@
 package com.cavetale.manager.data.plugin;
 
+import com.cavetale.manager.Manager;
 import com.cavetale.manager.data.DataError;
 import com.cavetale.manager.data.DataException;
 import com.cavetale.manager.data.Sel;
@@ -288,10 +289,11 @@ public enum Plugin implements Provider {
             }
             return;
         }
+
         try {
-            String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Plugin.FOLDER, file));
-            this.installations().add(file);
+            String name = this.displayName() + "-" + this.source.ver() + ".jar";
+            Util.download(this.source.uri(), Plugin.FOLDER, name);
+            this.installations().add(name);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed (" + e.getMessage() + ")\n")) {
@@ -304,25 +306,40 @@ public enum Plugin implements Provider {
     public void update() {
         Console.log(Type.INFO, "Updating " + this.displayName() + " plugin");
 
+        String name = this.displayName() + "-" + this.source.ver() + ".jar";
+        File file;
+
+        // Stash download
+        try {
+            file = Util.stash(this.source.uri());
+        } catch (IOException e) {
+            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
+                Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - failed to download (" + e.getMessage() + ")\n");
+            }
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
+            return;
+        }
+
         // Uninstall plugin
-        for (String fileName : this.installations()) {
-            File file = new File(Plugin.FOLDER, fileName);
-            if (!Files.isSymbolicLink(file.toPath())) {
-                if (file.delete()) continue;
-                if (!Console.log(Type.EXTRA, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                    Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - failed to delete " + file + "\n");
+        for (String inst : this.installations()) {
+            Console.log(Type.DEBUG, "Uninstalling " + inst);
+            File f = new File(Plugin.FOLDER, inst);
+            if (!Files.isSymbolicLink(f.toPath())) {
+                if (f.delete()) continue;
+                if (!Console.log(Type.EXTRA, Style.ERR, " failed - failed to delete " + f + "\n")) {
+                    Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - failed to delete " + f + "\n");
                 }
-            } else if (!Console.log(Type.EXTRA, Style.ERR, " failed - skipped " + file + " (linked)\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - skipped " + file + " (linked)\n");
+            } else if (!Console.log(Type.EXTRA, Style.ERR, " failed - skipped " + f + " (linked)\n")) {
+                Console.log(Type.ERR, "Updating " + this.displayName() + " plugin failed - skipped " + f + " (linked)\n");
             }
             return;
         }
         this.installations().clear();
 
-        try { // Install plugin
-            String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Plugin.FOLDER, file));
-            this.installations().add(file);
+        // Install stashed plugin
+        try {
+            Util.finalise(file, Plugin.FOLDER, name);
+            this.installations().add(name);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
@@ -333,12 +350,12 @@ public enum Plugin implements Provider {
     }
 
     public void uninstall() {
-        for (String fileName : this.installations()) {
-            Console.log(Type.INFO, "Uninstalling " + fileName);
-            File file = new File(Plugin.FOLDER, fileName);
+        for (String inst : this.installations()) {
+            Console.log(Type.INFO, "Uninstalling " + inst);
+            File file = new File(Plugin.FOLDER, inst);
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) {
-                    this.installations().remove(fileName);
+                    this.installations().remove(inst);
                     Console.log(Type.INFO, Style.DONE, " done\n");
                 } else if (!Console.log(Type.EXTRA, Style.ERR, " failed\n")) {
                     Console.log(Type.ERR, "Uninstalling " + file + " plugin failed\n");

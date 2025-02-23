@@ -12,7 +12,9 @@ import com.cavetale.manager.util.console.Code;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
 import com.cavetale.manager.util.console.Type;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +24,8 @@ import java.util.Objects;
  * Cavetale installation manager, used to manage plugins and server software for testing servers
  */
 public final class Manager {
+    public static final @NotNull File TEMP = new File(".setup/");
+
     public static boolean interactive = true;
 
     public static void main(String[] args) {

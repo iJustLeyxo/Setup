@@ -95,9 +95,10 @@ public enum Software {
             }
             return;
         }
+
         try {
             String file = this.displayName() + "-" + this.source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Software.FOLDER, file));
+            Util.download(this.source.uri(), Software.FOLDER, file);
             this.installations().add(file);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
@@ -109,20 +110,36 @@ public enum Software {
     }
 
     public void update() {
-        Console.log(Type.INFO, "Updating " + this.displayName() + " software"); // Uninstall software
-        for (String file : this.installations()) {
-            if (new File(Software.FOLDER, file).delete()) continue;
-            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to delete " + file + "\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to delete " + file + "\n");
+        Console.log(Type.INFO, "Updating " + this.displayName() + " software");
+
+        String name = this.displayName() + "-" + source.ver() + ".jar";
+        File file;
+
+        // Stash download
+        try {
+            file = Util.stash(this.source.uri());
+        } catch (IOException e) {
+            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
+                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to download (" + e.getMessage() + ")\n");
+            }
+            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
+            return;
+        }
+
+        // Uninstall software
+        for (String inst : this.installations()) {
+            if (new File(Software.FOLDER, inst).delete()) continue;
+            if (!Console.log(Type.INFO, Style.ERR, " failed - failed to delete " + inst + "\n")) {
+                Console.log(Type.ERR, "Updating " + this.displayName() + " software failed - failed to delete " + inst + "\n");
             }
             return;
         }
         this.installations().clear();
 
-        try { // Install software
-            String file = this.displayName() + "-" + source.ver() + ".jar";
-            Util.download(this.source.uri(), new File(Software.FOLDER, file));
-            this.installations().add(file);
+        // Install stashed software
+        try {
+            Util.finalise(file, Software.FOLDER, name);
+            this.installations().add(name);
             Console.log(Type.INFO, Style.DONE, " done\n");
         } catch (IOException e) {
             if (!Console.log(Type.INFO, Style.ERR, " failed - failed to download (" + e.getMessage() + ")\n")) {
