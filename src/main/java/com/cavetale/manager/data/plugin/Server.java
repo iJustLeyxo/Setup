@@ -251,12 +251,12 @@ public enum Server implements Provider {
         Console.logL(Type.REQUESTED, Style.SERVER, Server.installed.size() + " server(s) installed", 4, 21, Server.installed.toArray());
     }
 
-    public static void shortList() {
+    public static void list() {
         Console.sep();
         Console.logL(Type.REQUESTED, Style.SERVER, Server.values().length + " server(s) available", 4, 21, (Object[]) Server.values());
     }
 
-    public static void longList() {
+    public static void details() {
         Console.sep();
         Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD +
                 "--------------------------------------- " +

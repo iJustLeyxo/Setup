@@ -21,8 +21,8 @@ public enum Command {
         @Override
         public
         void run(@NotNull Parser parser) {
-            Plugins.summarize();
-            Softwares.summarize();
+            Plugin.summarize();
+            Software.summarize();
         }
     },
 
@@ -233,8 +233,8 @@ public enum Command {
     INSTALL("Install plugins and server software", "ADD") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Plugin> plugins = Plugins.selected();
-            List<Software> software = Softwares.selected();
+            List<Plugin> plugins = Plugin.selected();
+            List<Software> software = Software.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
@@ -273,7 +273,7 @@ public enum Command {
 
             for (File origin : files) {
                 Console.log(Type.INFO, "Linking " + origin.getName());
-                File folder = Plugins.FOLDER;
+                File folder = Plugin.FOLDER;
                 folder.mkdirs();
                 File link = new File(folder, origin.getName());
                 if (link.exists()) {
@@ -300,48 +300,48 @@ public enum Command {
         public void run(@NotNull Parser parser) {
             if (Flag.INSTALLED.isSelected()) {
                 if (Flag.ALL.isSelected()) {
-                    Plugins.listInstalled();
-                    Categories.listInstalled();
-                    Servers.listInstalled();
-                    Softwares.listInstalled();
+                    Plugin.listInstalled();
+                    Category.listInstalled();
+                    Server.listInstalled();
+                    Software.listInstalled();
                 } else {
                     boolean selected = false;
                     if (Flag.PLUGIN.isSelected()) {
-                        Plugins.listInstalled();
+                        Plugin.listInstalled();
                         selected = true;
                     }
                     if (Flag.CATEGORY.isSelected()) {
-                        Categories.listInstalled();
+                        Category.listInstalled();
                         selected = true;
                     }
                     if (Flag.SERVER.isSelected()) {
-                        Servers.listInstalled();
+                        Server.listInstalled();
                         selected = true;
                     }
                     if (Flag.SOFTWARE.isSelected()) {
-                        Softwares.listInstalled();
+                        Software.listInstalled();
                         selected = true;
                     }
-                    if (!selected) Plugins.listInstalled();
+                    if (!selected) Plugin.listInstalled();
                 }
             } else {
                 if (Flag.ALL.isSelected() || (!Flag.PLUGIN.isSelected() && !Flag.CATEGORY.isSelected() && !Flag.SERVER.isSelected() && !Flag.SOFTWARE.isSelected())) {
-                    Plugins.list();
-                    Categories.list();
-                    Servers.list();
-                    Softwares.list();
-                } else if (Plugins.selected().isEmpty() && Categories.selected().isEmpty() && Servers.selected().isEmpty() && Softwares.selected().isEmpty()) {
-                    if (Flag.PLUGIN.isSelected()) Plugins.list();
-                    if (Flag.CATEGORY.isSelected()) Categories.list();
-                    if (Flag.SERVER.isSelected()) Servers.list();
-                    if (Flag.SOFTWARE.isSelected()) Softwares.list();
+                    Plugin.list();
+                    Category.list();
+                    Server.list();
+                    Software.list();
+                } else if (Plugin.selected().isEmpty() && Category.selected().isEmpty() && Server.selected().isEmpty() && Software.selected().isEmpty()) {
+                    if (Flag.PLUGIN.isSelected()) Plugin.list();
+                    if (Flag.CATEGORY.isSelected()) Category.list();
+                    if (Flag.SERVER.isSelected()) Server.list();
+                    if (Flag.SOFTWARE.isSelected()) Software.list();
                 } else {
                     if (Flag.PLUGIN.isSelected() || Flag.CATEGORY.isSelected() || Flag.SERVER.isSelected()) {
-                        Plugins.listSelected();
-                        if (Flag.CATEGORY.isSelected()) Categories.listSelected();
-                        if (Flag.SERVER.isSelected()) Servers.listSelected();
+                        Plugin.listSelected();
+                        if (Flag.CATEGORY.isSelected()) Category.listSelected();
+                        if (Flag.SERVER.isSelected()) Server.listSelected();
                     }
-                    if (Flag.SOFTWARE.isSelected()) Softwares.listSelected();
+                    if (Flag.SOFTWARE.isSelected()) Software.listSelected();
                 }
             }
         }
@@ -350,8 +350,8 @@ public enum Command {
     RUN("Run installed server software") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Software> selected = Softwares.selected();
-            if (!Flag.SOFTWARE.isSelected() || Softwares.selected().isEmpty()) {
+            List<Software> selected = Software.selected();
+            if (!Flag.SOFTWARE.isSelected() || Software.selected().isEmpty()) {
                 selected = Arrays.asList(Software.values());
             }
             if (selected.size() > 1) Console.log(Type.WARN, "Multiple software selected\n");
@@ -364,7 +364,7 @@ public enum Command {
 
                     try {
                         ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
-                        builder.directory(Softwares.FOLDER);
+                        builder.directory(Software.FOLDER);
                         builder.redirectErrorStream(true);
                         Process process = builder.start();
 
@@ -424,16 +424,16 @@ public enum Command {
         @Override
         public
         void run(@NotNull Parser parser) {
-            Plugins.summarize();
-            Softwares.summarize();
+            Plugin.summarize();
+            Software.summarize();
         }
     },
 
     UNINSTALL("Uninstall plugins, server software and files", "Remove", "Delete") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Plugin> plugins = Plugins.selected();
-            List<Software> software = Softwares.selected();
+            List<Plugin> plugins = Plugin.selected();
+            List<Software> software = Software.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");
                 return;
@@ -449,11 +449,11 @@ public enum Command {
     UPDATE("Update plugins and software", "Upgrade") {
         @Override
         public void run(@NotNull Parser parser) {
-            List<Plugin> plugins = Plugins.selected();
-            List<Software> software = Softwares.selected();
+            List<Plugin> plugins = Plugin.selected();
+            List<Software> software = Software.selected();
             if (plugins.isEmpty() && software.isEmpty()) { // Auto select installed if nothing specified
-                plugins = Plugins.installed();
-                software = Softwares.installed();
+                plugins = Plugin.installed();
+                software = Software.installed();
             }
             if (plugins.isEmpty() && software.isEmpty()) {
                 Console.log(Type.REQUESTED, Style.WARN, "Nothing selected\n");

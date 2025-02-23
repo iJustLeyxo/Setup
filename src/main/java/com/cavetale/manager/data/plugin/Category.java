@@ -253,12 +253,12 @@ public enum Category implements Provider {
         Console.logL(Type.REQUESTED, Style.CATEGORY, Category.installed.size() + " categor(y/ies) installed", 4, 21, Category.installed.toArray());
     }
 
-    public static void shortList() {
+    public static void list() {
         Console.sep();
         Console.logL(Type.REQUESTED, Style.CATEGORY, Category.values().length + " categor(y/ies) available", 4, 21, (Object[]) Category.values());
     }
 
-    public static void longList() {
+    public static void details() {
         Console.sep();
         Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD +
                 "-------------------------------------- " +

@@ -1,5 +1,9 @@
 package com.cavetale.manager;
 
+import com.cavetale.manager.data.plugin.Category;
+import com.cavetale.manager.data.plugin.Plugin;
+import com.cavetale.manager.data.plugin.Server;
+import com.cavetale.manager.data.server.Software;
 import com.cavetale.manager.parser.*;
 import com.cavetale.manager.util.console.Console;
 import com.cavetale.manager.util.console.Style;
@@ -30,14 +34,14 @@ public final class Manager {
                 if (cmd == null) {
                     if (!changed) Console.log(Type.WARN, "Nothing to do. Try typing \"help\".\n");
                 } else {
-                    Plugins.reloadInstallations();
-                    Categories.reloadInstallations();
-                    Servers.reloadInstallations();
-                    Softwares.reloadInstallations();
-                    Softwares.reloadSelected(parser);
-                    Servers.reloadSelected(parser);
-                    Categories.reloadSelected(parser);
-                    Plugins.reloadSelected(parser);
+                    Plugin.reloadInstallations();
+                    Category.reloadInstallations();
+                    Server.reloadInstallations();
+                    Software.reloadInstallations();
+                    Software.reloadSelected(parser);
+                    Server.reloadSelected(parser);
+                    Category.reloadSelected(parser);
+                    Plugin.reloadSelected(parser);
 
                     Console.log(Type.EXTRA, "Running command " + cmd.displayName() + " with args " + parser.args() + " and flags " + parser.flags() + "\n");
 
