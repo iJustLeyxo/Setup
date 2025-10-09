@@ -49,6 +49,10 @@
       <id>cavetale</id>
       <url>https://cavetale.com/jenkins/plugin/repository/everything/</url>
     </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -57,6 +61,11 @@
         <artifactId>annotations</artifactId>
         <version>24.1.0</version>
         <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.iJustLeyxo</groupId>
+      <artifactId>jCLIx</artifactId>
+      <version>1.0.0</version>
     </dependency>
   </dependencies>
 </project>
