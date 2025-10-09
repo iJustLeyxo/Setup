@@ -36,7 +36,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>com.cavetale.manager.Manager</mainClass>
+              <mainClass>com.cavetale.setup.Setup</mainClass>
             </manifest>
           </archive>
         </configuration>
