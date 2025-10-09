@@ -1,12 +1,13 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.cavetale.setup</groupId>
-  <artifactId>setup</artifactId>
-  <version>0.1-SNAPSHOT</version>
-
   <name>Setup</name>
   <url>https://github.com/StarTux/Setup</url>
+  <description>Cavetale Installation Tools</description>
+
+  <groupId>com.cavetale.setup</groupId>
+  <artifactId>setup</artifactId>
+  <version>0.0.0</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -19,10 +20,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.13.0</version>
         <configuration>
-          <source>21</source>
-          <target>21</target>
+          <release>21</release>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
         </configuration>
@@ -31,7 +31,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.4.2</version>
         <configuration>
           <archive>
             <manifest>
@@ -55,7 +55,7 @@
     <dependency>
         <groupId>org.jetbrains</groupId>
         <artifactId>annotations</artifactId>
-        <version>24.0.0</version>
+        <version>24.1.0</version>
         <scope>compile</scope>
     </dependency>
   </dependencies>
