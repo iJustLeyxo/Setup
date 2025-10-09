@@ -1,16 +1,26 @@
+# Whitelist
+*
+!*/
+
+# Documentation
+!*.md
+!*.txt
+
+# LICENSE
+!LICENSE
+
+# GitHub
+!.github/workflows/*.yml
+
+# JitPack
+!jitpack.yml
+
+# Java
+!*.java
+
+# Maven
+!pom.xml
+!mvnw
+!mvnw.cmd
+!.mvn/**/*
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-
-# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
-!/.mvn/wrapper/maven-wrapper.jar
-/plugin
-
-# IntelliJ IDEA
-.idea/
