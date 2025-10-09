@@ -1,12 +1,13 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.cavetale.setup</groupId>
-  <artifactId>setup</artifactId>
-  <version>0.1-SNAPSHOT</version>
-
   <name>Setup</name>
   <url>https://github.com/StarTux/Setup</url>
+  <description>Cavetale Installation Tools</description>
+
+  <groupId>com.cavetale.setup</groupId>
+  <artifactId>setup</artifactId>
+  <version>0.0.0</version>
   <packaging>jar</packaging>
 
   <properties>
