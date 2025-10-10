@@ -153,26 +153,26 @@ public enum Server implements Provider {
     }
 
     public static void reset() {
-        SYSIO.out(Type.DEBUG, "Resetting servers\n");
+        SYSIO.debug("Resetting servers\n");
         for (Server s : Server.values()) s.revert();
         Server.selected = null;
         Server.installed = null;
     }
 
     public static void loadSelection() {
-        SYSIO.out(Type.INFO, "Reloading selected servers\n");
+        SYSIO.info("Reloading selected servers\n");
         for (Server s : Server.values()) s.deselect();
         Server.selected = new LinkedList<>();
 
         ServerContents servers = (ServerContents) CustomFlag.SERVER.container();
         if (CustomFlag.INSTALLED.isSelected()) {
             for (Server s : Server.installed()) s.target();
-            SYSIO.out(Type.DEBUG, "Selecting installed servers\n");
+            SYSIO.debug("Selecting installed servers\n");
         } else if (CustomFlag.ALL.isSelected() || (CustomFlag.SERVER.isSelected() && servers.isEmpty())) { // Select all
-            SYSIO.out(Type.DEBUG, "Selecting all servers\n");
+            SYSIO.debug("Selecting all servers\n");
             for (Server s : Server.values()) s.target();
         } else {
-            SYSIO.out(Type.DEBUG, "Selecting servers " + servers.contents() + "\n");
+            SYSIO.debug("Selecting servers " + servers.contents() + "\n");
             for (Server s : servers.contents()) s.target(); // Select by server
         }
 
@@ -180,7 +180,7 @@ public enum Server implements Provider {
     }
 
     public static void loadInstallation() {
-        SYSIO.out(Type.INFO, "Reloading installed servers\n");
+        SYSIO.info("Reloading installed servers\n");
         Server.installed = new LinkedList<>();
 
         for (Server s : Server.values()) if (s.isInstalled()) Server.installed().add(s); // Update installation
@@ -203,7 +203,7 @@ public enum Server implements Provider {
         SYSIO.sep();
 
         if (Server.values().length == 0) {
-            SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD + "No servers available\n");
+            SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD + "No servers available\n");
             return;
         }
 
@@ -214,7 +214,7 @@ public enum Server implements Provider {
     public static void listSelected() {
         if (Server.selected().isEmpty()) {
             SYSIO.sep();
-            SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD + "No servers selected\n");
+            SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD + "No servers selected\n");
             return;
         }
 
@@ -227,7 +227,7 @@ public enum Server implements Provider {
         SYSIO.sep();
 
         if (Server.installed().isEmpty()) {
-            SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD + "No servers installed\n");
+            SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD + "No servers installed\n");
             return;
         }
 
@@ -237,11 +237,11 @@ public enum Server implements Provider {
 
     public static void details() {
         SYSIO.sep();
-        SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD +
+        SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD +
                 "--------------------------------------- " +
                 "Servers ---------------------------------------\n");
         SYSIO.outF(Type.HELP, CustomStyle.SERVER + "%-16s | %-68s\n", "Server", "Info");
-        SYSIO.out(Type.HELP, CustomStyle.SERVER + "----------------------------------------------" +
+        SYSIO.help(CustomStyle.SERVER + "----------------------------------------------" +
                 "-----------------------------------------\n");
         ArrayList<Server> servers = new ArrayList<>(List.of(Server.values()));
         Collections.sort(servers);

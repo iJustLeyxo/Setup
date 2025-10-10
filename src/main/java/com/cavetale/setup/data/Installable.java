@@ -1,10 +1,8 @@
 package com.cavetale.setup.data;
 
 import com.cavetale.setup.download.Source;
-import com.cavetale.setup.console.CustomFlag;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.console.CustomStyle;
-import io.github.ijustleyxo.jclix.app.Flag;
+import io.github.ijustleyxo.jclix.io.Style;
 import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,10 +31,9 @@ public interface Installable {
             String name = this.displayName() + "-" + this.source().ver() + ".jar";
             Util.download(this.source().uri(), this.downloads(), name);
             this.installations().add(name);
-            SYSIO.info(CustomStyle.DONE + " done\n");
+            SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            SYSIO.out(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed (" + e.getMessage() + ")\n");
-            if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+            SYSIO.err(Style.INFO + "Installing " + this.displayName() + Style.ERR + " failed", e);
         }
     }
 
@@ -50,8 +47,7 @@ public interface Installable {
         try {
             file = Util.stash(this.source().uri());
         } catch (IOException e) {
-            SYSIO.out(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download (" + e.getMessage() + ")\n");
-            if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+            SYSIO.err(Style.INFO + "Updating " + this.displayName() + Style.ERR + " failed - failed to download", e);
             return;
         }
 
@@ -62,7 +58,7 @@ public interface Installable {
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
                 SYSIO.out(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
-            } else if (!SYSIO.info(CustomStyle.ERR + " failed - skipped " + f + " (linked)\n")) {
+            } else if (!SYSIO.info(Style.ERR + " failed - skipped " + f + " (linked)\n")) {
                 SYSIO.err("Updating " + this.displayName() + " failed - skipped " + f + " (linked)\n");
             }
             return;
@@ -73,10 +69,9 @@ public interface Installable {
         try {
             Util.finalise(file, this.downloads(), name);
             this.installations().add(name);
-            SYSIO.info(CustomStyle.DONE + " done\n");
+            SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            SYSIO.out(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download (" + e.getMessage() + ")\n");
-            if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+            SYSIO.err(Style.INFO + "Updating " + this.displayName() + Style.ERR + " failed - failed to download", e);
         }
     }
 
@@ -87,7 +82,7 @@ public interface Installable {
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) {
                     this.installations().remove(inst);
-                    SYSIO.info(CustomStyle.DONE + " done\n");
+                    SYSIO.info(Style.SUCCESS + " done\n");
                 } else SYSIO.out(Type.INFO, Type.ERR, "Uninstalling " + file, " failed\n");
             } else SYSIO.out(Type.INFO, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
         }

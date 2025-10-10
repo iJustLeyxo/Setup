@@ -136,10 +136,9 @@ public enum CustomCommand implements Command {
 
                 try {
                     Files.createSymbolicLink(file.toPath(), installation.toPath());
-                    SYSIO.out(Type.INFO, Style.SUCCESS + " done\n");
+                    SYSIO.info(Style.SUCCESS + " done\n");
                 } catch (IOException e) {
-                    SYSIO.out(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (" + e.getMessage() + ")\n");
-                    if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+                    SYSIO.err(Style.INFO + "Linking to " + dest.getName() + Style.ERR + " failed", e);
                 }
             }
         }
@@ -150,7 +149,7 @@ public enum CustomCommand implements Command {
         public void onRun(@NotNull Parser.Result result) {
             File eula = new File("eula.txt");
             if (!eula.exists()) {
-                SYSIO.out(Type.ERR, eula.getName() + " does not exist. You may need to run the server first.\n");
+                SYSIO.err(eula.getName() + " does not exist. You may need to run the server first.\n");
                 return;
             }
 
@@ -166,15 +165,14 @@ public enum CustomCommand implements Command {
                     if (c == '\n' || bytes.length - 1 <= i) {
                         String line = lineBuilder.toString();
                         if (line.equals("eula=false")) line = "eula=true";
-                        else if (line.equals("eula=true")) SYSIO.out(Type.INFO, "Already accepted the eula\n");
+                        else if (line.equals("eula=true")) SYSIO.info("Already accepted the eula\n");
                         builder.append(line);
                         if (c == '\n') builder.append(c);
                         lineBuilder = new StringBuilder();
                     } else lineBuilder.append(c);
                 }
             } catch (IOException e) {
-                SYSIO.out(Type.ERR, "Failed to read eula (" + e.getMessage() + ")\n");
-                if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+                SYSIO.err("Failed to read eula", e);
                 return;
             }
 
@@ -182,8 +180,7 @@ public enum CustomCommand implements Command {
                 writer.write(builder.toString());
                 writer.flush();
             } catch (IOException e) {
-                SYSIO.out(Type.ERR, "Failed to write eula (" + e.getMessage() + ")\n");
-                if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+                SYSIO.err("Failed to write eula", e);
             }
         }
     },
@@ -289,7 +286,7 @@ public enum CustomCommand implements Command {
                 SYSIO.warn("Nothing selected\n");
                 return;
             }
-            SYSIO.out(Type.HELP, CustomStyle.INSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to install\n");
+            SYSIO.help(CustomStyle.INSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to install\n");
             if (!SYSIO.in("Continue installation")) return;
             for (Plugin p : plugins) p.install();
             for (Software s : software) s.install();
@@ -315,13 +312,13 @@ public enum CustomCommand implements Command {
                 try {
                     Plugin.get(origin);
                 } catch (Plugin.NotAPluginException e) {
-                    SYSIO.out(Type.WARN, e.getMessage() + "\n");
+                    SYSIO.warn(e.getMessage() + "\n");
                 } catch (Plugin.NotFoundException e) {
-                    SYSIO.out(Type.WARN, "Unknown plugin " + origin.getName() + "\n");
+                    SYSIO.warn("Unknown plugin " + origin.getName() + "\n");
                 }
             }
 
-            SYSIO.out(Type.HELP, CustomStyle.LINK.toString() + files.size() + " file(s) will be linked\n");
+            SYSIO.help(CustomStyle.LINK.toString() + files.size() + " file(s) will be linked\n");
             if (!SYSIO.in("Continue linking")) return;
 
             for (File origin : files) {
@@ -339,8 +336,7 @@ public enum CustomCommand implements Command {
                     Files.createSymbolicLink(link.getAbsoluteFile().toPath(), origin.getAbsoluteFile().toPath());
                     SYSIO.info(Style.SUCCESS + " done\n");
                 } catch (IOException e) {
-                    SYSIO.out(Type.INFO, Type.ERR, "Linking " + origin.getName(), " failed (" + e.getMessage() + ")\n");
-                    if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+                    SYSIO.err(Style.INFO + "Linking " + origin.getName() + Style.ERR + " failed", e);
                 }
             }
         }
@@ -405,13 +401,13 @@ public enum CustomCommand implements Command {
             if (!CustomFlag.SOFTWARE.isSelected() || Software.selected().isEmpty()) {
                 selected = Arrays.asList(Software.values());
             }
-            if (selected.size() > 1) SYSIO.out(Type.WARN, "Multiple software selected\n");
+            if (selected.size() > 1) SYSIO.warn("Multiple software selected\n");
             for (Software software : selected) {
                 List<String> installations = software.installations();
                 if (!installations.isEmpty()) {
-                    if (installations.size() > 1) SYSIO.out(Type.WARN, software.displayName() + " has multiple installations\n");
+                    if (installations.size() > 1) SYSIO.warn(software.displayName() + " has multiple installations\n");
                     String installation = installations.getFirst();
-                    SYSIO.out(Type.INFO, "Running " + installation + "\n\n" + Code.RESET);
+                    SYSIO.info("Running " + installation + "\n\n" + Code.RESET);
 
                     try {
                         ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
@@ -419,48 +415,15 @@ public enum CustomCommand implements Command {
                         builder.redirectErrorStream(true);
                         Process process = builder.start();
 
-                        OutputStream inStream = process.getOutputStream();
-                        InputStream outStream = process.getInputStream();
+                        SYSIO.link(process, "SERVER");
 
-                        Thread inThread = new Thread(() -> {
-                            try {
-                                int i = System.in.read();
-                                while (0 <= i) {
-                                    inStream.write(i);
-                                    inStream.flush();
-                                    i = System.in.read();
-                                }
-                            } catch (IOException ignored) { }
-                        });
-
-                        inThread.setDaemon(true);
-                        inThread.start();
-
-                        Thread outThread = new Thread(() -> {
-                            try {
-                                System.out.print(Code.DARK_GRAY_FG + "[" + software.displayName() + "] " + Code.RESET);
-                                int i = outStream.read(); // i: current char
-                                while(0 <= i) {
-                                    System.out.write(i);
-                                    System.out.flush();
-                                    if (i == '\n') System.out.print(Code.DARK_GRAY_FG + "[" + software.displayName() + "] " + Code.RESET);
-                                    i = outStream.read();
-                                }
-                                inThread.interrupt();
-                            } catch (IOException ignored) { }
-                        });
-
-                        outThread.setDaemon(true);
-                        outThread.start();
                         int exit = process.waitFor();
-                        if (exit == 0) SYSIO.out(Type.INFO, "\n\n" + installation + " exited with code " + exit + "\n");
-                        else SYSIO.out(Type.WARN, "\n\n" + installation + " exited with code " + exit + "\n");
+                        if (exit == 0) SYSIO.info("\n\n" + installation + " exited with code " + exit + "\n");
+                        else SYSIO.warn("\n\n" + installation + " exited with code " + exit + "\n");
                     } catch (IOException e) {
-                        SYSIO.out(Type.ERR, "\n\nFailed to run " + installation + " (" + e.getMessage() + ")\n");
-                        if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+                        SYSIO.err("\n\nFailed to run " + installation, e);
                     } catch (InterruptedException e) {
-                        SYSIO.out(Type.WARN, "\n\n" + installation + " was interrupted\n");
-                        if (Flag.Default.ERROR.isSelected()) SYSIO.outT(Type.HELP, e);
+                        SYSIO.err("\n\n" + installation + " was interrupted", e);
                     }
 
                     return;
@@ -494,7 +457,7 @@ public enum CustomCommand implements Command {
                 SYSIO.warn("Nothing selected\n");
                 return;
             }
-            SYSIO.out(Type.HELP, CustomStyle.UNINSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to uninstall\n");
+            SYSIO.help(CustomStyle.UNINSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to uninstall\n");
             if (!SYSIO.in("Continue removal")) return;
             for (Plugin p : plugins) p.uninstall();
             for (Software s : software) s.uninstall();
@@ -514,7 +477,7 @@ public enum CustomCommand implements Command {
                 SYSIO.warn("Nothing selected\n");
                 return;
             }
-            SYSIO.out(Type.HELP, CustomStyle.UPDATE.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to update\n");
+            SYSIO.help(CustomStyle.UPDATE.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to update\n");
             if (!SYSIO.in("Continue update")) return;
             for (Plugin p : plugins) p.update();
             for (Software s  : software) s.update();

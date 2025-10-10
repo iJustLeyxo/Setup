@@ -139,7 +139,7 @@ public enum Software implements Installable {
     }
 
     public static void reset() {
-        SYSIO.out(Type.DEBUG, "Resetting software\n");
+        SYSIO.debug("Resetting software\n");
         for (Software s : Software.values()) s.revert();
         Software.selected = null;
         Software.installed = null;
@@ -147,19 +147,19 @@ public enum Software implements Installable {
     }
 
     public static void loadSelection() {
-        SYSIO.out(Type.INFO, "Reloading selected software\n");
+        SYSIO.info("Reloading selected software\n");
         for (Software s : Software.values()) s.deselect();
         Software.selected = new LinkedList<>();
 
         SoftwareContents softwares = (SoftwareContents) CustomFlag.SOFTWARE.container();
         if (CustomFlag.INSTALLED.isSelected()) {
-            SYSIO.out(Type.DEBUG, "Selecting installed software\n");
+            SYSIO.debug("Selecting installed software\n");
             for (Software s : Software.installed()) s.target();
         } else if (CustomFlag.ALL.isSelected() || (CustomFlag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
-            SYSIO.out(Type.DEBUG, "Selecting all software\n");
+            SYSIO.debug("Selecting all software\n");
             for (Software s : Software.values()) s.target();
         } else {
-            SYSIO.out(Type.DEBUG, "Selecting servers " + softwares.contents() + "\n");
+            SYSIO.debug("Selecting servers " + softwares.contents() + "\n");
             for (Software s : softwares.contents()) s.target(); // Select by software
         }
 
@@ -167,7 +167,7 @@ public enum Software implements Installable {
     }
 
     public static void loadInstallation() {
-        SYSIO.out(Type.INFO, "Reloading installed software\n");
+        SYSIO.info("Reloading installed software\n");
         for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
         Software.installed = new LinkedList<>();
         Software.unknown = new LinkedList<>();
@@ -206,7 +206,7 @@ public enum Software implements Installable {
         SYSIO.sep();
 
         if (Software.values().length == 0) {
-            SYSIO.out(Type.HELP, CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software available\n");
+            SYSIO.help(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software available\n");
             return;
         }
 
@@ -236,7 +236,7 @@ public enum Software implements Installable {
         SYSIO.sep();
 
         if (Software.installed().isEmpty()) {
-            SYSIO.out(Type.HELP, CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software installed\n");
+            SYSIO.help(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software installed\n");
             return;
         }
 
