@@ -7,14 +7,12 @@ import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.data.build.*;
 import com.cavetale.setup.download.Source;
 import com.cavetale.setup.download.Ver;
-import com.cavetale.setup.parser.Flag;
-import com.cavetale.setup.parser.InputException;
-import com.cavetale.setup.parser.container.PluginContainer;
+import com.cavetale.setup.console.CustomFlag;
+import com.cavetale.setup.console.container.PluginContents;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.util.console.Code;
-import com.cavetale.setup.util.console.Console;
-import com.cavetale.setup.util.console.Style;
-import com.cavetale.setup.util.console.Type;
+import com.cavetale.setup.console.CustomStyle;
+import io.github.ijustleyxo.jclix.io.Code;
+import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,6 +21,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
+
+import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
 /**
  * List of available plugins
@@ -292,12 +292,12 @@ public enum Plugin implements Provider, Installable {
 
     //= Finder ==
 
-    public static @NotNull Plugin get(@NotNull String ref) throws Plugin.PluginNotFoundException {
+    public static @NotNull Plugin get(@NotNull String ref) throws NotFoundException {
         for (Plugin p : Plugin.values()) if (p.displayName().equalsIgnoreCase(ref)) return p;
-        throw new Plugin.PluginNotFoundException(ref);
+        throw new NotFoundException(ref);
     }
 
-    public static @NotNull Plugin get(@NotNull File file) throws Plugin.NotAPluginException, Plugin.PluginNotFoundException {
+    public static @NotNull Plugin get(@NotNull File file) throws Plugin.NotAPluginException, NotFoundException {
         String ref = file.getName().toLowerCase();
         if (!file.getPath().endsWith(".jar")) throw new Plugin.NotAPluginException(file);
         int verStart = ref.indexOf("-");
@@ -307,7 +307,7 @@ public enum Plugin implements Provider, Installable {
         int endStart = Math.min(verStart, extStart);
         ref = ref.substring(0, endStart);
         for (Plugin p : Plugin.values()) if (ref.equalsIgnoreCase(p.displayName())) return p;
-        throw new Plugin.PluginNotFoundException(ref);
+        throw new NotFoundException(ref);
     }
 
     //= Indexing ==
@@ -340,7 +340,7 @@ public enum Plugin implements Provider, Installable {
     }
 
     public static void reset() {
-        Console.log(Type.DEBUG, "Resetting plugins\n");
+        SYSIO.debug("Resetting plugins\n");
         for (Plugin p : Plugin.values()) p.revert();
         Plugin.selected = null;
         Plugin.installed = null;
@@ -349,20 +349,20 @@ public enum Plugin implements Provider, Installable {
     }
 
     public static void loadSelection() {
-        Console.log(Type.EXTRA, "Loading selected plugins\n");
+        SYSIO.debug("Loading selected plugins\n");
         for (Plugin p : Plugin.values()) p.deselect();
         Plugin.selected = new LinkedList<>();
 
-        PluginContainer plugins = (PluginContainer) Flag.PLUGIN.container();
-        if (Flag.INSTALLED.isSelected()) {
-            Console.log(Type.DEBUG, "Selecting installed plugins\n");
+        PluginContents plugins = (PluginContents) CustomFlag.PLUGIN.container();
+        if (CustomFlag.INSTALLED.isSelected()) {
+            SYSIO.debug("Selecting installed plugins\n");
             for (Plugin p : Plugin.installed()) p.target();
-        } else if (Flag.ALL.isSelected() ||  (Flag.PLUGIN.isSelected() && plugins.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all plugins\n");
+        } else if (CustomFlag.ALL.isSelected() ||  (CustomFlag.PLUGIN.isSelected() && plugins.isEmpty())) { // Select all
+            SYSIO.debug("Selecting all plugins\n");
             for (Plugin p : Plugin.values()) p.target();
         } else {
-            Console.log(Type.DEBUG, "Selecting plugins " + plugins.get() + "\n");
-            for (Plugin p : plugins.get()) p.target(); // Select by plugin
+            SYSIO.debug("Selecting plugins " + plugins.contents() + "\n");
+            for (Plugin p : plugins.contents()) p.target(); // Select by plugin
 
             for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.select(); // Select by category
 
@@ -373,7 +373,7 @@ public enum Plugin implements Provider, Installable {
     }
 
     public static void loadInstallation() {
-        Console.log(Type.EXTRA, "Loading installed plugins\n");
+        SYSIO.debug("Loading installed plugins\n");
         for (Plugin p : Plugin.values()) p.inst = new LinkedList<>(); // Reset installations
         Plugin.installed = new LinkedList<>();
         Plugin.linked = new LinkedList<>();
@@ -389,12 +389,12 @@ public enum Plugin implements Provider, Installable {
                 p = Plugin.get(f);
             } catch (Plugin.NotAPluginException e) {
                 continue;
-            } catch (Plugin.PluginNotFoundException ignored) {}
+            } catch (NotFoundException ignored) {}
             if (Files.isSymbolicLink(f.toPath())) Plugin.linked.add(f.getName());
             else {
                 if (p == null) {
                     Plugin.unknown.add(f.getName());
-                    Console.log(Type.EXTRA, Style.WARN, "Unknown plugin " + f.getName());
+                    SYSIO.warn("Unknown plugin " + f.getName());
                 } else p.installations().add(f.getName());
             }
         }
@@ -416,22 +416,22 @@ public enum Plugin implements Provider, Installable {
     //= Cosmetics ==
 
     public static void requestAll() {
-        Console.sep();
+        SYSIO.sep();
 
         if (Plugin.values().length == 0) {
-            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins available\n");
+            SYSIO.help(CustomStyle.PLUGIN.toString() + Code.BOLD + "No plugins available\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.values().length +
+        SYSIO.outL(Type.HELP, CustomStyle.PLUGIN, Plugin.values().length +
                 " plugin(s) available", 4, 21, (Object[]) Plugin.values());
     }
 
     public static boolean listSelected() {
         List<Plugin> selected = Plugin.selected();
         if (selected.isEmpty()) return false;
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.PLUGIN, selected.size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.PLUGIN, selected.size() +
                 " plugin(s) selected", 4, 21, selected.toArray());
         return true;
     }
@@ -439,29 +439,29 @@ public enum Plugin implements Provider, Installable {
     public static boolean listInstalled() {
         List<Plugin> plugins = Plugin.installed();
         if (plugins.isEmpty()) return false;
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.INSTALL, plugins.size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.INSTALL, plugins.size() +
                 " plugin(s) installed", 4, 21, plugins.toArray());
         return true;
     }
 
     public static void requestInstalled() {
-        Console.sep();
+        SYSIO.sep();
 
         if (Plugin.installed().isEmpty()) {
-            Console.log(Type.REQUESTED, Style.PLUGIN, Code.BOLD + "No plugins installed\n");
+            SYSIO.help(CustomStyle.PLUGIN.toString() + Code.BOLD + "No plugins installed\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.PLUGIN, Plugin.installed().size() +
+        SYSIO.outL(Type.HELP, CustomStyle.PLUGIN, Plugin.installed().size() +
                 " plugin(s) installed", 4, 21, Plugin.installed().toArray());
     }
 
     public static boolean listLinked() {
         List<String> linked = Plugin.linked();
         if (linked.isEmpty()) return false;
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.LINK, linked.size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.LINK, linked.size() +
                 " plugin(s) linked", 4, 21, linked.toArray());
         return true;
     }
@@ -469,16 +469,16 @@ public enum Plugin implements Provider, Installable {
     public static boolean listUnknown() {
         List<String> unknown = Plugin.unknown();
         if (unknown.isEmpty()) return false;
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.UNKNOWN, unknown.size() +
                 " plugin(s) unknown", 4, 21, unknown.toArray());
         return true;
     }
 
     //= Exceptions ==
 
-    public static class PluginNotFoundException extends InputException {
-        public PluginNotFoundException(@NotNull String ref) {
+    public static class NotFoundException extends Exception {
+        public NotFoundException(@NotNull String ref) {
             super("Plugin \"" + ref + "\" not found. Did you mean to use -\"P\" for --path?");
         }
     }

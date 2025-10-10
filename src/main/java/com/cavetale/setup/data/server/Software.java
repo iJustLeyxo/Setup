@@ -5,14 +5,12 @@ import com.cavetale.setup.data.Installable;
 import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.download.Source;
 import com.cavetale.setup.download.Ver;
-import com.cavetale.setup.parser.Flag;
-import com.cavetale.setup.parser.InputException;
-import com.cavetale.setup.parser.container.SoftwareContainer;
+import com.cavetale.setup.console.CustomFlag;
+import com.cavetale.setup.console.container.SoftwareContents;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.util.console.Code;
-import com.cavetale.setup.util.console.Console;
-import com.cavetale.setup.util.console.Style;
-import com.cavetale.setup.util.console.Type;
+import com.cavetale.setup.console.CustomStyle;
+import io.github.ijustleyxo.jclix.io.Code;
+import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +18,8 @@ import java.io.File;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
+
+import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
 /**
  * Server software, used to register downloadable server software
@@ -97,12 +97,12 @@ public enum Software implements Installable {
 
     //= Finder ==
 
-    public static @NotNull Software get(@NotNull String ref) throws SoftwareNotFoundException {
+    public static @NotNull Software get(@NotNull String ref) throws NotFoundException {
         for (Software s : Software.values()) for (String r : s.refs) if (r.equalsIgnoreCase(ref)) return s;
-        throw new SoftwareNotFoundException(ref);
+        throw new NotFoundException(ref);
     }
 
-    public static @NotNull Software get(@NotNull File file) throws NotASoftwareException, SoftwareNotFoundException {
+    public static @NotNull Software get(@NotNull File file) throws NotASoftwareException, NotFoundException {
         String ref = file.getName().toLowerCase();
         if (!file.isFile() || !ref.endsWith(".jar")) throw new NotASoftwareException(file);
         int verStart = ref.indexOf("-");
@@ -112,7 +112,7 @@ public enum Software implements Installable {
         int endStart = Math.min(verStart, extStart);
         ref = ref.substring(0, endStart);
         for (Software s : Software.values()) for (String r : s.refs) if (ref.equalsIgnoreCase(r)) return s;
-        throw new SoftwareNotFoundException(ref);
+        throw new NotFoundException(ref);
     }
 
     //= Indexing ==
@@ -139,7 +139,7 @@ public enum Software implements Installable {
     }
 
     public static void reset() {
-        Console.log(Type.DEBUG, "Resetting software\n");
+        SYSIO.out(Type.DEBUG, "Resetting software\n");
         for (Software s : Software.values()) s.revert();
         Software.selected = null;
         Software.installed = null;
@@ -147,27 +147,27 @@ public enum Software implements Installable {
     }
 
     public static void loadSelection() {
-        Console.log(Type.EXTRA, "Reloading selected software\n");
+        SYSIO.out(Type.INFO, "Reloading selected software\n");
         for (Software s : Software.values()) s.deselect();
         Software.selected = new LinkedList<>();
 
-        SoftwareContainer softwares = (SoftwareContainer) Flag.SOFTWARE.container();
-        if (Flag.INSTALLED.isSelected()) {
-            Console.log(Type.DEBUG, "Selecting installed software\n");
+        SoftwareContents softwares = (SoftwareContents) CustomFlag.SOFTWARE.container();
+        if (CustomFlag.INSTALLED.isSelected()) {
+            SYSIO.out(Type.DEBUG, "Selecting installed software\n");
             for (Software s : Software.installed()) s.target();
-        } else if (Flag.ALL.isSelected() || (Flag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all software\n");
+        } else if (CustomFlag.ALL.isSelected() || (CustomFlag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
+            SYSIO.out(Type.DEBUG, "Selecting all software\n");
             for (Software s : Software.values()) s.target();
         } else {
-            Console.log(Type.DEBUG, "Selecting servers " + softwares.get() + "\n");
-            for (Software s : softwares.get()) s.target(); // Select by software
+            SYSIO.out(Type.DEBUG, "Selecting servers " + softwares.contents() + "\n");
+            for (Software s : softwares.contents()) s.target(); // Select by software
         }
 
         for (Software s : Software.values()) if (s.isSelected()) Software.selected.add(s); // Update selection
     }
 
     public static void loadInstallation() {
-        Console.log(Type.EXTRA, "Reloading installed software\n");
+        SYSIO.out(Type.INFO, "Reloading installed software\n");
         for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
         Software.installed = new LinkedList<>();
         Software.unknown = new LinkedList<>();
@@ -181,7 +181,7 @@ public enum Software implements Installable {
                 s = Software.get(f);
             } catch (Software.NotASoftwareException e) {
                 continue;
-            } catch (Software.SoftwareNotFoundException ignored) {}
+            } catch (NotFoundException ignored) {}
             if (s != null) s.installations().add(f.getName());
             else Software.unknown.add(f.getName());
         }
@@ -203,22 +203,22 @@ public enum Software implements Installable {
     //= Cosmetics ==
 
     public static void requestAll() {
-        Console.sep();
+        SYSIO.sep();
 
         if (Software.values().length == 0) {
-            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software available\n");
+            SYSIO.out(Type.HELP, CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software available\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.values().length +
+        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, Software.values().length +
                 " software available", 4, 21, (Object[]) Software.values());
     }
 
     public static boolean listSelected() {
         List<Software> selected = Software.selected();
         if (selected.isEmpty()) return false;
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, selected.size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, selected.size() +
                 " software selected", 4, 21, selected.toArray());
         return true;
     }
@@ -226,35 +226,35 @@ public enum Software implements Installable {
     public static boolean listInstalled() {
         List<Software> software = Software.installed();
         if (software.isEmpty()) return false;
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, software.size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, software.size() +
                 " software installed", 4, 21, software.toArray());
         return true;
     }
 
     public static void requestInstalled() {
-        Console.sep();
+        SYSIO.sep();
 
         if (Software.installed().isEmpty()) {
-            Console.log(Type.REQUESTED, Style.SOFTWARE, Code.BOLD + "No software installed\n");
+            SYSIO.out(Type.HELP, CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software installed\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.SOFTWARE, Software.installed().size() +
+        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, Software.installed().size() +
                 " software installed", 4, 21, Software.installed().toArray());
     }
 
     public static boolean listUnknown() {
         List<String> unknown = Software.unknown();
         if (unknown.isEmpty()) return false;
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.UNKNOWN, unknown.size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.UNKNOWN, unknown.size() +
                 " software unknown", 4, 21, unknown.toArray());
         return true;
     }
 
-    public static final class SoftwareNotFoundException extends InputException {
-        public SoftwareNotFoundException(@NotNull String ref) {
+    public static final class NotFoundException extends Exception {
+        public NotFoundException(@NotNull String ref) {
             super("Server software \"" + ref + "\" not found");
         }
     }

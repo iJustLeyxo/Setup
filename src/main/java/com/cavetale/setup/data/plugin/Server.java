@@ -1,14 +1,12 @@
 package com.cavetale.setup.data.plugin;
 
+import com.cavetale.setup.console.CustomFlag;
+import com.cavetale.setup.console.container.ServerContents;
 import com.cavetale.setup.data.Sel;
-import com.cavetale.setup.parser.Flag;
-import com.cavetale.setup.parser.InputException;
-import com.cavetale.setup.parser.container.ServerContainer;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.util.console.Code;
-import com.cavetale.setup.util.console.Console;
-import com.cavetale.setup.util.console.Style;
-import com.cavetale.setup.util.console.Type;
+import com.cavetale.setup.console.CustomStyle;
+import io.github.ijustleyxo.jclix.io.Code;
+import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +14,7 @@ import java.util.*;
 
 import static com.cavetale.setup.data.plugin.Category.BASE;
 import static com.cavetale.setup.data.plugin.Category.SURVIVAL;
+import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
 /**
  * Servers, used to group plugins by installed server
@@ -154,34 +153,34 @@ public enum Server implements Provider {
     }
 
     public static void reset() {
-        Console.log(Type.DEBUG, "Resetting servers\n");
+        SYSIO.out(Type.DEBUG, "Resetting servers\n");
         for (Server s : Server.values()) s.revert();
         Server.selected = null;
         Server.installed = null;
     }
 
     public static void loadSelection() {
-        Console.log(Type.EXTRA, "Reloading selected servers\n");
+        SYSIO.out(Type.INFO, "Reloading selected servers\n");
         for (Server s : Server.values()) s.deselect();
         Server.selected = new LinkedList<>();
 
-        ServerContainer servers = (ServerContainer) Flag.SERVER.container();
-        if (Flag.INSTALLED.isSelected()) {
+        ServerContents servers = (ServerContents) CustomFlag.SERVER.container();
+        if (CustomFlag.INSTALLED.isSelected()) {
             for (Server s : Server.installed()) s.target();
-            Console.log(Type.DEBUG, "Selecting installed servers\n");
-        } else if (Flag.ALL.isSelected() || (Flag.SERVER.isSelected() && servers.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all servers\n");
+            SYSIO.out(Type.DEBUG, "Selecting installed servers\n");
+        } else if (CustomFlag.ALL.isSelected() || (CustomFlag.SERVER.isSelected() && servers.isEmpty())) { // Select all
+            SYSIO.out(Type.DEBUG, "Selecting all servers\n");
             for (Server s : Server.values()) s.target();
         } else {
-            Console.log(Type.DEBUG, "Selecting servers " + servers.get() + "\n");
-            for (Server s : servers.get()) s.target(); // Select by server
+            SYSIO.out(Type.DEBUG, "Selecting servers " + servers.contents() + "\n");
+            for (Server s : servers.contents()) s.target(); // Select by server
         }
 
         for (Server s : Server.values()) if (s.isSelected()) Server.selected.add(s); // Update selection
     }
 
     public static void loadInstallation() {
-        Console.log(Type.EXTRA, "Reloading installed servers\n");
+        SYSIO.out(Type.INFO, "Reloading installed servers\n");
         Server.installed = new LinkedList<>();
 
         for (Server s : Server.values()) if (s.isInstalled()) Server.installed().add(s); // Update installation
@@ -201,59 +200,59 @@ public enum Server implements Provider {
     //= Cosmetics ==
 
     public static void requestAll() {
-        Console.sep();
+        SYSIO.sep();
 
         if (Server.values().length == 0) {
-            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers available\n");
+            SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD + "No servers available\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.values().length +
+        SYSIO.outL(Type.HELP, CustomStyle.SERVER, Server.values().length +
                 " server(s) available", 4, 21, (Object[]) Server.values());
     }
 
     public static void listSelected() {
         if (Server.selected().isEmpty()) {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers selected\n");
+            SYSIO.sep();
+            SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD + "No servers selected\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.selected().size() +
+        SYSIO.sep();
+        SYSIO.outL(Type.HELP, CustomStyle.SERVER, Server.selected().size() +
                 " server(s) selected", 4, 21, Server.selected().toArray());
     }
 
     public static void requestInstalled() {
-        Console.sep();
+        SYSIO.sep();
 
         if (Server.installed().isEmpty()) {
-            Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD + "No servers installed\n");
+            SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD + "No servers installed\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.SERVER, Server.installed().size() +
+        SYSIO.outL(Type.HELP, CustomStyle.SERVER, Server.installed().size() +
                 " server(s) installed", 4, 21, Server.installed().toArray());
     }
 
     public static void details() {
-        Console.sep();
-        Console.log(Type.REQUESTED, Style.SERVER, Code.BOLD +
+        SYSIO.sep();
+        SYSIO.out(Type.HELP, CustomStyle.SERVER.toString() + Code.BOLD +
                 "--------------------------------------- " +
                 "Servers ---------------------------------------\n");
-        Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", "Server", "Info");
-        Console.log(Type.REQUESTED, Style.SERVER, "----------------------------------------------" +
+        SYSIO.outF(Type.HELP, CustomStyle.SERVER + "%-16s | %-68s\n", "Server", "Info");
+        SYSIO.out(Type.HELP, CustomStyle.SERVER + "----------------------------------------------" +
                 "-----------------------------------------\n");
         ArrayList<Server> servers = new ArrayList<>(List.of(Server.values()));
         Collections.sort(servers);
         for (Server s : servers) {
-            Console.logF(Type.REQUESTED, Style.SERVER, "%-16s | %-68s\n", s.displayName(), s.info);
+            SYSIO.outF(Type.HELP, CustomStyle.SERVER + "%-16s | %-68s\n", s.displayName(), s.info);
         }
     }
 
-    public static class NotFoundException extends InputException {
+    public static class NotFoundException extends Exception {
         public NotFoundException(@NotNull String ref) {
-            super("Server \"" + ref + "\" not found. Did you mean to use -\"S\" for --software?");
+            super("Server \"" + ref + "\" not found. Did you mean to use \"-" + CustomFlag.SOFTWARE.ref() + "\" for \"--" + CustomFlag.SOFTWARE.reference() + "\"?");
         }
     }
 }

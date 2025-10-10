@@ -1,11 +1,13 @@
-package com.cavetale.setup.util.console;
+package com.cavetale.setup.console;
 
+import io.github.ijustleyxo.jclix.io.AbstractStyle;
+import io.github.ijustleyxo.jclix.io.Code;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Console output styles, used to manage color, weight, etc. of console outputs
  */
-public enum Style {
+public enum CustomStyle implements AbstractStyle {
     PROMPT(Code.BOLD, Code.LIGHT_BLUE_FG),
     INPUT(Code.BOLD, Code.WHITE_FG),
     DEBUG(Code.DARK_GRAY_FG),
@@ -31,7 +33,7 @@ public enum Style {
 
     public final @NotNull String xCodes;
 
-    Style(@NotNull Code @NotNull ... codes) {
+    CustomStyle(@NotNull Code @NotNull ... codes) {
         StringBuilder s = new StringBuilder();
         for (Code c : codes) {
             s.append(c);
