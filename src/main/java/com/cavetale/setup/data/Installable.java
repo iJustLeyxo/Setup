@@ -1,17 +1,17 @@
 package com.cavetale.setup.data;
 
 import com.cavetale.setup.download.Source;
-import com.cavetale.setup.parser.Flag;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.util.console.Console;
-import com.cavetale.setup.util.console.Style;
-import com.cavetale.setup.util.console.Type;
+import io.github.ijustleyxo.jclix.io.Style;
+import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+
+import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
 public interface Installable {
     @NotNull String displayName();
@@ -21,9 +21,9 @@ public interface Installable {
     @NotNull List<String> installations();
 
     default void install() {
-        Console.log(Type.INFO, "Installing " + this.displayName());
+        SYSIO.info("Installing " + this.displayName());
         if (this.isInstalled()) {
-            Console.log(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)");
+            SYSIO.send(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)");
             return;
         }
 
@@ -31,15 +31,14 @@ public interface Installable {
             String name = this.displayName() + "-" + this.source().ver() + ".jar";
             Util.download(this.source().uri(), this.downloads(), name);
             this.installations().add(name);
-            Console.log(Type.INFO, Style.DONE, " done\n");
+            SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            Console.log(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed (" + e.getMessage() + ")\n");
-            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
+            SYSIO.err(Style.INFO + "Installing " + this.displayName() + Style.ERR + " failed", e);
         }
     }
 
     default void update() {
-        Console.log(Type.INFO, "Updating " + this.displayName());
+        SYSIO.info("Updating " + this.displayName());
 
         String name = this.displayName() + "-" + this.source().ver() + ".jar";
         File file;
@@ -48,20 +47,19 @@ public interface Installable {
         try {
             file = Util.stash(this.source().uri());
         } catch (IOException e) {
-            Console.log(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download (" + e.getMessage() + ")\n");
-            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
+            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download", e);
             return;
         }
 
         // Uninstall
         for (String inst : this.installations()) {
-            Console.log(Type.DEBUG, "Uninstalling " + inst);
+            SYSIO.debug("Uninstalling " + inst);
             File f = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
-                Console.log(Type.EXTRA, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
-            } else if (!Console.log(Type.EXTRA, Style.ERR, " failed - skipped " + f + " (linked)\n")) {
-                Console.log(Type.ERR, "Updating " + this.displayName() + " failed - skipped " + f + " (linked)\n");
+                SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
+            } else if (!SYSIO.info(Style.ERR + " failed - skipped " + f + " (linked)\n")) {
+                SYSIO.err("Updating " + this.displayName() + " failed - skipped " + f + " (linked)\n");
             }
             return;
         }
@@ -71,23 +69,22 @@ public interface Installable {
         try {
             Util.finalise(file, this.downloads(), name);
             this.installations().add(name);
-            Console.log(Type.INFO, Style.DONE, " done\n");
+            SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            Console.log(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download (" + e.getMessage() + ")\n");
-            if (Flag.ERROR.isSelected()) Console.log(Type.REQUESTED, e);
+            SYSIO.err(Style.INFO + "Updating " + this.displayName() + Style.ERR + " failed - failed to download", e);
         }
     }
 
     default void uninstall() {
         for (String inst : this.installations()) {
-            Console.log(Type.INFO, "Uninstalling " + inst);
+            SYSIO.info("Uninstalling " + inst);
             File file = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) {
                     this.installations().remove(inst);
-                    Console.log(Type.INFO, Style.DONE, " done\n");
-                } else Console.log(Type.EXTRA, Type.ERR, "Uninstalling " + file, " failed\n");
-            } else Console.log(Type.EXTRA, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
+                    SYSIO.info(Style.SUCCESS + " done\n");
+                } else SYSIO.send(Type.INFO, Type.ERR, "Uninstalling " + file, " failed\n");
+            } else SYSIO.send(Type.INFO, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
         }
     }
 }

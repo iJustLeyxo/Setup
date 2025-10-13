@@ -1,14 +1,12 @@
 package com.cavetale.setup.data.plugin;
 
+import com.cavetale.setup.console.CustomFlag;
+import com.cavetale.setup.console.container.CategoryContents;
 import com.cavetale.setup.data.Sel;
-import com.cavetale.setup.parser.Flag;
-import com.cavetale.setup.parser.InputException;
-import com.cavetale.setup.parser.container.CategoryContainer;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.util.console.Code;
-import com.cavetale.setup.util.console.Console;
-import com.cavetale.setup.util.console.Style;
-import com.cavetale.setup.util.console.Type;
+import com.cavetale.setup.console.CustomStyle;
+import io.github.ijustleyxo.jclix.io.Code;
+import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.cavetale.setup.data.plugin.Plugin.*;
+import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
 /**
  * Plugin categories, used to group plugins by purpose / usage
@@ -142,38 +141,38 @@ public enum Category implements Provider {
     private static @Nullable List<Category> installed = null;
 
     public static @NotNull List<Category> installed() {
-        if (Category.installed == null) Category.loadInstallation();
+        Category.loadInstallation();
         return Category.installed;
     }
 
     public static @NotNull List<Category> selected() {
-        if (Category.selected == null) Category.loadSelection();
+        Category.loadSelection();
         return Category.selected;
     }
 
     public static void reset() {
-        Console.log(Type.DEBUG, "Resetting categories\n");
+        SYSIO.debug("Resetting categories\n");
         for (Category c : Category.values()) c.revert();
         Category.selected = null;
         Category.installed = null;
     }
 
     public static void loadSelection() {
-        Console.log(Type.EXTRA, "Reloading selected categories\n");
+        SYSIO.debug("Reloading selected categories\n");
         for (Category c : Category.values()) c.deselect();
         Category.selected = new LinkedList<>();
 
-        CategoryContainer categories = (CategoryContainer) Flag.CATEGORY.container();
-        if (Flag.INSTALLED.isSelected()) {
+        CategoryContents categories = (CategoryContents) CustomFlag.CATEGORY.container();
+        if (CustomFlag.INSTALLED.isSelected()) {
             Category.loadInstallation();
-            Console.log(Type.DEBUG, "Selecting installed categories\n");
+            SYSIO.debug("Selecting installed categories\n");
             for (Category c : Category.installed()) c.target();
-        } else if (Flag.ALL.isSelected() || (Flag.CATEGORY.isSelected() && categories.isEmpty())) { // Select all
-            Console.log(Type.DEBUG, "Selecting all categories\n");
+        } else if (CustomFlag.ALL.isSelected() || (CustomFlag.CATEGORY.isSelected() && categories.isEmpty())) { // Select all
+            SYSIO.debug("Selecting all categories\n");
             for (Category c : Category.values()) c.target();
         } else {
-            Console.log(Type.DEBUG, "Selecting categories " + categories.get() + "\n"); // Select by category
-            for (Category c : categories.get()) c.target();
+            SYSIO.debug("Selecting categories " + categories.contents() + "\n"); // Select by category
+            for (Category c : categories.contents()) c.target();
 
             for (Server s : Server.values()) if (s.isSelected()) for (Category c : s.categories()) c.select(); // Select by server
         }
@@ -182,7 +181,7 @@ public enum Category implements Provider {
     }
 
     public static void loadInstallation() {
-        Console.log(Type.EXTRA, "Reloading installed categories\n");
+        SYSIO.debug("Reloading installed categories\n");
         Category.installed = new LinkedList<>();
 
         for (Category c : Category.values()) if (c.isInstalled()) Category.installed.add(c); // Update installation
@@ -202,55 +201,55 @@ public enum Category implements Provider {
     //= Cosmetics ==
 
     public static void requestAll() {
-        Console.sep();
+        SYSIO.separate();
 
         if (Category.values().length == 0) {
-            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories available\n");
+            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories available\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.values().length +
+        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.values().length +
                 " categor(y/ies) available", 4, 21, (Object[]) Category.values());
     }
 
     public static void listSelected() {
         if (Category.selected().isEmpty()) {
-            Console.sep();
-            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories selected\n");
+            SYSIO.separate();
+            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories selected\n");
             return;
         }
 
-        Console.sep();
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.selected().size() +
+        SYSIO.separate();
+        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.selected().size() +
                 " categor(y/ies) selected", 4, 21, Category.selected().toArray());
     }
 
     public static void requestInstalled() {
-        Console.sep();
+        SYSIO.separate();
 
         if (Category.installed().isEmpty()) {
-            Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD + "No categories installed\n");
+            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories installed\n");
             return;
         }
 
-        Console.logL(Type.REQUESTED, Style.CATEGORY, Category.installed().size() +
+        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.installed().size() +
                 " categor(y/ies) installed", 4, 21, Category.installed().toArray());
     }
 
     public static void details() {
-        Console.sep();
-        Console.log(Type.REQUESTED, Style.CATEGORY, Code.BOLD +
+        SYSIO.separate();
+        SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD +
                 "-------------------------------------- " +
                 "Categories -------------------------------------\n");
-        Console.logF(Type.REQUESTED, Style.CATEGORY, "%-16s | %-68s\n", "Category", "Info");
-        Console.log(Type.REQUESTED, Style.CATEGORY, "--------------------------------------------" +
+        SYSIO.format(Type.REQUESTED, CustomStyle.CATEGORY + "%-16s | %-68s\n", "Category", "Info");
+        SYSIO.requested(CustomStyle.CATEGORY + "--------------------------------------------" +
                 "-------------------------------------------\n");
         ArrayList<Category> categories = new ArrayList<>(List.of(Category.values()));
         Collections.sort(categories);
-        for (Category c : categories) Console.logF(Type.REQUESTED, Style.CATEGORY, "%-16s | %-68s\n", c.displayName(), c.info);
+        for (Category c : categories) SYSIO.format(Type.REQUESTED, CustomStyle.CATEGORY + "%-16s | %-68s\n", c.displayName(), c.info);
     }
 
-    public static final class NotFoundException extends InputException {
+    public static final class NotFoundException extends Exception {
         public NotFoundException(@NotNull String name) {
             super("Category \"" + name + "\" not found");
         }
