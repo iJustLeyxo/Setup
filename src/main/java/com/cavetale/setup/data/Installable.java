@@ -23,7 +23,7 @@ public interface Installable {
     default void install() {
         SYSIO.info("Installing " + this.displayName());
         if (this.isInstalled()) {
-            SYSIO.out(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)");
+            SYSIO.send(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)");
             return;
         }
 
@@ -47,7 +47,7 @@ public interface Installable {
         try {
             file = Util.stash(this.source().uri());
         } catch (IOException e) {
-            SYSIO.err(Style.INFO + "Updating " + this.displayName() + Style.ERR + " failed - failed to download", e);
+            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download", e);
             return;
         }
 
@@ -57,7 +57,7 @@ public interface Installable {
             File f = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
-                SYSIO.out(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
+                SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
             } else if (!SYSIO.info(Style.ERR + " failed - skipped " + f + " (linked)\n")) {
                 SYSIO.err("Updating " + this.displayName() + " failed - skipped " + f + " (linked)\n");
             }
@@ -83,8 +83,8 @@ public interface Installable {
                 if (file.delete()) {
                     this.installations().remove(inst);
                     SYSIO.info(Style.SUCCESS + " done\n");
-                } else SYSIO.out(Type.INFO, Type.ERR, "Uninstalling " + file, " failed\n");
-            } else SYSIO.out(Type.INFO, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
+                } else SYSIO.send(Type.INFO, Type.ERR, "Uninstalling " + file, " failed\n");
+            } else SYSIO.send(Type.INFO, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
         }
     }
 }

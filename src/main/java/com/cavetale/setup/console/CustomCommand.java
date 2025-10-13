@@ -36,20 +36,20 @@ public enum CustomCommand implements Command {
 
                 List<Plugin> selected = Plugin.get(true, true);
                 if (!selected.isEmpty()) {
-                    SYSIO.sep();
-                    SYSIO.outL(Type.HELP, CustomStyle.INSTALL, selected.size() +
+                    SYSIO.separate();
+                    SYSIO.list(Type.REQUESTED, CustomStyle.INSTALL, selected.size() +
                             " plugin(s) installed", 4, 21, selected.toArray());
                 }
                 selected = Plugin.get(true, false);
                 if (!selected.isEmpty()) {
-                    SYSIO.sep();
-                    SYSIO.outL(Type.HELP, CustomStyle.SUPERFLUOUS, selected.size() +
+                    SYSIO.separate();
+                    SYSIO.list(Type.REQUESTED, CustomStyle.SUPERFLUOUS, selected.size() +
                             " plugin(s) superfluous", 4, 21, selected.toArray());
                 }
                 selected = Plugin.get(false, true);
                 if (!selected.isEmpty()) {
-                    SYSIO.sep();
-                    SYSIO.outL(Type.HELP, CustomStyle.MISSING, selected.size() +
+                    SYSIO.separate();
+                    SYSIO.list(Type.REQUESTED, CustomStyle.MISSING, selected.size() +
                             " plugin(s) missing", 4, 21, selected.toArray());
                 }
             }
@@ -59,20 +59,20 @@ public enum CustomCommand implements Command {
 
                 List<Software> selected = Software.get(true, true);
                 if (!selected.isEmpty()) {
-                    SYSIO.sep();
-                    SYSIO.outL(Type.HELP, CustomStyle.INSTALL, selected.size() +
+                    SYSIO.separate();
+                    SYSIO.list(Type.REQUESTED, CustomStyle.INSTALL, selected.size() +
                             " software installed", 4, 21, selected.toArray());
                 }
                 selected = Software.get(true, false);
                 if (!selected.isEmpty()) {
-                    SYSIO.sep();
-                    SYSIO.outL(Type.HELP, CustomStyle.SUPERFLUOUS, selected.size() +
+                    SYSIO.separate();
+                    SYSIO.list(Type.REQUESTED, CustomStyle.SUPERFLUOUS, selected.size() +
                             " software superfluous", 4, 21, selected.toArray());
                 }
                 selected = Software.get(false, true);
                 if (!selected.isEmpty()) {
-                    SYSIO.sep();
-                    SYSIO.outL(Type.HELP, CustomStyle.MISSING, selected.size() +
+                    SYSIO.separate();
+                    SYSIO.list(Type.REQUESTED, CustomStyle.MISSING, selected.size() +
                             " software missing", 4, 21, selected.toArray());
                 }
             }
@@ -118,19 +118,19 @@ public enum CustomCommand implements Command {
                 return;
             }
 
-            SYSIO.help(CustomStyle.LINK.toString() + files.size() + " destination(s) will be linked to\n");
-            if (!SYSIO.in("Continue linking")) return;
+            SYSIO.requested(CustomStyle.LINK.toString() + files.size() + " destination(s) will be linked to\n");
+            if (!SYSIO.getConfirmation("Continue linking")) return;
 
             for (File dest : files) {
                 SYSIO.info("Linking to " + dest.getName());
                 if (!dest.isDirectory()) {
-                    SYSIO.out(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (not a folder)\n");
+                    SYSIO.send(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (not a folder)\n");
                     continue;
                 }
                 dest.mkdirs();
                 File file = new File(dest, installation.getName());
                 if (file.exists()) {
-                    SYSIO.out(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (already exists)\n");
+                    SYSIO.send(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed (already exists)\n");
                     return;
                 }
 
@@ -138,7 +138,7 @@ public enum CustomCommand implements Command {
                     Files.createSymbolicLink(file.toPath(), installation.toPath());
                     SYSIO.info(Style.SUCCESS + " done\n");
                 } catch (IOException e) {
-                    SYSIO.err(Style.INFO + "Linking to " + dest.getName() + Style.ERR + " failed", e);
+                    SYSIO.send(Type.INFO, Type.ERR, "Linking to " + dest.getName(), " failed", e);
                 }
             }
         }
@@ -153,7 +153,7 @@ public enum CustomCommand implements Command {
                 return;
             }
 
-            if (!SYSIO.in("Agree to the Minecraft EULA")) return;
+            if (!SYSIO.getConfirmation("Agree to the Minecraft EULA")) return;
 
             StringBuilder builder = new StringBuilder(); // Read eula
             try (FileInputStream in = new FileInputStream(eula)) {
@@ -165,7 +165,7 @@ public enum CustomCommand implements Command {
                     if (c == '\n' || bytes.length - 1 <= i) {
                         String line = lineBuilder.toString();
                         if (line.equals("eula=false")) line = "eula=true";
-                        else if (line.equals("eula=true")) SYSIO.info("Already accepted the eula\n");
+                        else if (line.equals("eula=true")) SYSIO.warn("Already accepted the eula\n");
                         builder.append(line);
                         if (c == '\n') builder.append(c);
                         lineBuilder = new StringBuilder();
@@ -221,8 +221,8 @@ public enum CustomCommand implements Command {
 
             List<CustomCommand> result = commands.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
-            SYSIO.sep();
-            SYSIO.outL(Type.HELP, CustomStyle.COMMAND, "Commands", 4, 21, result.toArray());
+            SYSIO.separate();
+            SYSIO.list(Type.REQUESTED, CustomStyle.COMMAND, "Commands", 4, 21, result.toArray());
             return true;
         }
 
@@ -231,8 +231,8 @@ public enum CustomCommand implements Command {
             for (CustomFlag flag : CustomFlag.values()) flags.put(flag, Util.similarity(arg, flag.reference()));
             List<CustomFlag> result = flags.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
-            SYSIO.sep();
-            SYSIO.outL(Type.HELP, CustomStyle.FLAG, "Flags", 4, 21, result.toArray());
+            SYSIO.separate();
+            SYSIO.list(Type.REQUESTED, CustomStyle.FLAG, "Flags", 4, 21, result.toArray());
             return true;
         }
 
@@ -241,8 +241,8 @@ public enum CustomCommand implements Command {
             for (Plugin plugin : Plugin.values()) plugins.put(plugin, Util.similarity(arg, plugin.displayName().toLowerCase()));
             List<Plugin> result = plugins.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
-            SYSIO.sep();
-            SYSIO.outL(Type.HELP, CustomStyle.PLUGIN, "Plugins", 4, 21, result.toArray());
+            SYSIO.separate();
+            SYSIO.list(Type.REQUESTED, CustomStyle.PLUGIN, "Plugins", 4, 21, result.toArray());
             return true;
         }
 
@@ -251,8 +251,8 @@ public enum CustomCommand implements Command {
             for (Category category : Category.values()) categories.put(category, Util.similarity(arg, category.displayName().toLowerCase()));
             List<Category> result = categories.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
-            SYSIO.sep();
-            SYSIO.outL(Type.HELP, CustomStyle.CATEGORY, "Categories", 4, 21, result.toArray());
+            SYSIO.separate();
+            SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, "Categories", 4, 21, result.toArray());
             return true;
         }
 
@@ -261,8 +261,8 @@ public enum CustomCommand implements Command {
             for (Server server : Server.values()) servers.put(server, Util.similarity(arg, server.displayName().toLowerCase()));
             List<Server> result = servers.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
-            SYSIO.sep();
-            SYSIO.outL(Type.HELP, CustomStyle.SERVER, "Servers", 4, 21, result.toArray());
+            SYSIO.separate();
+            SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, "Servers", 4, 21, result.toArray());
             return true;
         }
 
@@ -271,8 +271,8 @@ public enum CustomCommand implements Command {
             for (Software soft : Software.values()) software.put(soft, Util.similarity(arg, soft.displayName().toLowerCase()));
             List<Software> result = software.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
-            SYSIO.sep();
-            SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, "Software", 4, 21, result.toArray());
+            SYSIO.separate();
+            SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, "Software", 4, 21, result.toArray());
             return true;
         }
     },
@@ -286,8 +286,8 @@ public enum CustomCommand implements Command {
                 SYSIO.warn("Nothing selected\n");
                 return;
             }
-            SYSIO.help(CustomStyle.INSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to install\n");
-            if (!SYSIO.in("Continue installation")) return;
+            SYSIO.requested(CustomStyle.INSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to install\n");
+            if (!SYSIO.getConfirmation("Continue installation")) return;
             for (Plugin p : plugins) p.install();
             for (Software s : software) s.install();
         }
@@ -318,8 +318,8 @@ public enum CustomCommand implements Command {
                 }
             }
 
-            SYSIO.help(CustomStyle.LINK.toString() + files.size() + " file(s) will be linked\n");
-            if (!SYSIO.in("Continue linking")) return;
+            SYSIO.requested(CustomStyle.LINK.toString() + files.size() + " file(s) will be linked\n");
+            if (!SYSIO.getConfirmation("Continue linking")) return;
 
             for (File origin : files) {
                 SYSIO.info("Linking " + origin.getName());
@@ -327,16 +327,14 @@ public enum CustomCommand implements Command {
                 folder.mkdirs();
                 File link = new File(folder, origin.getName());
                 if (link.exists()) {
-                    if (!SYSIO.info(" failed (already exists)\n")) {
-                        SYSIO.err("Linking " + origin.getName() + " failed (already exists)\n");
-                    }
+                    SYSIO.send(Type.INFO, Type.ERR, "Linking " + origin.getName(), " failed (already exists)\n");
                     continue;
                 }
                 try {
                     Files.createSymbolicLink(link.getAbsoluteFile().toPath(), origin.getAbsoluteFile().toPath());
                     SYSIO.info(Style.SUCCESS + " done\n");
                 } catch (IOException e) {
-                    SYSIO.err(Style.INFO + "Linking " + origin.getName() + Style.ERR + " failed", e);
+                    SYSIO.send(Type.INFO, Type.ERR, "Linking " + origin.getName(), " failed", e);
                 }
             }
         }
@@ -415,7 +413,7 @@ public enum CustomCommand implements Command {
                         builder.redirectErrorStream(true);
                         Process process = builder.start();
 
-                        SYSIO.link(process, "SERVER");
+                        SYSIO.connect(process, "SERVER");
 
                         int exit = process.waitFor();
                         if (exit == 0) SYSIO.info("\n\n" + installation + " exited with code " + exit + "\n");
@@ -457,8 +455,8 @@ public enum CustomCommand implements Command {
                 SYSIO.warn("Nothing selected\n");
                 return;
             }
-            SYSIO.help(CustomStyle.UNINSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to uninstall\n");
-            if (!SYSIO.in("Continue removal")) return;
+            SYSIO.requested(CustomStyle.UNINSTALL.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to uninstall\n");
+            if (!SYSIO.getConfirmation("Continue removal")) return;
             for (Plugin p : plugins) p.uninstall();
             for (Software s : software) s.uninstall();
         }
@@ -477,8 +475,8 @@ public enum CustomCommand implements Command {
                 SYSIO.warn("Nothing selected\n");
                 return;
             }
-            SYSIO.help(CustomStyle.UPDATE.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to update\n");
-            if (!SYSIO.in("Continue update")) return;
+            SYSIO.requested(CustomStyle.UPDATE.toString() + plugins.size() + " plugin(s) and " + software.size() + " software to update\n");
+            if (!SYSIO.getConfirmation("Continue update")) return;
             for (Plugin p : plugins) p.update();
             for (Software s  : software) s.update();
         }

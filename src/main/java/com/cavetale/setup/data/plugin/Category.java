@@ -201,52 +201,52 @@ public enum Category implements Provider {
     //= Cosmetics ==
 
     public static void requestAll() {
-        SYSIO.sep();
+        SYSIO.separate();
 
         if (Category.values().length == 0) {
-            SYSIO.help(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories available\n");
+            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories available\n");
             return;
         }
 
-        SYSIO.outL(Type.HELP, CustomStyle.CATEGORY, Category.values().length +
+        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.values().length +
                 " categor(y/ies) available", 4, 21, (Object[]) Category.values());
     }
 
     public static void listSelected() {
         if (Category.selected().isEmpty()) {
-            SYSIO.sep();
-            SYSIO.help(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories selected\n");
+            SYSIO.separate();
+            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories selected\n");
             return;
         }
 
-        SYSIO.sep();
-        SYSIO.outL(Type.HELP, CustomStyle.CATEGORY, Category.selected().size() +
+        SYSIO.separate();
+        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.selected().size() +
                 " categor(y/ies) selected", 4, 21, Category.selected().toArray());
     }
 
     public static void requestInstalled() {
-        SYSIO.sep();
+        SYSIO.separate();
 
         if (Category.installed().isEmpty()) {
-            SYSIO.help(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories installed\n");
+            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories installed\n");
             return;
         }
 
-        SYSIO.outL(Type.HELP, CustomStyle.CATEGORY, Category.installed().size() +
+        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.installed().size() +
                 " categor(y/ies) installed", 4, 21, Category.installed().toArray());
     }
 
     public static void details() {
-        SYSIO.sep();
-        SYSIO.help(CustomStyle.CATEGORY.toString() + Code.BOLD +
+        SYSIO.separate();
+        SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD +
                 "-------------------------------------- " +
                 "Categories -------------------------------------\n");
-        SYSIO.outF(Type.HELP, CustomStyle.CATEGORY + "%-16s | %-68s\n", "Category", "Info");
-        SYSIO.help(CustomStyle.CATEGORY + "--------------------------------------------" +
+        SYSIO.format(Type.REQUESTED, CustomStyle.CATEGORY + "%-16s | %-68s\n", "Category", "Info");
+        SYSIO.requested(CustomStyle.CATEGORY + "--------------------------------------------" +
                 "-------------------------------------------\n");
         ArrayList<Category> categories = new ArrayList<>(List.of(Category.values()));
         Collections.sort(categories);
-        for (Category c : categories) SYSIO.outF(Type.HELP, CustomStyle.CATEGORY + "%-16s | %-68s\n", c.displayName(), c.info);
+        for (Category c : categories) SYSIO.format(Type.REQUESTED, CustomStyle.CATEGORY + "%-16s | %-68s\n", c.displayName(), c.info);
     }
 
     public static final class NotFoundException extends Exception {

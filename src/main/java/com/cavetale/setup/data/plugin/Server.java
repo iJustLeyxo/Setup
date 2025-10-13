@@ -200,53 +200,53 @@ public enum Server implements Provider {
     //= Cosmetics ==
 
     public static void requestAll() {
-        SYSIO.sep();
+        SYSIO.separate();
 
         if (Server.values().length == 0) {
-            SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD + "No servers available\n");
+            SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers available\n");
             return;
         }
 
-        SYSIO.outL(Type.HELP, CustomStyle.SERVER, Server.values().length +
+        SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.values().length +
                 " server(s) available", 4, 21, (Object[]) Server.values());
     }
 
     public static void listSelected() {
         if (Server.selected().isEmpty()) {
-            SYSIO.sep();
-            SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD + "No servers selected\n");
+            SYSIO.separate();
+            SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers selected\n");
             return;
         }
 
-        SYSIO.sep();
-        SYSIO.outL(Type.HELP, CustomStyle.SERVER, Server.selected().size() +
+        SYSIO.separate();
+        SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.selected().size() +
                 " server(s) selected", 4, 21, Server.selected().toArray());
     }
 
     public static void requestInstalled() {
-        SYSIO.sep();
+        SYSIO.separate();
 
         if (Server.installed().isEmpty()) {
-            SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD + "No servers installed\n");
+            SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers installed\n");
             return;
         }
 
-        SYSIO.outL(Type.HELP, CustomStyle.SERVER, Server.installed().size() +
+        SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.installed().size() +
                 " server(s) installed", 4, 21, Server.installed().toArray());
     }
 
     public static void details() {
-        SYSIO.sep();
-        SYSIO.help(CustomStyle.SERVER.toString() + Code.BOLD +
+        SYSIO.separate();
+        SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD +
                 "--------------------------------------- " +
                 "Servers ---------------------------------------\n");
-        SYSIO.outF(Type.HELP, CustomStyle.SERVER + "%-16s | %-68s\n", "Server", "Info");
-        SYSIO.help(CustomStyle.SERVER + "----------------------------------------------" +
+        SYSIO.format(Type.REQUESTED, CustomStyle.SERVER + "%-16s | %-68s\n", "Server", "Info");
+        SYSIO.requested(CustomStyle.SERVER + "----------------------------------------------" +
                 "-----------------------------------------\n");
         ArrayList<Server> servers = new ArrayList<>(List.of(Server.values()));
         Collections.sort(servers);
         for (Server s : servers) {
-            SYSIO.outF(Type.HELP, CustomStyle.SERVER + "%-16s | %-68s\n", s.displayName(), s.info);
+            SYSIO.format(Type.REQUESTED, CustomStyle.SERVER + "%-16s | %-68s\n", s.displayName(), s.info);
         }
     }
 

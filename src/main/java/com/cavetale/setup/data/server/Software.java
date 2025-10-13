@@ -203,22 +203,22 @@ public enum Software implements Installable {
     //= Cosmetics ==
 
     public static void requestAll() {
-        SYSIO.sep();
+        SYSIO.separate();
 
         if (Software.values().length == 0) {
-            SYSIO.help(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software available\n");
+            SYSIO.requested(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software available\n");
             return;
         }
 
-        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, Software.values().length +
+        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, Software.values().length +
                 " software available", 4, 21, (Object[]) Software.values());
     }
 
     public static boolean listSelected() {
         List<Software> selected = Software.selected();
         if (selected.isEmpty()) return false;
-        SYSIO.sep();
-        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, selected.size() +
+        SYSIO.separate();
+        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, selected.size() +
                 " software selected", 4, 21, selected.toArray());
         return true;
     }
@@ -226,29 +226,29 @@ public enum Software implements Installable {
     public static boolean listInstalled() {
         List<Software> software = Software.installed();
         if (software.isEmpty()) return false;
-        SYSIO.sep();
-        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, software.size() +
+        SYSIO.separate();
+        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, software.size() +
                 " software installed", 4, 21, software.toArray());
         return true;
     }
 
     public static void requestInstalled() {
-        SYSIO.sep();
+        SYSIO.separate();
 
         if (Software.installed().isEmpty()) {
-            SYSIO.help(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software installed\n");
+            SYSIO.requested(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software installed\n");
             return;
         }
 
-        SYSIO.outL(Type.HELP, CustomStyle.SOFTWARE, Software.installed().size() +
+        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, Software.installed().size() +
                 " software installed", 4, 21, Software.installed().toArray());
     }
 
     public static boolean listUnknown() {
         List<String> unknown = Software.unknown();
         if (unknown.isEmpty()) return false;
-        SYSIO.sep();
-        SYSIO.outL(Type.HELP, CustomStyle.UNKNOWN, unknown.size() +
+        SYSIO.separate();
+        SYSIO.list(Type.REQUESTED, CustomStyle.UNKNOWN, unknown.size() +
                 " software unknown", 4, 21, unknown.toArray());
         return true;
     }
