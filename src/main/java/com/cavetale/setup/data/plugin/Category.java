@@ -141,12 +141,12 @@ public enum Category implements Provider {
     private static @Nullable List<Category> installed = null;
 
     public static @NotNull List<Category> installed() {
-        if (Category.installed == null) Category.loadInstallation();
+        Category.loadInstallation();
         return Category.installed;
     }
 
     public static @NotNull List<Category> selected() {
-        if (Category.selected == null) Category.loadSelection();
+        Category.loadSelection();
         return Category.selected;
     }
 

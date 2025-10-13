@@ -124,17 +124,17 @@ public enum Software implements Installable {
     private static @Nullable List<String> unknown = null;
 
     public static @NotNull List<Software> selected() {
-        if (Software.selected == null) Software.loadSelection();
+        Software.loadSelection();
         return Software.selected;
     }
 
     public static @NotNull List<Software> installed() {
-        if (Software.installed == null) Software.loadInstallation();
+        Software.loadInstallation();
         return Software.installed;
     }
 
     public static @NotNull List<String> unknown() {
-        if (Software.unknown == null) Software.loadInstallation();
+        Software.loadInstallation();
         return Software.unknown;
     }
 

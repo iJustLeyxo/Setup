@@ -143,12 +143,12 @@ public enum Server implements Provider {
     private static @Nullable List<Server> installed = null;
 
     public static @NotNull List<Server> installed() {
-        if (Server.installed == null) Server.loadInstallation();
+        Server.loadInstallation();
         return Server.installed;
     }
 
     public static @NotNull List<Server> selected() {
-        if (Server.selected == null) Server.loadSelection();
+        Server.loadSelection();
         return Server.selected;
     }
 

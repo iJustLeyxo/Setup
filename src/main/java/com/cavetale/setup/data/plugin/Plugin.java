@@ -320,22 +320,22 @@ public enum Plugin implements Provider, Installable {
     private static @Nullable List<String> unknown = null;
 
     public static @NotNull List<Plugin> installed() {
-        if (Plugin.installed == null) Plugin.loadInstallation();
+        Plugin.loadInstallation();
         return Plugin.installed;
     }
 
     public static @NotNull List<Plugin> selected() {
-        if (Plugin.selected == null) Plugin.loadSelection();
+        Plugin.loadSelection();
         return Plugin.selected;
     }
 
     public static @NotNull List<String> linked() {
-        if (Plugin.linked == null) Plugin.loadSelection();
+        Plugin.loadSelection();
         return Plugin.linked;
     }
 
     public static @NotNull List<String> unknown() {
-        if (Plugin.unknown == null) Plugin.loadSelection();
+        Plugin.loadSelection();
         return Plugin.unknown;
     }
 
