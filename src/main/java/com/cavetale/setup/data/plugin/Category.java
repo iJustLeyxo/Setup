@@ -108,7 +108,7 @@ public enum Category implements Provider {
     }
 
     public boolean isSelected() {
-        if (this.sel == null) Category.loadSelection();
+        if (this.sel == null) Category.selected();
         return this.sel != Sel.OFF;
     }
 
@@ -140,31 +140,17 @@ public enum Category implements Provider {
     private static @Nullable List<Category> selected = null;
     private static @Nullable List<Category> installed = null;
 
-    public static @NotNull List<Category> installed() {
-        Category.loadInstallation();
-        return Category.installed;
-    }
-
     public static @NotNull List<Category> selected() {
-        Category.loadSelection();
-        return Category.selected;
-    }
+        if (Category.selected != null) return Category.selected; // Update not necessary
 
-    public static void reset() {
-        SYSIO.debug("Resetting categories\n");
-        for (Category c : Category.values()) c.revert();
-        Category.selected = null;
-        Category.installed = null;
-    }
-
-    public static void loadSelection() {
+        // Update selection
         SYSIO.debug("Reloading selected categories\n");
         for (Category c : Category.values()) c.deselect();
         Category.selected = new LinkedList<>();
 
         CategoryContents categories = (CategoryContents) CustomFlag.CATEGORY.container();
         if (CustomFlag.INSTALLED.isSelected()) {
-            Category.loadInstallation();
+            Category.installed();
             SYSIO.debug("Selecting installed categories\n");
             for (Category c : Category.installed()) c.target();
         } else if (CustomFlag.ALL.isSelected() || (CustomFlag.CATEGORY.isSelected() && categories.isEmpty())) { // Select all
@@ -178,13 +164,24 @@ public enum Category implements Provider {
         }
 
         for (Category c : Category.values()) if (c.isSelected()) Category.selected.add(c); // Update selection
+        return Category.selected;
     }
 
-    public static void loadInstallation() {
+    public static @NotNull List<Category> installed() {
+        if (Category.installed != null) return Category.installed; // Update not necessary
+
+        // Update installation
         SYSIO.debug("Reloading installed categories\n");
         Category.installed = new LinkedList<>();
+        for (Category c : Category.values()) if (c.isInstalled()) Category.installed.add(c);
+        return Category.installed;
+    }
 
-        for (Category c : Category.values()) if (c.isInstalled()) Category.installed.add(c); // Update installation
+    public static void reset() {
+        SYSIO.debug("Resetting categories\n");
+        for (Category c : Category.values()) c.revert();
+        Category.selected = null;
+        Category.installed = null;
     }
 
     public static @NotNull List<Category> get(@Nullable Boolean installed, @Nullable Boolean selected) {

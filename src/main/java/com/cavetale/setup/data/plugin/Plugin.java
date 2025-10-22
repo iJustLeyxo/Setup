@@ -274,14 +274,14 @@ public enum Plugin implements Provider, Installable {
     }
 
     public boolean isSelected() {
-        if (this.sel == null) Plugin.loadSelection();
+        if (this.sel == null) Plugin.selected();
         return this.sel != Sel.OFF;
     }
 
     //= Installation ==
 
     public @NotNull List<String> installations() {
-        if (this.inst == null) Plugin.loadInstallation();
+        if (this.inst == null) Plugin.installed();
         return this.inst;
     }
 
@@ -319,36 +319,10 @@ public enum Plugin implements Provider, Installable {
     private static @Nullable List<String> linked = null;
     private static @Nullable List<String> unknown = null;
 
-    public static @NotNull List<Plugin> installed() {
-        Plugin.loadInstallation();
-        return Plugin.installed;
-    }
-
     public static @NotNull List<Plugin> selected() {
-        Plugin.loadSelection();
-        return Plugin.selected;
-    }
+        if (Plugin.selected != null) return Plugin.selected; // Update not necessary
 
-    public static @NotNull List<String> linked() {
-        Plugin.loadSelection();
-        return Plugin.linked;
-    }
-
-    public static @NotNull List<String> unknown() {
-        Plugin.loadSelection();
-        return Plugin.unknown;
-    }
-
-    public static void reset() {
-        SYSIO.debug("Resetting plugins\n");
-        for (Plugin p : Plugin.values()) p.revert();
-        Plugin.selected = null;
-        Plugin.installed = null;
-        Plugin.linked = null;
-        Plugin.unknown = null;
-    }
-
-    public static void loadSelection() {
+        // Update selection
         SYSIO.debug("Loading selected plugins\n");
         for (Plugin p : Plugin.values()) p.deselect();
         Plugin.selected = new LinkedList<>();
@@ -370,9 +344,38 @@ public enum Plugin implements Provider, Installable {
         }
 
         for (Plugin p : Plugin.values()) if (p.isSelected()) Plugin.selected.add(p); // Update selection
+        return Plugin.selected;
     }
 
-    public static void loadInstallation() {
+    public static @NotNull List<Plugin> installed() {
+        if (Plugin.installed != null) return Plugin.installed; // Update not necessary
+
+        // Update installation
+        Plugin.loadInstalled();
+        assert Plugin.installed != null;
+        return Plugin.installed;
+    }
+
+    public static @NotNull List<String> linked() {
+        if (Plugin.linked != null) return Plugin.linked; // Update not necessary
+
+        // Update installation
+        Plugin.loadInstalled();
+        assert Plugin.linked != null;
+        return Plugin.linked;
+    }
+
+    public static @NotNull List<String> unknown() {
+        if (Plugin.unknown != null) return Plugin.unknown; // Update not necessary
+
+        // Update installation
+        Plugin.loadInstalled();
+        assert Plugin.unknown != null;
+        return Plugin.unknown;
+    }
+
+    private static void loadInstalled() {
+        // Update installation
         SYSIO.debug("Loading installed plugins\n");
         for (Plugin p : Plugin.values()) p.inst = new LinkedList<>(); // Reset installations
         Plugin.installed = new LinkedList<>();
@@ -400,6 +403,15 @@ public enum Plugin implements Provider, Installable {
         }
 
         for (Plugin p : Plugin.values()) if (p.isInstalled()) Plugin.installed.add(p); // Update installation
+    }
+
+    public static void reset() {
+        SYSIO.debug("Resetting plugins\n");
+        for (Plugin p : Plugin.values()) p.revert();
+        Plugin.selected = null;
+        Plugin.installed = null;
+        Plugin.linked = null;
+        Plugin.unknown = null;
     }
 
     public static @NotNull List<Plugin> get(@Nullable Boolean installed, @Nullable Boolean selected) {

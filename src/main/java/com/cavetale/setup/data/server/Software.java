@@ -87,7 +87,7 @@ public enum Software implements Installable {
     //= Installation ==
 
     public @NotNull List<String> installations() {
-        if (this.inst == null) Software.loadInstallation();
+        if (this.inst == null) Software.installed();
         return this.inst;
     }
 
@@ -124,29 +124,9 @@ public enum Software implements Installable {
     private static @Nullable List<String> unknown = null;
 
     public static @NotNull List<Software> selected() {
-        Software.loadSelection();
-        return Software.selected;
-    }
+        if (Software.selected != null) return Software.selected; // Update not necessary
 
-    public static @NotNull List<Software> installed() {
-        Software.loadInstallation();
-        return Software.installed;
-    }
-
-    public static @NotNull List<String> unknown() {
-        Software.loadInstallation();
-        return Software.unknown;
-    }
-
-    public static void reset() {
-        SYSIO.debug("Resetting software\n");
-        for (Software s : Software.values()) s.revert();
-        Software.selected = null;
-        Software.installed = null;
-        Software.unknown = null;
-    }
-
-    public static void loadSelection() {
+        // Update selected
         SYSIO.info("Reloading selected software\n");
         for (Software s : Software.values()) s.deselect();
         Software.selected = new LinkedList<>();
@@ -164,9 +144,29 @@ public enum Software implements Installable {
         }
 
         for (Software s : Software.values()) if (s.isSelected()) Software.selected.add(s); // Update selection
+        return Software.selected;
     }
 
-    public static void loadInstallation() {
+    public static @NotNull List<Software> installed() {
+        if (Software.installed != null) return Software.installed; // Update not necessary
+
+        // Update installed
+        Software.loadInstalled();
+        assert Software.installed != null;
+        return Software.installed;
+    }
+
+    public static @NotNull List<String> unknown() {
+        if (Software.unknown != null) return Software.unknown; // Update not necessary
+
+        // Update unknown
+        Software.loadInstalled();
+        assert Software.unknown != null;
+        return Software.unknown;
+    }
+
+    private static void loadInstalled() {
+        // Update installed
         SYSIO.info("Reloading installed software\n");
         for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
         Software.installed = new LinkedList<>();
@@ -187,6 +187,14 @@ public enum Software implements Installable {
         }
 
         for (Software s : Software.values()) if (s.isInstalled()) Software.installed.add(s); // Update installations
+    }
+
+    public static void reset() {
+        SYSIO.debug("Resetting software\n");
+        for (Software s : Software.values()) s.revert();
+        Software.selected = null;
+        Software.installed = null;
+        Software.unknown = null;
     }
 
     public static @NotNull List<Software> get(@Nullable Boolean installed, @Nullable Boolean selected) {
