@@ -105,7 +105,7 @@ public enum Server implements Provider {
     }
 
     public boolean isSelected() {
-        if (this.sel == null) Server.loadSelection();
+        if (this.sel == null) Server.selected();
         return this.sel != Sel.OFF;
     }
 
@@ -142,24 +142,10 @@ public enum Server implements Provider {
     private static @Nullable List<Server> selected = null;
     private static @Nullable List<Server> installed = null;
 
-    public static @NotNull List<Server> installed() {
-        Server.loadInstallation();
-        return Server.installed;
-    }
-
     public static @NotNull List<Server> selected() {
-        Server.loadSelection();
-        return Server.selected;
-    }
+        if (Server.selected != null) return Server.selected; // Update not necessary
 
-    public static void reset() {
-        SYSIO.debug("Resetting servers\n");
-        for (Server s : Server.values()) s.revert();
-        Server.selected = null;
-        Server.installed = null;
-    }
-
-    public static void loadSelection() {
+        // Update selected
         SYSIO.info("Reloading selected servers\n");
         for (Server s : Server.values()) s.deselect();
         Server.selected = new LinkedList<>();
@@ -177,13 +163,24 @@ public enum Server implements Provider {
         }
 
         for (Server s : Server.values()) if (s.isSelected()) Server.selected.add(s); // Update selection
+        return Server.selected;
     }
 
-    public static void loadInstallation() {
+    public static @NotNull List<Server> installed() {
+        if (Server.installed != null) return Server.installed; // Update not necessary
+
+        // Update installed
         SYSIO.info("Reloading installed servers\n");
         Server.installed = new LinkedList<>();
+        for (Server s : Server.values()) if (s.isInstalled()) Server.installed.add(s); // Update installation
+        return Server.installed;
+    }
 
-        for (Server s : Server.values()) if (s.isInstalled()) Server.installed().add(s); // Update installation
+    public static void reset() {
+        SYSIO.debug("Resetting servers\n");
+        for (Server s : Server.values()) s.revert();
+        Server.selected = null;
+        Server.installed = null;
     }
 
     public static @NotNull List<Server> get(@Nullable Boolean installed, @Nullable Boolean selected) {
