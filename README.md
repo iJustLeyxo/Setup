@@ -1,7 +1,8 @@
-### Setup
+## Setup
 Cavetale installation manager for plugins and server software on test servers
 
-##### Usage, commands and flags
+### Usage, commands and flags
+
 ```
 ---------------------------------------- Help -----------------------------------------
 Interactive: java -jar Manager.jar
@@ -46,16 +47,16 @@ Flag             | Info                             | Usage
 -v --Verbose     | Detailed console output          |                                  
 ```
 
-##### Adding commands
-1. Create a command executor that extends the Exec class and overrides the run() method to run your custom logic
-2. Add an entry to the Command enum with a description of your command and maybe some aliases that overrides the exec() method to run your command executor
+### Build
 
-##### Adding flags
-1. If required, create a new container for you flag options / arguments that extends the EmptyContainer class and overrides the option() and isEmpty() methods to run your custom logic
-2. Add an entry to the Flag enum with a description and maybe some usage help of your flag and a custom short ref if there already is another flag that start with the same letter that overrides the container() method to return your custom container
+Build using `mvn clean package`.
 
-##### Adding plugins, categories, servers and software
-- Simply add a new entry to the respective enum with the data of your new entry
+### Dependencies
 
-##### Compiling
-- Package using `mvn clean package`
+PackMake depends on [jCLIx][GitHub:jCLIx].
+
+### Customizations
+
+Simply add a new entry with your data to the corresponding enum. For console command and flag customization, please check the [jCLIx][GitHub:jCLIx] documentation.
+
+[GitHub:jCLIx]: https://github.com/iJustLeyxo/jCLIx
