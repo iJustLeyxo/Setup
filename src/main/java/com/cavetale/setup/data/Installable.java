@@ -1,15 +1,22 @@
 package com.cavetale.setup.data;
 
+import com.cavetale.setup.Setup;
+import com.cavetale.setup.data.plugin.Plugin;
 import com.cavetale.setup.download.Source;
-import com.cavetale.setup.util.Util;
 import io.github.ijustleyxo.jclix.io.Style;
 import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.UUID;
 
 import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
@@ -29,7 +36,7 @@ public interface Installable {
 
         try {
             String name = this.displayName() + "-" + this.source().ver() + ".jar";
-            Util.download(this.source().uri(), this.downloads(), name);
+            Installable.download(this.source().uri(), this.downloads(), name);
             this.installations().add(name);
             SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
@@ -45,7 +52,7 @@ public interface Installable {
 
         // Stash download
         try {
-            file = Util.stash(this.source().uri());
+            file = Installable.stash(this.source().uri());
         } catch (IOException e) {
             SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download", e);
             return;
@@ -67,7 +74,7 @@ public interface Installable {
 
         // Install stashed
         try {
-            Util.finalise(file, this.downloads(), name);
+            Installable.finalise(file, this.downloads(), name);
             this.installations().add(name);
             SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
@@ -86,5 +93,48 @@ public interface Installable {
                 } else SYSIO.send(Type.INFO, Type.ERR, "Uninstalling " + file, " failed\n");
             } else SYSIO.send(Type.INFO, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
         }
+    }
+
+    //= Utils == == == == == == == == == == == ==
+
+    static @NotNull URI uriOf(@NotNull String uri) {
+        try {
+            return new URI(uri);
+        } catch (URISyntaxException e) {
+            throw new Plugin.URIError(uri, e);
+        }
+    }
+
+    /**
+     * Download a file from the internet
+     * @param uri The uri to download from
+     * @param folder The target folder
+     * @param name The target file name
+     * @throws IOException If the download failed
+     */
+    private static void download(@NotNull URI uri, @NotNull File folder, @NotNull String name) throws IOException {
+        File file = Installable.stash(uri);
+        finalise(file, folder, name);
+    }
+
+    private static void finalise(@NotNull File stash, @NotNull File folder, @NotNull String name) throws IOException {
+        folder.mkdirs();
+        Files.copy(stash.toPath(), new File(folder, name).toPath());
+        stash.delete();
+    }
+
+    private static @NotNull File stash(@NotNull URI uri) throws IOException {
+        Setup.TEMP.mkdirs();
+        File file;
+
+        do {
+            file = new File(Setup.TEMP, UUID.randomUUID().toString());
+        } while (file.exists());
+
+        ReadableByteChannel byteChannel = Channels.newChannel(uri.toURL().openStream());
+        FileOutputStream outputStream = new FileOutputStream(file);
+        outputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
+
+        return file;
     }
 }

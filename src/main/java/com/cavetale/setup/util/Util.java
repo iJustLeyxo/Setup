@@ -1,19 +1,8 @@
 package com.cavetale.setup.util;
 
-import com.cavetale.setup.Setup;
-import com.cavetale.setup.data.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -22,47 +11,6 @@ import java.util.stream.Collectors;
 public final class Util {
     public static @NotNull String capsToCamel(@NotNull String name) {
         return Arrays.stream(name.split("_")).map(s -> s.isEmpty() ? "" : s.charAt(0) + s.substring(1).toLowerCase()).collect(Collectors.joining());
-    }
-
-    public static @NotNull URI uriOf(@NotNull String uri) {
-        try {
-            return new URI(uri);
-        } catch (URISyntaxException e) {
-            throw new Plugin.URIError(uri, e);
-        }
-    }
-
-    /**
-     * Download a file from the internet
-     * @param uri The uri to download from
-     * @param folder The target folder
-     * @param name The target file name
-     * @throws IOException If the download failed
-     */
-    public static void download(@NotNull URI uri, @NotNull File folder, @NotNull String name) throws IOException {
-        File file = Util.stash(uri);
-        finalise(file, folder, name);
-    }
-
-    public static @NotNull File stash(@NotNull URI uri) throws IOException {
-        Setup.TEMP.mkdirs();
-        File file;
-
-        do {
-            file = new File(Setup.TEMP, UUID.randomUUID().toString());
-        } while (file.exists());
-
-        ReadableByteChannel byteChannel = Channels.newChannel(uri.toURL().openStream());
-        FileOutputStream outputStream = new FileOutputStream(file);
-        outputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
-
-        return file;
-    }
-
-    public static void finalise(@NotNull File stash, @NotNull File folder, @NotNull String name) throws IOException {
-        folder.mkdirs();
-        Files.copy(stash.toPath(), new File(folder, name).toPath());
-        stash.delete();
     }
 
     public static double similarity(@NotNull String s1, @NotNull String s2) {

@@ -31,7 +31,7 @@ public enum Plugin implements Provider, Installable {
     ADVENTURE, // TODO: Status?
     ADVICE_ANIMALS(Parent.of("com.winthier")), // TODO: Status?
     A_F_K,
-    ANTI_POPUP(Util.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/7d0370f/AntiPopup-10.1.jar"), Ver.of("10.1")),
+    ANTI_POPUP(Installable.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/7d0370f/AntiPopup-10.1.jar"), Ver.of("10.1")),
     AREA,
     ARMOR_STAND_EDITOR(Parent.of("io.github.rypofalem"), Ver.of("1.17-25")),
     AUCTION,
@@ -99,7 +99,7 @@ public enum Plugin implements Provider, Installable {
     MOB_ARENA,
     MONEY,
     MYTEMS,
-    OPEN_INV(Util.uriOf("https://github.com/Jikoo/OpenInv/releases/latest/download/OpenInv.jar"), Ver.of("5.1.6")),
+    OPEN_INV(Installable.uriOf("https://github.com/Jikoo/OpenInv/releases/latest/download/OpenInv.jar"), Ver.of("5.1.6")),
     OVERBOARD,
     PERM(Parent.of("com.winthier")),
     PHOTOS(Parent.of("com.winthier")),
@@ -110,7 +110,7 @@ public enum Plugin implements Provider, Installable {
     POCKET_MOB,
     POSTER,
     PROTECT(Parent.of("com.winthier")),
-    PROTOCOL_LIB(Util.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/latest/download/ProtocolLib.jar"), Ver.of("5.3.0")),
+    PROTOCOL_LIB(Installable.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/latest/download/ProtocolLib.jar"), Ver.of("5.3.0")),
     P_V_P_ARENA,
     QUIDDITCH,
     @Deprecated
@@ -160,7 +160,7 @@ public enum Plugin implements Provider, Installable {
     WATCHMAN,
     WINDICATOR,
     WIN_TAG,
-    WORLD_EDIT(Util.uriOf("https://dev.bukkit.org/projects/worldedit/files/6013130/download"), Ver.of("7.3.10-Beta-1")),
+    WORLD_EDIT(Installable.uriOf("https://dev.bukkit.org/projects/worldedit/files/6013130/download"), Ver.of("7.3.10-Beta-1")),
     WORLD_MARKER,
     WORLDS(Parent.of("com.winthier")),
     X_MAS;

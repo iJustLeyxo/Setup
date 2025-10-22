@@ -25,7 +25,7 @@ import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
  * Server software, used to register downloadable server software
  */
 public enum Software implements Installable {
-    PAPER(Util.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
+    PAPER(Installable.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
 
     private final @NotNull String[] refs;
     private final @NotNull Source source;
