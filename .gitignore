@@ -2,6 +2,10 @@
 *
 !*/
 
+# Environment
+!.envrc
+!shell.nix
+
 # Documentation
 !*.md
 !*.txt
