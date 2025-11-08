@@ -30,7 +30,7 @@ public interface Installable {
     default void install() {
         SYSIO.info("Installing " + this.displayName());
         if (this.isInstalled()) {
-            SYSIO.send(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)");
+            SYSIO.send(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)\n");
             return;
         }
 
@@ -40,7 +40,7 @@ public interface Installable {
             this.installations().add(name);
             SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            SYSIO.err(Style.INFO + "Installing " + this.displayName() + Style.ERR + " failed", e);
+            SYSIO.send(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed", e);
         }
     }
 
@@ -54,7 +54,7 @@ public interface Installable {
         try {
             file = Installable.stash(this.source().uri());
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to download", e);
+            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
             return;
         }
 
@@ -64,9 +64,9 @@ public interface Installable {
             File f = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
-                SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed - failed to delete " + f + "\n");
-            } else if (!SYSIO.info(Style.ERR + " failed - skipped " + f + " (linked)\n")) {
-                SYSIO.err("Updating " + this.displayName() + " failed - skipped " + f + " (linked)\n");
+                SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to delete) " + f + "\n");
+            } else {
+                SYSIO.send(Type.INFO, Type.WARN, "Updating " + this.displayName(), " skipped (linked)\n");
             }
             return;
         }
@@ -78,7 +78,7 @@ public interface Installable {
             this.installations().add(name);
             SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            SYSIO.err(Style.INFO + "Updating " + this.displayName() + Style.ERR + " failed - failed to download", e);
+            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
         }
     }
 
