@@ -165,34 +165,73 @@ public enum Plugin implements Provider, Installable {
     WORLDS(Parent.of("com.winthier")),
     X_MAS;
 
+    /** Plugin references. */
     private final @NotNull String[] refs;
+
+    /** Plugin download source. */
     private final @NotNull Source source;
+
+    /** Plugins that are contained by this structure. */
     private final @NotNull Plugin[] plugins;
 
+    /** Plugin selection state. */
     private @Nullable Sel sel = null;
     // TODO: Linked?
+
+    /** Plugin installation state. */
     private @Nullable List<String> inst = null;
 
+    /**
+     * Creates a new plugin.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull String @NotNull ... aliases) {
-        this(Ver.DEFAULT);
+        this(Ver.DEFAULT, aliases);
     }
 
+    /**
+     * Creates a new plugin.
+     * @param parent The package parent.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull Parent parent, @NotNull String @NotNull ... aliases) {
-        this(parent, Ver.DEFAULT);
+        this(parent, Ver.DEFAULT, aliases);
     }
 
+    /**
+     * Creates a new plugin.
+     * @param ref The package reference.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull Ref ref, @NotNull String @NotNull ... aliases) {
-        this(Parent.DEFAULT, ref, Ver.DEFAULT);
+        this(Parent.DEFAULT, ref, Ver.DEFAULT, aliases);
     }
 
+    /**
+     * Creates a new plugin.
+     * @param ver The package version.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this(Parent.DEFAULT, ver);
+        this(Parent.DEFAULT, ver, aliases);
     }
 
+    /**
+     * Creates a new plugin.
+     * @param group The package group.
+     * @param ref The package reference.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull Group group, @NotNull Ref ref, @NotNull String @NotNull ... aliases) {
-        this(group, ref, Ver.DEFAULT);
+        this(group, ref, Ver.DEFAULT, aliases);
     }
 
+    /**
+     * Creates a new plugin.
+     * @param parent The package parent.
+     * @param ver The package version.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull Parent parent, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
@@ -202,6 +241,13 @@ public enum Plugin implements Provider, Installable {
         this.plugins = new Plugin[]{this};
     }
 
+    /**
+     * Creates a new plugin.
+     * @param parent The package parent.
+     * @param ref The package reference.
+     * @param ver The package version.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull Parent parent, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
@@ -211,6 +257,13 @@ public enum Plugin implements Provider, Installable {
         this.plugins = new Plugin[]{this};
     }
 
+    /**
+     * Creates a new plugin.
+     * @param group The package group.
+     * @param ref The package reference.
+     * @param ver The package version.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull Group group, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
@@ -220,6 +273,12 @@ public enum Plugin implements Provider, Installable {
         this.plugins = new Plugin[]{this};
     }
 
+    /**
+     * Creates a new plugin.
+     * @param uri The download location.
+     * @param ver The package version.
+     * @param aliases The plugin aliases.
+     */
     Plugin(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
@@ -254,6 +313,7 @@ public enum Plugin implements Provider, Installable {
         return this.plugins;
     }
 
+    /** Resets the plugin. */
     public void revert() {
         this.sel = null;
         this.inst = null;
@@ -261,18 +321,25 @@ public enum Plugin implements Provider, Installable {
 
     //= Selection ==
 
+    /** Sets this plugins' selection state to target. */
     public void target() {
         this.sel = Sel.TARGET;
     }
 
+    /** Sets this plugins' selection state to active. */
     public void select() {
         this.sel = Sel.ON;
     }
 
+    /** Deselects this plugin. */
     public void deselect() {
         this.sel = Sel.OFF;
     }
 
+    /**
+     * Returns whether this plugin is selected.
+     * @return {@code true} if and only if this plugin is selected.
+     */
     public boolean isSelected() {
         if (this.sel == null) Plugin.selected();
         return this.sel != Sel.OFF;
@@ -280,6 +347,10 @@ public enum Plugin implements Provider, Installable {
 
     //= Installation ==
 
+    /**
+     * Returns whether this plugin is selected.
+     * @return {@code true} if and only if this plugin is selected.
+     */
     public @NotNull List<String> installations() {
         if (this.inst == null) Plugin.installed();
         return this.inst;
@@ -292,11 +363,23 @@ public enum Plugin implements Provider, Installable {
 
     //= Finder ==
 
+    /**
+     * Finds the plugin matching a specific reference.
+     * @param ref The reference of the plugin to find.
+     * @return The plugin - if found.
+     * @throws Plugin.NotFoundException If no matching plugin was found.
+     */
     public static @NotNull Plugin get(@NotNull String ref) throws NotFoundException {
         for (Plugin p : Plugin.values()) if (p.displayName().equalsIgnoreCase(ref)) return p;
         throw new NotFoundException(ref);
     }
 
+    /**
+     * Finds the plugin matching a specific reference.
+     * @param file The reference of the plugin to find.
+     * @return The plugin - if found.
+     * @throws Plugin.NotFoundException If no matching plugin was found.
+     */
     public static @NotNull Plugin get(@NotNull File file) throws Plugin.NotAPluginException, NotFoundException {
         String ref = file.getName().toLowerCase();
         if (!file.getPath().endsWith(".jar")) throw new Plugin.NotAPluginException(file);
@@ -312,13 +395,25 @@ public enum Plugin implements Provider, Installable {
 
     //= Indexing ==
 
+    /** Plugin installation folder. */
     public static final @NotNull File FOLDER = new File("plugins/");
 
+    /** List of selected plugins. */
     private static @Nullable List<Plugin> selected = null;
+
+    /** List of installed plugins. */
     private static @Nullable List<Plugin> installed = null;
+
+    /** List of linked plugins. */
     private static @Nullable List<String> linked = null;
+
+    /** List of unknown plugins. */
     private static @Nullable List<String> unknown = null;
 
+    /**
+     * Returns the selected plugins. Determines them beforehand if necessary.
+     * @return A list of selected plugins.
+     */
     public static @NotNull List<Plugin> selected() {
         if (Plugin.selected != null) return Plugin.selected; // Update not necessary
 
@@ -347,6 +442,10 @@ public enum Plugin implements Provider, Installable {
         return Plugin.selected;
     }
 
+    /**
+     * Returns installed plugins. Determines them beforehand if necessary.
+     * @return A list of installed plugins.
+     */
     public static @NotNull List<Plugin> installed() {
         if (Plugin.installed != null) return Plugin.installed; // Update not necessary
 
@@ -356,6 +455,10 @@ public enum Plugin implements Provider, Installable {
         return Plugin.installed;
     }
 
+    /**
+     * Returns linked plugins. Determines them beforehand if necessary.
+     * @return A list of linked plugins.
+     */
     public static @NotNull List<String> linked() {
         if (Plugin.linked != null) return Plugin.linked; // Update not necessary
 
@@ -365,6 +468,10 @@ public enum Plugin implements Provider, Installable {
         return Plugin.linked;
     }
 
+    /**
+     * Returns unknown plugins. Determines them beforehand if necessary.
+     * @return A list of unknown plugins.
+     */
     public static @NotNull List<String> unknown() {
         if (Plugin.unknown != null) return Plugin.unknown; // Update not necessary
 
@@ -427,6 +534,7 @@ public enum Plugin implements Provider, Installable {
 
     //= Cosmetics ==
 
+    /** List all plugins. */
     public static void requestAll() {
         SYSIO.separate();
 
@@ -439,6 +547,7 @@ public enum Plugin implements Provider, Installable {
                 " plugin(s) available", 4, 21, (Object[]) Plugin.values());
     }
 
+    /** List selected plugins. */
     public static boolean listSelected() {
         List<Plugin> selected = Plugin.selected();
         if (selected.isEmpty()) return false;
@@ -448,6 +557,7 @@ public enum Plugin implements Provider, Installable {
         return true;
     }
 
+    /** List installed plugins. */
     public static boolean listInstalled() {
         List<Plugin> plugins = Plugin.installed();
         if (plugins.isEmpty()) return false;
@@ -469,6 +579,7 @@ public enum Plugin implements Provider, Installable {
                 " plugin(s) installed", 4, 21, Plugin.installed().toArray());
     }
 
+    /** List lniked plugins. */
     public static boolean listLinked() {
         List<String> linked = Plugin.linked();
         if (linked.isEmpty()) return false;
@@ -478,6 +589,7 @@ public enum Plugin implements Provider, Installable {
         return true;
     }
 
+    /** List unknown plugins. */
     public static boolean listUnknown() {
         List<String> unknown = Plugin.unknown();
         if (unknown.isEmpty()) return false;
@@ -489,19 +601,35 @@ public enum Plugin implements Provider, Installable {
 
     //= Exceptions ==
 
+    /** Exception that is thrown if a requested plugin could not be found. */
     public static class NotFoundException extends Exception {
+        /**
+         * Creates a new plugin not found exception.
+         * @param ref The reference that could not be matched.
+         */
         public NotFoundException(@NotNull String ref) {
             super("Plugin \"" + ref + "\" not found. Did you mean to use -\"P\" for --path?");
         }
     }
 
+    /** Exception that is thrown if a file is not a plugin. */
     public static class NotAPluginException extends DataException {
+        /**
+         * Creates a new not a plugin exception.
+         * @param file The file that is not a plugin.
+         */
         public NotAPluginException(@NotNull File file) {
             super(file.getName() + " is not a plugin");
         }
     }
 
+    /** Exception that is thrown if a uri is invalid. */
     public static class URIError extends DataError {
+        /**
+         * Creates a new uri error.
+         * @param uri The invalid uri.
+         * @param cause The original error.
+         */
         public URIError(@NotNull String uri, @NotNull Throwable cause) {
             super("Faulty url \n" + uri + ": " + cause.getMessage(), cause);
         }

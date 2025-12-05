@@ -1,13 +1,12 @@
 package com.cavetale.setup.console.container;
 
 import com.cavetale.setup.data.plugin.Category;
+import io.github.ijustleyxo.jclix.app.container.SetContents;
 import org.jetbrains.annotations.NotNull;
 
 import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
-/**
- * Category container, used to store categories from a category flag
- */
+/** Used for storing categories in commands and flags. */
 public final class CategoryContents extends SetContents<Category> {
     @Override
     public @NotNull Boolean add(@NotNull String arg) throws Category.NotFoundException {

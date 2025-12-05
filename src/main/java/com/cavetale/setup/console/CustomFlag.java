@@ -6,12 +6,12 @@ import io.github.ijustleyxo.jclix.app.container.Contents;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Flags, used to specify flag properties
- */
+/** Custom console flags. */
 public enum CustomFlag implements Flag {
+    /** Selects everything. */
     ALL('A', "Select all"),
 
+    /** Selects categories. */
     CATEGORY('C', "Specify categor(y/ies)", "-s []:all | [categories]") {
         @Override
         public @NotNull Contents<?> init() {
@@ -19,8 +19,10 @@ public enum CustomFlag implements Flag {
         }
     },
 
+    /** Selects installed items. */
     INSTALLED('I', "Select installed"),
 
+    /** Selects plugins. */
     PLUGIN('P', "Specify plugins(s)", "-p []:all | [plugins]") {
         @Override
         public @NotNull Contents<?> init() {
@@ -28,6 +30,7 @@ public enum CustomFlag implements Flag {
         }
     },
 
+    /** Selects server configurations. */
     SERVER('S', "Specify server(s)", "-s []:all | [servers]") {
         @Override
         public @NotNull Contents<?> init() {
@@ -35,6 +38,7 @@ public enum CustomFlag implements Flag {
         }
     },
 
+    /** Selects server software. */
     SOFTWARE('Z', "Specify server software", "-S []:all | [software]") {
         @Override
         public @NotNull Contents<?> init() {
@@ -42,12 +46,24 @@ public enum CustomFlag implements Flag {
         }
     };
 
+    /** Flag data container, for each flag. */
     private final @NotNull Data data;
 
+    /**
+     * Creates a new flag.
+     * @param ref The short reference of the flag.
+     * @param info The description of the flag.
+     */
     CustomFlag(@NotNull Character ref, @NotNull String info) {
         this.data = new Data(this, ref, this.name(), info);
     }
 
+    /**
+     * Creates a new flag.
+     * @param ref The short reference of the flag.
+     * @param info The description of the flag.
+     * @param usage The usage information of the flag.
+     */
     CustomFlag(@NotNull Character ref, @NotNull String info, @Nullable String usage) {
         this.data = new Data(this, ref, this.name(), info, usage);
     }

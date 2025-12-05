@@ -1,13 +1,12 @@
 package com.cavetale.setup.console.container;
 
 import com.cavetale.setup.data.plugin.Server;
+import io.github.ijustleyxo.jclix.app.container.SetContents;
 import org.jetbrains.annotations.NotNull;
 
 import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
-/**
- * Server container, used to store servers from a server flag
- */
+/** Used for storing server configurations in commands and flags. */
 public final class ServerContents extends SetContents<Server> {
     @Override
     public @NotNull Boolean add(@NotNull String arg) throws Server.NotFoundException {

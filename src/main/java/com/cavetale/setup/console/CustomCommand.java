@@ -25,7 +25,9 @@ import java.util.Map;
 
 import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
+/** Custom console commands. */
 public enum CustomCommand implements Command {
+    /** Compares installed and selected software. */
     COMPARE("Compare installed to selected software", "VERIFY", "CHECK"){
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -83,6 +85,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Links this tool to a server installation. */
     CONNECT("Link this tool to a server installation") {
         @Override
         public @NotNull Contents<?> init() {
@@ -144,6 +147,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Accepts the Minecraft EULA. */
     EULA("Agree to the Minecraft EULA") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -185,6 +189,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Finds anything */
     FIND("Find anything", "Search") {
         private static final double MIN_SIMILARITY = 0.33;
 
@@ -277,6 +282,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Installs plugins and server software */
     INSTALL("Install plugins and server software", "ADD") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -293,6 +299,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Links any jar archive to the plugin directory. */
     LINK("Link any jar archive path to the plugins directory") {
         @Override
         public @NotNull Contents<?> init() {
@@ -340,6 +347,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Lists plugins, categories, servers and server software. */
     LIST("List plugins, categories, servers and server software", "SHOW", "RESOLVE") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -392,6 +400,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Runs the installed server software. */
     RUN("Run installed server software") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -431,6 +440,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Prints installation status. */
     STATUS("View installation status", "STATE", "INFO") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -446,6 +456,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Uninstalls plugins, server software and other files. */
     UNINSTALL("Uninstall plugins, server software and files", "Remove", "Delete") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -462,6 +473,7 @@ public enum CustomCommand implements Command {
         }
     },
 
+    /** Updates plugins and server software. */
     UPDATE("Update plugins and software", "Upgrade") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -482,10 +494,16 @@ public enum CustomCommand implements Command {
         }
     };
 
+    /** Command data container, for each command. */
     private final @NotNull Data data;
 
-    CustomCommand(@NotNull String info, @NotNull String @NotNull ... names) {
-        this.data = new Data(this, this.name(), info, names);
+    /**
+     * Creates a new command.
+     * @param info The description of the command.
+     * @param refs All other references of the command.
+     */
+    CustomCommand(@NotNull String info, @NotNull String @NotNull ... refs) {
+        this.data = new Data(this, this.name(), info, refs);
     }
 
     @Override

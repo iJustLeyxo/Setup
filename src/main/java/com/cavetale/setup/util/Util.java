@@ -5,14 +5,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-/**
- * Download manager, used to download files from the internet
- */
+/** Utility collection. */
 public final class Util {
-    public static @NotNull String capsToCamel(@NotNull String name) {
-        return Arrays.stream(name.split("_")).map(s -> s.isEmpty() ? "" : s.charAt(0) + s.substring(1).toLowerCase()).collect(Collectors.joining());
+    /**
+     * Converts CAPS_WITH_UNDERSCORES to CamelCase
+     * @param string The string to convert.
+     * @return The converted string.
+     */
+    public static @NotNull String capsToCamel(@NotNull String string) {
+        return Arrays.stream(string.split("_")).map(s -> s.isEmpty() ? "" : s.charAt(0) + s.substring(1).toLowerCase()).collect(Collectors.joining());
     }
 
+    /**
+     * Computes the similarity between two strings.
+     * @param s1 The first string.
+     * @param s2 The second string.
+     * @return The similarity between 0 (maximum) and 1 (identical).
+     */
     public static double similarity(@NotNull String s1, @NotNull String s2) {
         String longer = s1, shorter = s2;
         if (s1.length() < s2.length()) {
@@ -28,6 +37,12 @@ public final class Util {
         return (longerLength - editDistance(longer, shorter)) / (double) longerLength;
     }
 
+    /**
+     * Utility function for the similarity computation.
+     * @param s1 The first string.
+     * @param s2 The second string.
+     * @return Some magic value.
+     */
     private static int editDistance(String s1, String s2) {
         s1 = s1.toLowerCase();
         s2 = s2.toLowerCase();
