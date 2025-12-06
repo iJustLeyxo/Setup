@@ -1,4 +1,5 @@
 ## Setup
+
 Cavetale installation manager for plugins and server software on test servers
 
 ### Usage, commands and flags
@@ -53,7 +54,7 @@ Build using `mvn clean package`.
 
 ### Dependencies
 
-PackMake depends on [jCLIx][GitHub:jCLIx].
+Setup depends on [jCLIx][GitHub:jCLIx].
 
 ### Customizations
 
