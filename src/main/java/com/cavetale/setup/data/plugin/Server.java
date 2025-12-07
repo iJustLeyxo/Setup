@@ -146,7 +146,7 @@ public enum Server implements Provider {
         if (Server.selected != null) return Server.selected; // Update not necessary
 
         // Update selected
-        SYSIO.info("Reloading selected servers\n");
+        SYSIO.debug("Reloading selected servers\n");
         for (Server s : Server.values()) s.deselect();
         Server.selected = new LinkedList<>();
 
@@ -170,7 +170,7 @@ public enum Server implements Provider {
         if (Server.installed != null) return Server.installed; // Update not necessary
 
         // Update installed
-        SYSIO.info("Reloading installed servers\n");
+        SYSIO.debug("Reloading installed servers\n");
         Server.installed = new LinkedList<>();
         for (Server s : Server.values()) if (s.isInstalled()) Server.installed.add(s); // Update installation
         return Server.installed;

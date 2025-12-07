@@ -123,7 +123,7 @@ public enum Software implements Installable {
         if (Software.selected != null) return Software.selected; // Update not necessary
 
         // Update selected
-        SYSIO.info("Reloading selected software\n");
+        SYSIO.debug("Reloading selected software\n");
         for (Software s : Software.values()) s.deselect();
         Software.selected = new LinkedList<>();
 
@@ -163,7 +163,7 @@ public enum Software implements Installable {
 
     private static void loadInstalled() {
         // Update installed
-        SYSIO.info("Reloading installed software\n");
+        SYSIO.debug("Reloading installed software\n");
         for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
         Software.installed = new LinkedList<>();
         Software.unknown = new LinkedList<>();
