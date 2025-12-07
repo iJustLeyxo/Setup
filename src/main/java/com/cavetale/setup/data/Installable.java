@@ -39,7 +39,7 @@ public interface Installable {
             this.installations().add(name);
             SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed\n", e);
+            SYSIO.send(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed", e);
         }
     }
 
@@ -53,7 +53,7 @@ public interface Installable {
         try {
             file = Installable.stash(this.source().link());
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)\n", e);
+            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
             return;
         }
 
@@ -77,7 +77,7 @@ public interface Installable {
             this.installations().add(name);
             SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)\n", e);
+            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
         }
     }
 
