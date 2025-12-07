@@ -103,24 +103,24 @@ public final class Jenkins {
          * Modifies the Jenkins job and artifact id.
          * @param ref The new reference to set.
          */
-        record Ref(@NotNull String ref) implements Mod {
+        record Artifact(@NotNull String ref) implements Mod {
             @Override
             public void modify(@NotNull Jenkins jenkins) {
-                jenkins.job = this.ref();
                 jenkins.group = DEFAULT_PARENT + "." + this.ref();
+                jenkins.artifact = this.ref();
             }
         }
 
         /**
-         * Modifies the Jenkins job and artifact id, as well ad the group id.
+         * Modifies the artifact id and the group id.
          * @param group The new group id to set.
-         * @param ref The new reference to set.
+         * @param artifact The new artifact id to set.
          */
-        record GroupRef(@NotNull String group, @NotNull String ref) implements Mod {
+        record GroupArtifact(@NotNull String group, @NotNull String artifact) implements Mod {
             @Override
             public void modify(@NotNull Jenkins jenkins) {
-                jenkins.job = this.ref();
-                jenkins.group = this.group() + "." + this.ref();
+                jenkins.group = this.group();
+                jenkins.artifact = this.artifact();
             }
         }
 
