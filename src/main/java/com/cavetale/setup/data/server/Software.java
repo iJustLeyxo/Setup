@@ -1,31 +1,27 @@
 package com.cavetale.setup.data.server;
 
+import com.cavetale.setup.console.CustomFlag;
+import com.cavetale.setup.console.CustomStyle;
+import com.cavetale.setup.console.container.SoftwareContents;
 import com.cavetale.setup.data.DataException;
 import com.cavetale.setup.data.Installable;
 import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.download.Source;
-import com.cavetale.setup.download.Ver;
-import com.cavetale.setup.console.CustomFlag;
-import com.cavetale.setup.console.container.SoftwareContents;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.console.CustomStyle;
 import io.github.ijustleyxo.jclix.io.Code;
 import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
 import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
-/**
- * Server software, used to register downloadable server software
- */
+/** Server software, used to register downloadable server software. */
 public enum Software implements Installable {
-    PAPER(Installable.uriOf("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar"), Ver.of("1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
+    PAPER(new Source("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar", "1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
 
     private final @NotNull String[] refs;
     private final @NotNull Source source;
@@ -33,12 +29,12 @@ public enum Software implements Installable {
     private @Nullable Sel sel = null;
     private @Nullable List<String> inst = null;
 
-    Software(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+    Software(@NotNull Source source, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
-        this.source = new Source.Other(uri, ver);
+        this.source = source;
     }
 
     @Override
