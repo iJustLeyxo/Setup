@@ -1,6 +1,9 @@
 package com.cavetale.setup.console;
 
-import com.cavetale.setup.console.container.*;
+import com.cavetale.setup.console.container.CategoryContents;
+import com.cavetale.setup.console.container.PluginContents;
+import com.cavetale.setup.console.container.ServerContents;
+import com.cavetale.setup.console.container.SoftwareContents;
 import io.github.ijustleyxo.jclix.app.Flag;
 import io.github.ijustleyxo.jclix.app.container.Contents;
 import org.jetbrains.annotations.NotNull;

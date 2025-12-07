@@ -1,27 +1,25 @@
 package com.cavetale.setup.data.plugin;
 
-import com.cavetale.setup.data.DataError;
+import com.cavetale.setup.console.CustomFlag;
+import com.cavetale.setup.console.CustomStyle;
+import com.cavetale.setup.console.container.PluginContents;
 import com.cavetale.setup.data.DataException;
 import com.cavetale.setup.data.Installable;
 import com.cavetale.setup.data.Sel;
-import com.cavetale.setup.data.build.*;
+import com.cavetale.setup.download.Jenkins;
 import com.cavetale.setup.download.Source;
-import com.cavetale.setup.download.Ver;
-import com.cavetale.setup.console.CustomFlag;
-import com.cavetale.setup.console.container.PluginContents;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.console.CustomStyle;
 import io.github.ijustleyxo.jclix.io.Code;
 import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.cavetale.setup.download.Jenkins.Mod.*;
 import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
 /**
@@ -29,43 +27,43 @@ import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
  */
 public enum Plugin implements Provider, Installable {
     ADVENTURE, // TODO: Status?
-    ADVICE_ANIMALS(Parent.of("com.winthier")), // TODO: Status?
+    ADVICE_ANIMALS(new Parent("com.winthier")), // TODO: Status?
     A_F_K,
-    ANTI_POPUP(Installable.uriOf("https://github.com/KaspianDev/AntiPopup/releases/download/7d0370f/AntiPopup-10.1.jar"), Ver.of("10.1")),
+    ANTI_POPUP(new Source("https://github.com/KaspianDev/AntiPopup/releases/download/7d0370f/AntiPopup-10.1.jar", "10.1")),
     AREA,
-    ARMOR_STAND_EDITOR(Parent.of("io.github.rypofalem"), Ver.of("1.17-25")),
+    ARMOR_STAND_EDITOR(new ParentVersion("io.github.rypofalem", "1.17-25")),
     AUCTION,
-    BANS(Parent.of("com.winthier")),
+    BANS(new Parent("com.winthier")),
     BINGO,
     BLOCK_CLIP,
     BLOCK_TRIGGER,
     CAPTURE_THE_FLAG,
     CAVES,
     CHAIR,
-    CHAT(Parent.of("com.winthier")),
+    CHAT(new Parent("com.winthier")),
     CHESS,
     CHRISTMAS, // TODO: Status?
-    COLORFALL(Parent.of("io.github.feydk")),
-    CONNECT(Parent.of("com.winthier")),
+    COLORFALL(new Parent("io.github.feydk")),
+    CONNECT(new Parent("com.winthier")),
     // TODO: ConnectCore Status?
     CORE,
-    COUNTDOWN(Parent.of("com.winthier"), Ver.of("0.1")),
+    COUNTDOWN(new ParentVersion("com.winthier", "0.1")),
     @Deprecated
-    CRAFT_BAY(Parent.of("com.winthier"), Ver.of("2.26-SNAPSHOT")), // TODO: Status?
-    CREATIVE(Parent.of("com.winthier")),
+    CRAFT_BAY(new ParentVersion("com.winthier", "2.26-SNAPSHOT")), // TODO: Status?
+    CREATIVE(new Parent("com.winthier")),
     CULL_MOB,
-    DECORATOR(Parent.of("com.winthier")),
+    DECORATOR(new Parent("com.winthier")),
     DUNGEONS,
-    DUSK(Parent.of("com.winthier"), Ver.of("0.1")),
+    DUSK(new ParentVersion("com.winthier", "0.1")),
     EASTER,
     EDITOR,
     ELECTION,
     ENDERBALL,
     ENEMY,
-    EXPLOITS(Parent.of("com.winthier")),
+    EXPLOITS(new Parent("com.winthier")),
     EXTREME_GRASS_GROWING("EGG"),
     FAM,
-    FAST_LEAF_DECAY(Ver.of("1.0-SNAPSHOT")),
+    FAST_LEAF_DECAY,
     FESTIVAL,
     FLAT_GENERATOR,
     FLY,
@@ -75,23 +73,23 @@ public enum Plugin implements Provider, Installable {
     HALLOWEEN,
     HIDE_AND_SEEK,
     HOME,
-    HOPPER_FILTER(Parent.of("com.winthier")),
+    HOPPER_FILTER(new Parent("com.winthier")),
     HOT_SWAP,
     INVENTORY,
     @Deprecated
     INVISIBLE_ITEM_FRAMES,
-    ITEM_STORE(Parent.of("com.winthier")),
-    KEEP_INVENTORY(Parent.of("com.winthier")),
-    KING_OF_THE_LADDER(Ref.of("kotl"), "KOTL"),
+    ITEM_STORE(new Parent("com.winthier")),
+    KEEP_INVENTORY(new Parent("com.winthier")),
+    KING_OF_THE_LADDER(new Ref("kotl"), "KOTL"),
     // TODO: KingOfTheRing Status?
-    KIT(Parent.of("com.winthier"), Ver.of("0.1")),
+    KIT(new ParentVersion("com.winthier", "0.1")),
     @Deprecated
-    LINK_PORTAL(Parent.of("com.winthier")),
+    LINK_PORTAL(new Parent("com.winthier")),
     MAGIC_MAP,
-    MAIL(Parent.of("com.winthier")),
+    MAIL(new Parent("com.winthier")),
     MAP_LOAD,
     MASS_STORAGE,
-    MAYPOLE(Parent.of("com.winthier"), Ver.of("0.1")),
+    MAYPOLE(new ParentVersion("com.winthier", "0.1")),
     MEMBER_LIST,
     MENU,
     MERCHANT,
@@ -99,70 +97,70 @@ public enum Plugin implements Provider, Installable {
     MOB_ARENA,
     MONEY,
     MYTEMS,
-    OPEN_INV(Installable.uriOf("https://github.com/Jikoo/OpenInv/releases/latest/download/OpenInv.jar"), Ver.of("5.1.6")),
+    OPEN_INV(new Source("https://github.com/Jikoo/OpenInv/releases/latest/download/OpenInv.jar", "5.1.6")),
     OVERBOARD,
-    PERM(Parent.of("com.winthier")),
-    PHOTOS(Parent.of("com.winthier")),
+    PERM(new Parent("com.winthier")),
+    PHOTOS(new Parent("com.winthier")),
     PICTIONARY("CavePaint"),
-    PLAYER_CACHE(Parent.of("com.winthier")),
-    PLAYER_INFO(Parent.of("com.winthier")),
+    PLAYER_CACHE(new Parent("com.winthier")),
+    PLAYER_INFO(new Parent("com.winthier")),
     PLUG_INFO,
     POCKET_MOB,
     POSTER,
-    PROTECT(Parent.of("com.winthier")),
-    PROTOCOL_LIB(Installable.uriOf("https://github.com/dmulloy2/ProtocolLib/releases/latest/download/ProtocolLib.jar"), Ver.of("5.3.0")),
+    PROTECT(new Parent("com.winthier")),
+    PROTOCOL_LIB(new Source("https://github.com/dmulloy2/ProtocolLib/releases/latest/download/ProtocolLib.jar", "5.3.0")),
     P_V_P_ARENA,
     QUIDDITCH,
     @Deprecated
-    QUIZ(Parent.of("com.winthier")),
+    QUIZ(new Parent("com.winthier")),
     RACE,
     @Deprecated
     RAID,
-    RANDOM_PLAYER_HEAD(Group.of("com.winthier.rph"), Ref.of("random-player-head"), Ver.of("0.1-SNAPSHOT"), "RPH"),
+    RANDOM_PLAYER_HEAD(new GroupRef("com.winthier.rph", "random-player-head"), "RPH"),
     RED_GREEN_LIGHT("RedLightGreenLight", "RGL", "RLGL"),
     RESIDENT,
-    RESOURCE(Parent.of("com.winthier"), Ver.of("0.1")),
+    RESOURCE(new ParentVersion("com.winthier", "0.1")),
     RESOURCE_PACK,
-    RULES(Parent.of("com.winthier")),
+    RULES(new Parent("com.winthier")),
     SERVER,
     @Deprecated
     SERVER_STATUS,
-    SHOP(Parent.of("com.winthier")),
-    SHUTDOWN(Parent.of("com.winthier")),
+    SHOP(new Parent("com.winthier")),
+    SHUTDOWN(new Parent("com.winthier")),
     SIDEBAR,
     SIGN_SPY,
     SKILLS,
     SKYBLOCK,
-    SPAWN(Parent.of("com.winthier")),
+    SPAWN(new Parent("com.winthier")),
     SPIKE,
-    SPLEEF(Parent.of("com.winthier")),
-    S_Q_L(Parent.of("com.winthier")),
-    STAR_BOOK(Parent.of("com.winthier")),
-    STOP_RAIN(Parent.of("com.winthier")),
+    SPLEEF(new Parent("com.winthier")),
+    S_Q_L(new Parent("com.winthier")),
+    STAR_BOOK(new Parent("com.winthier")),
+    STOP_RAIN(new Parent("com.winthier")),
     STREAMER,
     STRUCTURE,
     SURVIVAL_GAMES,
     TELEVATOR,
     TETRIS,
-    TICKET(Parent.of("com.winthier")),
-    TINFOIL(Parent.of("com.winthier"), Ver.of("0.1")),
-    TITLE(Parent.of("com.winthier")),
-    TOO_MANY_ENTITIES(Parent.of("com.winthier"), Ver.of("0.1")),
+    TICKET(new Parent("com.winthier")),
+    TINFOIL(new ParentVersion("com.winthier", "0.1")),
+    TITLE(new Parent("com.winthier")),
+    TOO_MANY_ENTITIES(new ParentVersion("com.winthier", "0.1")),
     T_P_A,
     TREES,
     TUTOR,
-    VERTIGO(Parent.of("io.github.feydk")),
+    VERTIGO(new Parent("io.github.feydk")),
     VOID_GENERATOR,
     VOTE,
-    WALL(Parent.of("com.winthier")),
+    WALL(new Parent("com.winthier")),
     WARDROBE,
     WARP,
     WATCHMAN,
     WINDICATOR,
     WIN_TAG,
-    WORLD_EDIT(Installable.uriOf("https://dev.bukkit.org/projects/worldedit/files/6013130/download"), Ver.of("7.3.10-Beta-1")),
+    WORLD_EDIT(new Source("https://dev.bukkit.org/projects/worldedit/files/6013130/download", "7.3.10-Beta-1")),
     WORLD_MARKER,
-    WORLDS(Parent.of("com.winthier")),
+    WORLDS(new Parent("com.winthier")),
     X_MAS;
 
     /** Plugin references. */
@@ -186,105 +184,42 @@ public enum Plugin implements Provider, Installable {
      * @param aliases The plugin aliases.
      */
     Plugin(@NotNull String @NotNull ... aliases) {
-        this(Ver.DEFAULT, aliases);
-    }
-
-    /**
-     * Creates a new plugin.
-     * @param parent The package parent.
-     * @param aliases The plugin aliases.
-     */
-    Plugin(@NotNull Parent parent, @NotNull String @NotNull ... aliases) {
-        this(parent, Ver.DEFAULT, aliases);
-    }
-
-    /**
-     * Creates a new plugin.
-     * @param ref The package reference.
-     * @param aliases The plugin aliases.
-     */
-    Plugin(@NotNull Ref ref, @NotNull String @NotNull ... aliases) {
-        this(Parent.DEFAULT, ref, Ver.DEFAULT, aliases);
-    }
-
-    /**
-     * Creates a new plugin.
-     * @param ver The package version.
-     * @param aliases The plugin aliases.
-     */
-    Plugin(@NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this(Parent.DEFAULT, ver, aliases);
-    }
-
-    /**
-     * Creates a new plugin.
-     * @param group The package group.
-     * @param ref The package reference.
-     * @param aliases The plugin aliases.
-     */
-    Plugin(@NotNull Group group, @NotNull Ref ref, @NotNull String @NotNull ... aliases) {
-        this(group, ref, Ver.DEFAULT, aliases);
-    }
-
-    /**
-     * Creates a new plugin.
-     * @param parent The package parent.
-     * @param ver The package version.
-     * @param aliases The plugin aliases.
-     */
-    Plugin(@NotNull Parent parent, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+        // Gather and format all references
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
-        this.source = new Jenkins(Job.of(this.displayName()), Group.of(parent, this.displayName().toLowerCase()), Ref.of(this.displayName().toLowerCase()), ver);
+        this.source = new Jenkins(this).toSource();
         this.plugins = new Plugin[]{this};
     }
 
     /**
      * Creates a new plugin.
-     * @param parent The package parent.
-     * @param ref The package reference.
-     * @param ver The package version.
+     * @param mod The jenkins source modifications.
      * @param aliases The plugin aliases.
      */
-    Plugin(@NotNull Parent parent, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+    Plugin(@NotNull Jenkins.Mod mod, @NotNull String @NotNull ... aliases) {
+        // Gather and format all references
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
-        this.source = new Jenkins(Job.of(this.displayName()), Group.of(parent, ref), ref, ver);
+        this.source = new Jenkins(this, mod).toSource();
         this.plugins = new Plugin[]{this};
     }
 
     /**
      * Creates a new plugin.
-     * @param group The package group.
-     * @param ref The package reference.
-     * @param ver The package version.
+     * @param source The download source.
      * @param aliases The plugin aliases.
      */
-    Plugin(@NotNull Group group, @NotNull Ref ref, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
+    Plugin(@NotNull Source source, @NotNull String @NotNull ... aliases) {
+        // Gather and format all references
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
-        this.source = new Jenkins(Job.of(this.displayName()), group, ref, ver);
-        this.plugins = new Plugin[]{this};
-    }
-
-    /**
-     * Creates a new plugin.
-     * @param uri The download location.
-     * @param ver The package version.
-     * @param aliases The plugin aliases.
-     */
-    Plugin(@NotNull URI uri, @NotNull Ver ver, @NotNull String @NotNull ... aliases) {
-        this.refs = new String[aliases.length + 1];
-        this.refs[0] = Util.capsToCamel(this.name());
-        System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
-
-        this.source = new Source.Other(uri, ver);
+        this.source = source;
         this.plugins = new Plugin[]{this};
     }
 
@@ -620,18 +555,6 @@ public enum Plugin implements Provider, Installable {
          */
         public NotAPluginException(@NotNull File file) {
             super(file.getName() + " is not a plugin");
-        }
-    }
-
-    /** Exception that is thrown if a uri is invalid. */
-    public static class URIError extends DataError {
-        /**
-         * Creates a new uri error.
-         * @param uri The invalid uri.
-         * @param cause The original error.
-         */
-        public URIError(@NotNull String uri, @NotNull Throwable cause) {
-            super("Faulty url \n" + uri + ": " + cause.getMessage(), cause);
         }
     }
 }

@@ -1,10 +1,10 @@
 package com.cavetale.setup.data.plugin;
 
 import com.cavetale.setup.console.CustomFlag;
+import com.cavetale.setup.console.CustomStyle;
 import com.cavetale.setup.console.container.ServerContents;
 import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.util.Util;
-import com.cavetale.setup.console.CustomStyle;
 import io.github.ijustleyxo.jclix.io.Code;
 import io.github.ijustleyxo.jclix.io.Type;
 import org.jetbrains.annotations.NotNull;

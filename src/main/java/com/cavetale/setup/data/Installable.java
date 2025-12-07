@@ -1,7 +1,6 @@
 package com.cavetale.setup.data;
 
 import com.cavetale.setup.Setup;
-import com.cavetale.setup.data.plugin.Plugin;
 import com.cavetale.setup.download.Source;
 import io.github.ijustleyxo.jclix.io.Style;
 import io.github.ijustleyxo.jclix.io.Type;
@@ -11,7 +10,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -20,6 +18,7 @@ import java.util.UUID;
 
 import static io.github.ijustleyxo.jclix.io.Console.SYSIO;
 
+/** Interface for software that can be installed, uninstalled and updated. */
 public interface Installable {
     @NotNull String displayName();
     boolean isInstalled();
@@ -35,8 +34,8 @@ public interface Installable {
         }
 
         try {
-            String name = this.displayName() + "-" + this.source().ver() + ".jar";
-            Installable.download(this.source().uri(), this.downloads(), name);
+            String name = this.displayName() + "-" + this.source().version() + ".jar";
+            Installable.download(this.source().link(), this.downloads(), name);
             this.installations().add(name);
             SYSIO.info(Style.SUCCESS + " done\n");
         } catch (IOException e) {
@@ -47,12 +46,12 @@ public interface Installable {
     default void update() {
         SYSIO.info("Updating " + this.displayName());
 
-        String name = this.displayName() + "-" + this.source().ver() + ".jar";
+        String name = this.displayName() + "-" + this.source().version() + ".jar";
         File file;
 
         // Stash download
         try {
-            file = Installable.stash(this.source().uri());
+            file = Installable.stash(this.source().link());
         } catch (IOException e) {
             SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
             return;
@@ -96,14 +95,6 @@ public interface Installable {
     }
 
     //= Utils == == == == == == == == == == == ==
-
-    static @NotNull URI uriOf(@NotNull String uri) {
-        try {
-            return new URI(uri);
-        } catch (URISyntaxException e) {
-            throw new Plugin.URIError(uri, e);
-        }
-    }
 
     /**
      * Download a file from the internet
