@@ -63,7 +63,7 @@ public enum Plugin implements Provider, Installable {
     EXPLOITS(new Parent("com.winthier")),
     EXTREME_GRASS_GROWING("EGG"),
     FAM,
-    FAST_LEAF_DECAY,
+    FAST_LEAF_DECAY(new Version("1.0-SNAPSHOT")),
     FESTIVAL,
     FLAT_GENERATOR,
     FLY,
@@ -80,7 +80,7 @@ public enum Plugin implements Provider, Installable {
     INVISIBLE_ITEM_FRAMES,
     ITEM_STORE(new Parent("com.winthier")),
     KEEP_INVENTORY(new Parent("com.winthier")),
-    KING_OF_THE_LADDER(new Ref("kotl"), "KOTL"),
+    KING_OF_THE_LADDER(new Artifact("kotl"), "KOTL"),
     // TODO: KingOfTheRing Status?
     KIT(new ParentVersion("com.winthier", "0.1")),
     @Deprecated
@@ -116,7 +116,7 @@ public enum Plugin implements Provider, Installable {
     RACE,
     @Deprecated
     RAID,
-    RANDOM_PLAYER_HEAD(new GroupRef("com.winthier.rph", "random-player-head"), "RPH"),
+    RANDOM_PLAYER_HEAD(new GroupArtifact("com.winthier.rph", "random-player-head"), "RPH"),
     RED_GREEN_LIGHT("RedLightGreenLight", "RGL", "RLGL"),
     RESIDENT,
     RESOURCE(new ParentVersion("com.winthier", "0.1")),
