@@ -1,0 +1,18 @@
+# Whitelist
+*
+!*/
+
+# General
+!.gitignore
+!README.md
+!LICENSE
+
+# Sources
+!*.java
+
+# CI/CD
+!pom.xml
+target/
+
+# IDE
+.idea/
