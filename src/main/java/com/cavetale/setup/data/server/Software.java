@@ -8,8 +8,6 @@ import com.cavetale.setup.data.Installable;
 import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.download.Source;
 import com.cavetale.setup.util.Util;
-import link.l_pf.cmdlib.io.Code;
-import link.l_pf.cmdlib.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +15,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import static link.l_pf.cmdlib.io.Console.SYSIO;
+import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
+import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
 /** Server software, used to register downloadable server software. */
 public enum Software implements Installable {
@@ -123,19 +122,19 @@ public enum Software implements Installable {
         if (Software.selected != null) return Software.selected; // Update not necessary
 
         // Update selected
-        SYSIO.debug("Reloading selected software\n");
+        STDIO.debug("Reloading selected software");
         for (Software s : Software.values()) s.deselect();
         Software.selected = new LinkedList<>();
 
         SoftwareContents softwares = (SoftwareContents) CustomFlag.SOFTWARE.container();
         if (CustomFlag.INSTALLED.isSelected()) {
-            SYSIO.debug("Selecting installed software\n");
+            STDIO.debug("Selecting installed software");
             for (Software s : Software.installed()) s.target();
         } else if (CustomFlag.ALL.isSelected() || (CustomFlag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
-            SYSIO.debug("Selecting all software\n");
+            STDIO.debug("Selecting all software");
             for (Software s : Software.values()) s.target();
         } else {
-            SYSIO.debug("Selecting servers " + softwares.contents() + "\n");
+            STDIO.debug("Selecting servers ", softwares.contents());
             for (Software s : softwares.contents()) s.target(); // Select by software
         }
 
@@ -163,7 +162,7 @@ public enum Software implements Installable {
 
     private static void loadInstalled() {
         // Update installed
-        SYSIO.debug("Reloading installed software\n");
+        STDIO.debug("Reloading installed software");
         for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
         Software.installed = new LinkedList<>();
         Software.unknown = new LinkedList<>();
@@ -186,7 +185,7 @@ public enum Software implements Installable {
     }
 
     public static void reset() {
-        SYSIO.debug("Resetting software\n");
+        STDIO.debug("Resetting software");
         for (Software s : Software.values()) s.revert();
         Software.selected = null;
         Software.installed = null;
@@ -207,53 +206,46 @@ public enum Software implements Installable {
     //= Cosmetics ==
 
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Software.values().length == 0) {
-            SYSIO.requested(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software available\n");
+            STDIO.log(CustomStyle.SOFTWARE, BOLD + "No software available");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, Software.values().length +
-                " software available", 4, 21, (Object[]) Software.values());
+        STDIO.list(CustomStyle.SOFTWARE, Software.values().length +
+                " software available", (Object[]) Software.values());
     }
 
     public static boolean listSelected() {
         List<Software> selected = Software.selected();
         if (selected.isEmpty()) return false;
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, selected.size() +
-                " software selected", 4, 21, selected.toArray());
+        STDIO.list(CustomStyle.SOFTWARE, selected.size() +
+                " software selected", selected.toArray());
         return true;
     }
 
     public static boolean listInstalled() {
         List<Software> software = Software.installed();
         if (software.isEmpty()) return false;
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, software.size() +
-                " software installed", 4, 21, software.toArray());
+        STDIO.list(CustomStyle.SOFTWARE, software.size() +
+                " software installed", software.toArray());
         return true;
     }
 
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Software.installed().isEmpty()) {
-            SYSIO.requested(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software installed\n");
+            STDIO.log(CustomStyle.SOFTWARE, BOLD + "No software installed");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, Software.installed().size() +
-                " software installed", 4, 21, Software.installed().toArray());
+        STDIO.list(CustomStyle.SOFTWARE, Software.installed().size() +
+                " software installed", Software.installed().toArray());
     }
 
     public static boolean listUnknown() {
         List<String> unknown = Software.unknown();
         if (unknown.isEmpty()) return false;
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.UNKNOWN, unknown.size() +
-                " software unknown", 4, 21, unknown.toArray());
+        STDIO.list(CustomStyle.UNKNOWN, unknown.size() +
+                " software unknown", unknown.toArray());
         return true;
     }
 

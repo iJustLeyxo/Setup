@@ -5,8 +5,6 @@ import com.cavetale.setup.console.CustomStyle;
 import com.cavetale.setup.console.container.CategoryContents;
 import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.util.Util;
-import link.l_pf.cmdlib.io.Code;
-import link.l_pf.cmdlib.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,8 +13,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.cavetale.setup.console.CustomStyle.CATEGORY;
 import static com.cavetale.setup.data.plugin.Plugin.*;
-import static link.l_pf.cmdlib.io.Console.SYSIO;
+import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
+import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
 /** Plugin categories, used to group plugins by purpose or usage. */
 public enum Category implements Provider {
@@ -214,20 +214,20 @@ public enum Category implements Provider {
         if (Category.selected != null) return Category.selected; // Update not necessary
 
         // Update selection
-        SYSIO.debug("Reloading selected categories\n");
+        STDIO.debug("Reloading selected categories");
         for (Category c : Category.values()) c.deselect();
         Category.selected = new LinkedList<>();
 
         CategoryContents categories = (CategoryContents) CustomFlag.CATEGORY.container();
         if (CustomFlag.INSTALLED.isSelected()) {
             Category.installed();
-            SYSIO.debug("Selecting installed categories\n");
+            STDIO.debug("Selecting installed categories");
             for (Category c : Category.installed()) c.target();
         } else if (CustomFlag.ALL.isSelected() || (CustomFlag.CATEGORY.isSelected() && categories.isEmpty())) { // Select all
-            SYSIO.debug("Selecting all categories\n");
+            STDIO.debug("Selecting all categories");
             for (Category c : Category.values()) c.target();
         } else {
-            SYSIO.debug("Selecting categories " + categories.contents() + "\n"); // Select by category
+            STDIO.debug("Selecting categories ", categories.contents()); // Select by category
             for (Category c : categories.contents()) c.target();
 
             for (Server s : Server.values()) if (s.isSelected()) for (Category c : s.categories()) c.select(); // Select by server
@@ -245,7 +245,7 @@ public enum Category implements Provider {
         if (Category.installed != null) return Category.installed; // Update not necessary
 
         // Update installation
-        SYSIO.debug("Reloading installed categories\n");
+        STDIO.debug("Reloading installed categories");
         Category.installed = new LinkedList<>();
         for (Category c : Category.values()) if (c.isInstalled()) Category.installed.add(c);
         return Category.installed;
@@ -253,7 +253,7 @@ public enum Category implements Provider {
 
     /** Resets the index of installed and selected categories and resets each categories' state. */
     public static void reset() {
-        SYSIO.debug("Resetting categories\n");
+        STDIO.debug("Resetting categories");
         for (Category c : Category.values()) c.revert();
         Category.selected = null;
         Category.installed = null;
@@ -280,55 +280,35 @@ public enum Category implements Provider {
 
     /** List all categories. */
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Category.values().length == 0) {
-            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories available\n");
+            STDIO.log(CATEGORY, BOLD, "No categories available");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.values().length +
-                " categor(y/ies) available", 4, 21, (Object[]) Category.values());
+        STDIO.list(CATEGORY, Category.values().length +
+                " categor(y/ies) available", (Object) Category.values());
     }
 
     /** List selected categories. */
     public static void listSelected() {
         if (Category.selected().isEmpty()) {
-            SYSIO.separate();
-            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories selected\n");
+            STDIO.log(CATEGORY,  BOLD, "No categories selected");
             return;
         }
 
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.selected().size() +
-                " categor(y/ies) selected", 4, 21, Category.selected().toArray());
+        STDIO.list(CATEGORY, Category.selected().size() +
+                " categor(y/ies) selected", Category.selected().toArray());
     }
 
     /** List installed categories. */
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Category.installed().isEmpty()) {
-            SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories installed\n");
+            STDIO.log(CATEGORY, BOLD, "No categories installed");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.installed().size() +
-                " categor(y/ies) installed", 4, 21, Category.installed().toArray());
-    }
-
-    /** List categories with additional information. */
-    public static void details() {
-        SYSIO.separate();
-        SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD +
-                "-------------------------------------- " +
-                "Categories -------------------------------------\n");
-        SYSIO.format(Type.REQUESTED, CustomStyle.CATEGORY + "%-16s | %-68s\n", "Category", "Info");
-        SYSIO.requested(CustomStyle.CATEGORY + "--------------------------------------------" +
-                "-------------------------------------------\n");
-        ArrayList<Category> categories = new ArrayList<>(List.of(Category.values()));
-        Collections.sort(categories);
-        for (Category c : categories) SYSIO.format(Type.REQUESTED, CustomStyle.CATEGORY + "%-16s | %-68s\n", c.displayName(), c.info);
+        STDIO.list(CATEGORY, Category.installed().size() +
+                " categor(y/ies) installed", Category.installed().toArray());
     }
 
     /** Exception that is thrown if a requested category could not be found. */

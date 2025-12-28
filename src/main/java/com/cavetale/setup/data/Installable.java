@@ -2,8 +2,6 @@ package com.cavetale.setup.data;
 
 import com.cavetale.setup.Setup;
 import com.cavetale.setup.download.Source;
-import link.l_pf.cmdlib.io.Style;
-import link.l_pf.cmdlib.io.Type;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -16,7 +14,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
-import static link.l_pf.cmdlib.io.Console.SYSIO;
+import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
 /** Interface for software that can be installed, uninstalled and updated. */
 public interface Installable {
@@ -27,9 +25,10 @@ public interface Installable {
     @NotNull List<String> installations();
 
     default void install() {
-        SYSIO.info("Installing " + this.displayName());
+        STDIO.openInfo("Installing ", this.displayName());
+
         if (this.isInstalled()) {
-            SYSIO.send(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)\n");
+            STDIO.closeWarn("skipped (already installed)");
             return;
         }
 
@@ -37,15 +36,14 @@ public interface Installable {
             String name = this.displayName() + "-" + this.source().version() + ".jar";
             Installable.download(this.source().link(), this.downloads(), name);
             this.installations().add(name);
-            SYSIO.info(Style.SUCCESS + " done\n");
+            STDIO.closeInfoDone();
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed", e);
+            STDIO.closeErr(e, "failed");
         }
     }
 
     default void update() {
-        SYSIO.info("Updating " + this.displayName());
-
+        STDIO.openInfo("Updating ", this.displayName());
         String name = this.displayName() + "-" + this.source().version() + ".jar";
         File file;
 
@@ -53,20 +51,18 @@ public interface Installable {
         try {
             file = Installable.stash(this.source().link());
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
+            STDIO.closeErr( e, "failed (failed to download)");
             return;
         }
 
         // Uninstall
         for (String inst : this.installations()) {
-            SYSIO.debug("Uninstalling " + inst);
+            STDIO.debug("Uninstalling ", inst);
             File f = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
-                SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to delete) " + f + "\n");
-            } else {
-                SYSIO.send(Type.INFO, Type.WARN, "Updating " + this.displayName(), " skipped (linked)\n");
-            }
+                STDIO.closeErr("failed (failed to delete ", f, ")");
+            } else STDIO.closeWarn("skipped (already linked)");
             return;
         }
         this.installations().clear();
@@ -75,22 +71,22 @@ public interface Installable {
         try {
             Installable.finalise(file, this.downloads(), name);
             this.installations().add(name);
-            SYSIO.info(Style.SUCCESS + " done\n");
+            STDIO.closeInfoDone();
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
+            STDIO.closeErr(e, "failed (could not replace ", name, ")");
         }
     }
 
     default void uninstall() {
         for (String inst : this.installations()) {
-            SYSIO.info("Uninstalling " + inst);
+            STDIO.openInfo("Uninstalling ", inst);
             File file = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) {
                     this.installations().remove(inst);
-                    SYSIO.info(Style.SUCCESS + " done\n");
-                } else SYSIO.send(Type.INFO, Type.ERR, "Uninstalling " + file, " failed\n");
-            } else SYSIO.send(Type.INFO, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
+                    STDIO.closeInfoDone();
+                } else STDIO.closeErr("failed");
+            } else STDIO.closeErr("skipped (linked)");
         }
     }
 

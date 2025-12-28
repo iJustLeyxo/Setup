@@ -15,7 +15,7 @@ public enum CustomFlag implements Flag {
     ALL('A', "Select all"),
 
     /** Selects categories. */
-    CATEGORY('C', "Specify categor(y/ies)", "-s []:all | [categories]") {
+    CATEGORY('C', "Specify categor(y/ies)", ":all | [category]:select") {
         @Override
         public @NotNull Contents<?> init() {
             return new CategoryContents();
@@ -26,7 +26,7 @@ public enum CustomFlag implements Flag {
     INSTALLED('I', "Select installed"),
 
     /** Selects plugins. */
-    PLUGIN('P', "Specify plugins(s)", "-p []:all | [plugins]") {
+    PLUGIN('P', "Specify plugins(s)", ":all | [plugin]:select") {
         @Override
         public @NotNull Contents<?> init() {
             return new PluginContents();
@@ -34,7 +34,7 @@ public enum CustomFlag implements Flag {
     },
 
     /** Selects server configurations. */
-    SERVER('S', "Specify server(s)", "-s []:all | [servers]") {
+    SERVER('S', "Specify server(s)", ":all | [server]:select") {
         @Override
         public @NotNull Contents<?> init() {
             return new ServerContents();
@@ -42,7 +42,7 @@ public enum CustomFlag implements Flag {
     },
 
     /** Selects server software. */
-    SOFTWARE('Z', "Specify server software", "-S []:all | [software]") {
+    SOFTWARE('Z', "Specify server software", ":all | [software]:select") {
         @Override
         public @NotNull Contents<?> init() {
             return new SoftwareContents();

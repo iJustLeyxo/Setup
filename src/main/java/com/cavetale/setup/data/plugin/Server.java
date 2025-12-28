@@ -5,8 +5,6 @@ import com.cavetale.setup.console.CustomStyle;
 import com.cavetale.setup.console.container.ServerContents;
 import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.util.Util;
-import link.l_pf.cmdlib.io.Code;
-import link.l_pf.cmdlib.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +12,8 @@ import java.util.*;
 
 import static com.cavetale.setup.data.plugin.Category.BASE;
 import static com.cavetale.setup.data.plugin.Category.SURVIVAL;
-import static link.l_pf.cmdlib.io.Console.SYSIO;
+import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
+import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
 /**
  * Servers, used to group plugins by installed server
@@ -36,7 +35,6 @@ public enum Server implements Provider {
     private final @NotNull Category[] categories;
     private final @NotNull Plugin[] plugins;
 
-    // TODO: Custom printing
     private @Nullable Sel sel = null;
     private @Nullable Boolean inst = null;
 
@@ -146,19 +144,19 @@ public enum Server implements Provider {
         if (Server.selected != null) return Server.selected; // Update not necessary
 
         // Update selected
-        SYSIO.debug("Reloading selected servers\n");
+        STDIO.debug("Reloading selected servers");
         for (Server s : Server.values()) s.deselect();
         Server.selected = new LinkedList<>();
 
         ServerContents servers = (ServerContents) CustomFlag.SERVER.container();
         if (CustomFlag.INSTALLED.isSelected()) {
             for (Server s : Server.installed()) s.target();
-            SYSIO.debug("Selecting installed servers\n");
+            STDIO.debug("Selecting installed servers");
         } else if (CustomFlag.ALL.isSelected() || (CustomFlag.SERVER.isSelected() && servers.isEmpty())) { // Select all
-            SYSIO.debug("Selecting all servers\n");
+            STDIO.debug("Selecting all servers");
             for (Server s : Server.values()) s.target();
         } else {
-            SYSIO.debug("Selecting servers " + servers.contents() + "\n");
+            STDIO.debug("Selecting servers ", servers.contents());
             for (Server s : servers.contents()) s.target(); // Select by server
         }
 
@@ -170,14 +168,14 @@ public enum Server implements Provider {
         if (Server.installed != null) return Server.installed; // Update not necessary
 
         // Update installed
-        SYSIO.debug("Reloading installed servers\n");
+        STDIO.debug("Reloading installed servers");
         Server.installed = new LinkedList<>();
         for (Server s : Server.values()) if (s.isInstalled()) Server.installed.add(s); // Update installation
         return Server.installed;
     }
 
     public static void reset() {
-        SYSIO.debug("Resetting servers\n");
+        STDIO.debug("Resetting servers");
         for (Server s : Server.values()) s.revert();
         Server.selected = null;
         Server.installed = null;
@@ -197,54 +195,33 @@ public enum Server implements Provider {
     //= Cosmetics ==
 
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Server.values().length == 0) {
-            SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers available\n");
+            STDIO.log(CustomStyle.SERVER, BOLD, "No servers available");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.values().length +
-                " server(s) available", 4, 21, (Object[]) Server.values());
+        STDIO.list(CustomStyle.SERVER, Server.values().length +
+                " server(s) available", (Object[]) Server.values());
     }
 
     public static void listSelected() {
         if (Server.selected().isEmpty()) {
-            SYSIO.separate();
-            SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers selected\n");
+            STDIO.log(CustomStyle.SERVER, BOLD, "No servers selected");
             return;
         }
 
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.selected().size() +
-                " server(s) selected", 4, 21, Server.selected().toArray());
+        STDIO.list(CustomStyle.SERVER, Server.selected().size() +
+                " server(s) selected", Server.selected().toArray());
     }
 
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Server.installed().isEmpty()) {
-            SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers installed\n");
+            STDIO.log(CustomStyle.SERVER, BOLD, "No servers installed");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.installed().size() +
-                " server(s) installed", 4, 21, Server.installed().toArray());
-    }
-
-    public static void details() {
-        SYSIO.separate();
-        SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD +
-                "--------------------------------------- " +
-                "Servers ---------------------------------------\n");
-        SYSIO.format(Type.REQUESTED, CustomStyle.SERVER + "%-16s | %-68s\n", "Server", "Info");
-        SYSIO.requested(CustomStyle.SERVER + "----------------------------------------------" +
-                "-----------------------------------------\n");
-        ArrayList<Server> servers = new ArrayList<>(List.of(Server.values()));
-        Collections.sort(servers);
-        for (Server s : servers) {
-            SYSIO.format(Type.REQUESTED, CustomStyle.SERVER + "%-16s | %-68s\n", s.displayName(), s.info);
-        }
+        STDIO.list(CustomStyle.SERVER, Server.installed().size() +
+                " server(s) installed", Server.installed().toArray());
     }
 
     public static class NotFoundException extends Exception {

@@ -1,25 +1,27 @@
 package com.cavetale.setup.console;
 
-import link.l_pf.cmdlib.io.AbstractStyle;
-import link.l_pf.cmdlib.io.Code;
+import link.l_pf.cmdlib.shell.Code;
+import link.l_pf.cmdlib.shell.Style;
 import org.jetbrains.annotations.NotNull;
 
+import static link.l_pf.cmdlib.shell.Code.Std.*;
+
 /** Custom console output styles. */
-public enum CustomStyle implements AbstractStyle {
-    SELECT(Code.LIGHT_BLUE_FG),
-    COMMAND(Code.LIGHT_CYAN_FG),
-    FLAG(Code.DARK_YELLOW_FG),
-    INSTALL(Code.LIGHT_GREEN_FG),
-    UPDATE(Code.LIGHT_GREEN_FG),
-    UNINSTALL(Code.LIGHT_RED_FG),
-    LINK(Code.LIGHT_MAGENTA_FG),
-    SUPERFLUOUS(Code.LIGHT_YELLOW_FG),
-    MISSING(Code.LIGHT_RED_FG),
-    UNKNOWN(Code.DARK_GRAY_FG),
-    PLUGIN(Code.LIGHT_BLUE_FG),
-    CATEGORY(Code.LIGHT_GREEN_FG),
-    SERVER(Code.LIGHT_MAGENTA_FG),
-    SOFTWARE(Code.LIGHT_YELLOW_FG);
+public enum CustomStyle implements Style {
+    SELECT(LIGHT_BLUE_FG),
+    COMMAND(LIGHT_CYAN_FG),
+    FLAG(DARK_YELLOW_FG),
+    INSTALL(LIGHT_GREEN_FG),
+    UPDATE(LIGHT_GREEN_FG),
+    UNINSTALL(LIGHT_RED_FG),
+    LINK(LIGHT_MAGENTA_FG),
+    SUPERFLUOUS(LIGHT_YELLOW_FG),
+    MISSING(LIGHT_RED_FG),
+    UNKNOWN(DARK_GRAY_FG),
+    PLUGIN(LIGHT_BLUE_FG),
+    CATEGORY(LIGHT_GREEN_FG),
+    SERVER(LIGHT_MAGENTA_FG),
+    SOFTWARE(LIGHT_YELLOW_FG);
 
     /** Escape code string */
     public final @NotNull String code;

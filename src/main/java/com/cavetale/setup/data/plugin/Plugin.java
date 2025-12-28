@@ -9,8 +9,6 @@ import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.download.Jenkins;
 import com.cavetale.setup.download.Source;
 import com.cavetale.setup.util.Util;
-import link.l_pf.cmdlib.io.Code;
-import link.l_pf.cmdlib.io.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +18,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.cavetale.setup.download.Jenkins.Mod.*;
-import static link.l_pf.cmdlib.io.Console.SYSIO;
+import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
+import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
 /**
  * List of available plugins
@@ -353,19 +352,19 @@ public enum Plugin implements Provider, Installable {
         if (Plugin.selected != null) return Plugin.selected; // Update not necessary
 
         // Update selection
-        SYSIO.debug("Loading selected plugins\n");
+        STDIO.debug("Loading selected plugins");
         for (Plugin p : Plugin.values()) p.deselect();
         Plugin.selected = new LinkedList<>();
 
         PluginContents plugins = (PluginContents) CustomFlag.PLUGIN.container();
         if (CustomFlag.INSTALLED.isSelected()) {
-            SYSIO.debug("Selecting installed plugins\n");
+            STDIO.debug("Selecting installed plugins");
             for (Plugin p : Plugin.installed()) p.target();
         } else if (CustomFlag.ALL.isSelected() ||  (CustomFlag.PLUGIN.isSelected() && plugins.isEmpty())) { // Select all
-            SYSIO.debug("Selecting all plugins\n");
+            STDIO.debug("Selecting all plugins");
             for (Plugin p : Plugin.values()) p.target();
         } else {
-            SYSIO.debug("Selecting plugins " + plugins.contents() + "\n");
+            STDIO.debug("Selecting plugins ", plugins.contents());
             for (Plugin p : plugins.contents()) p.target(); // Select by plugin
 
             for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.select(); // Select by category
@@ -418,7 +417,7 @@ public enum Plugin implements Provider, Installable {
 
     private static void loadInstalled() {
         // Update installation
-        SYSIO.debug("Loading installed plugins\n");
+        STDIO.debug("Loading installed plugins");
         for (Plugin p : Plugin.values()) p.inst = new LinkedList<>(); // Reset installations
         Plugin.installed = new LinkedList<>();
         Plugin.linked = new LinkedList<>();
@@ -439,7 +438,7 @@ public enum Plugin implements Provider, Installable {
             else {
                 if (p == null) {
                     Plugin.unknown.add(f.getName());
-                    SYSIO.warn("Unknown plugin " + f.getName());
+                    STDIO.warn("Unknown plugin ", f.getName());
                 } else p.installations().add(f.getName());
             }
         }
@@ -448,7 +447,7 @@ public enum Plugin implements Provider, Installable {
     }
 
     public static void reset() {
-        SYSIO.debug("Resetting plugins\n");
+        STDIO.debug("Resetting plugins");
         for (Plugin p : Plugin.values()) p.revert();
         Plugin.selected = null;
         Plugin.installed = null;
@@ -471,24 +470,21 @@ public enum Plugin implements Provider, Installable {
 
     /** List all plugins. */
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Plugin.values().length == 0) {
-            SYSIO.requested(CustomStyle.PLUGIN.toString() + Code.BOLD + "No plugins available\n");
+            STDIO.log(CustomStyle.PLUGIN, BOLD, "No plugins available");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.PLUGIN, Plugin.values().length +
-                " plugin(s) available", 4, 21, (Object[]) Plugin.values());
+        STDIO.list(CustomStyle.PLUGIN, Plugin.values().length +
+                " plugin(s) available", (Object[]) Plugin.values());
     }
 
     /** List selected plugins. */
     public static boolean listSelected() {
         List<Plugin> selected = Plugin.selected();
         if (selected.isEmpty()) return false;
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.PLUGIN, selected.size() +
-                " plugin(s) selected", 4, 21, selected.toArray());
+        STDIO.list(CustomStyle.PLUGIN, selected.size() +
+                " plugin(s) selected", selected.toArray());
         return true;
     }
 
@@ -496,31 +492,27 @@ public enum Plugin implements Provider, Installable {
     public static boolean listInstalled() {
         List<Plugin> plugins = Plugin.installed();
         if (plugins.isEmpty()) return false;
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.INSTALL, plugins.size() +
-                " plugin(s) installed", 4, 21, plugins.toArray());
+        STDIO.list(CustomStyle.INSTALL, plugins.size() +
+                " plugin(s) installed", plugins.toArray());
         return true;
     }
 
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Plugin.installed().isEmpty()) {
-            SYSIO.requested(CustomStyle.PLUGIN.toString() + Code.BOLD + "No plugins installed\n");
+            STDIO.log(CustomStyle.PLUGIN, BOLD, "No plugins installed");
             return;
         }
 
-        SYSIO.list(Type.REQUESTED, CustomStyle.PLUGIN, Plugin.installed().size() +
-                " plugin(s) installed", 4, 21, Plugin.installed().toArray());
+        STDIO.list(CustomStyle.PLUGIN, Plugin.installed().size() +
+                " plugin(s) installed", Plugin.installed().toArray());
     }
 
     /** List lniked plugins. */
     public static boolean listLinked() {
         List<String> linked = Plugin.linked();
         if (linked.isEmpty()) return false;
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.LINK, linked.size() +
-                " plugin(s) linked", 4, 21, linked.toArray());
+        STDIO.list(CustomStyle.LINK, linked.size() +
+                " plugin(s) linked", linked.toArray());
         return true;
     }
 
@@ -528,9 +520,8 @@ public enum Plugin implements Provider, Installable {
     public static boolean listUnknown() {
         List<String> unknown = Plugin.unknown();
         if (unknown.isEmpty()) return false;
-        SYSIO.separate();
-        SYSIO.list(Type.REQUESTED, CustomStyle.UNKNOWN, unknown.size() +
-                " plugin(s) unknown", 4, 21, unknown.toArray());
+        STDIO.list(CustomStyle.UNKNOWN, unknown.size() +
+                " plugin(s) unknown", unknown.toArray());
         return true;
     }
 
