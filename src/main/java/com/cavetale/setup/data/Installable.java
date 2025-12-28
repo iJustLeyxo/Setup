@@ -27,9 +27,10 @@ public interface Installable {
     @NotNull List<String> installations();
 
     default void install() {
-        SYSIO.info("Installing " + this.displayName());
+        SYSIO.openFrame(Type.INFO, "Installing " + this.displayName());
+
         if (this.isInstalled()) {
-            SYSIO.send(Type.INFO, Type.WARN, "Installing " + this.displayName(), " skipped (already installed)\n");
+            SYSIO.closeFrame(Type.WARN, "skipped (already installed)\n");
             return;
         }
 
@@ -37,15 +38,14 @@ public interface Installable {
             String name = this.displayName() + "-" + this.source().version() + ".jar";
             Installable.download(this.source().link(), this.downloads(), name);
             this.installations().add(name);
-            SYSIO.info(Style.SUCCESS + " done\n");
+            SYSIO.closeFrame(Type.INFO, Style.SUCCESS + "done\n");
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Installing " + this.displayName(), " failed", e);
+            SYSIO.closeFrame(Type.ERR, "failed", e);
         }
     }
 
     default void update() {
-        SYSIO.info("Updating " + this.displayName());
-
+        SYSIO.openFrame(Type.INFO, "Updating " + this.displayName());
         String name = this.displayName() + "-" + this.source().version() + ".jar";
         File file;
 
@@ -53,7 +53,7 @@ public interface Installable {
         try {
             file = Installable.stash(this.source().link());
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
+            SYSIO.closeFrame(Type.ERR, "failed (failed to download)", e);
             return;
         }
 
@@ -63,10 +63,8 @@ public interface Installable {
             File f = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(f.toPath())) {
                 if (f.delete()) continue;
-                SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to delete) " + f + "\n");
-            } else {
-                SYSIO.send(Type.INFO, Type.WARN, "Updating " + this.displayName(), " skipped (linked)\n");
-            }
+                SYSIO.closeFrame(Type.ERR, "failed (failed to delete " + f + ")\n");
+            } else SYSIO.closeFrame(Type.WARN, "skipped (linked)\n");
             return;
         }
         this.installations().clear();
@@ -75,22 +73,22 @@ public interface Installable {
         try {
             Installable.finalise(file, this.downloads(), name);
             this.installations().add(name);
-            SYSIO.info(Style.SUCCESS + " done\n");
+            SYSIO.closeFrame(Type.INFO, Style.SUCCESS + " done\n");
         } catch (IOException e) {
-            SYSIO.send(Type.INFO, Type.ERR, "Updating " + this.displayName(), " failed (failed to download)", e);
+            SYSIO.closeFrame(Type.ERR, "failed (could not replace " + name + ")", e);
         }
     }
 
     default void uninstall() {
         for (String inst : this.installations()) {
-            SYSIO.info("Uninstalling " + inst);
+            SYSIO.openFrame(Type.INFO, "Uninstalling " + inst);
             File file = new File(this.downloads(), inst);
             if (!Files.isSymbolicLink(file.toPath())) {
                 if (file.delete()) {
                     this.installations().remove(inst);
-                    SYSIO.info(Style.SUCCESS + " done\n");
-                } else SYSIO.send(Type.INFO, Type.ERR, "Uninstalling " + file, " failed\n");
-            } else SYSIO.send(Type.INFO, Type.WARN, "Uninstalling " + file, " skipped (linked)\n");
+                    SYSIO.closeFrame(Type.INFO, Style.SUCCESS + "done\n");
+                } else SYSIO.closeFrame(Type.ERR, "failed\n");
+            } else SYSIO.closeFrame(Type.WARN, "skipped (linked)\n");
         }
     }
 

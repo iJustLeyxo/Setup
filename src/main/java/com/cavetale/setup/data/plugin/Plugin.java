@@ -471,15 +471,14 @@ public enum Plugin implements Provider, Installable {
 
     /** List all plugins. */
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Plugin.values().length == 0) {
             SYSIO.requested(CustomStyle.PLUGIN.toString() + Code.BOLD + "No plugins available\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.PLUGIN, Plugin.values().length +
-                " plugin(s) available", 4, 21, (Object[]) Plugin.values());
+                " plugin(s) available", 4, false, (Object[]) Plugin.values());
     }
 
     /** List selected plugins. */
@@ -488,7 +487,7 @@ public enum Plugin implements Provider, Installable {
         if (selected.isEmpty()) return false;
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.PLUGIN, selected.size() +
-                " plugin(s) selected", 4, 21, selected.toArray());
+                " plugin(s) selected", 4, false, selected.toArray());
         return true;
     }
 
@@ -498,20 +497,19 @@ public enum Plugin implements Provider, Installable {
         if (plugins.isEmpty()) return false;
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.INSTALL, plugins.size() +
-                " plugin(s) installed", 4, 21, plugins.toArray());
+                " plugin(s) installed", 4, false, plugins.toArray());
         return true;
     }
 
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Plugin.installed().isEmpty()) {
             SYSIO.requested(CustomStyle.PLUGIN.toString() + Code.BOLD + "No plugins installed\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.PLUGIN, Plugin.installed().size() +
-                " plugin(s) installed", 4, 21, Plugin.installed().toArray());
+                " plugin(s) installed", 4, false, Plugin.installed().toArray());
     }
 
     /** List lniked plugins. */
@@ -520,7 +518,7 @@ public enum Plugin implements Provider, Installable {
         if (linked.isEmpty()) return false;
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.LINK, linked.size() +
-                " plugin(s) linked", 4, 21, linked.toArray());
+                " plugin(s) linked", 4, false, linked.toArray());
         return true;
     }
 
@@ -530,7 +528,7 @@ public enum Plugin implements Provider, Installable {
         if (unknown.isEmpty()) return false;
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.UNKNOWN, unknown.size() +
-                " plugin(s) unknown", 4, 21, unknown.toArray());
+                " plugin(s) unknown", 4, false, unknown.toArray());
         return true;
     }
 

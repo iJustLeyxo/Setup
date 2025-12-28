@@ -6,46 +6,53 @@ Cavetale testing server setup utility.
 
 ```
 ---------------------------------------- Help -----------------------------------------
-Interactive: java -jar Manager.jar
-Single: java -jar Manager.jar <command>
-Command: <flag(s)> <command(s)> <flag(s)>
+Interactive: java -jar <file>.jar
+Single: java -jar <file>.jar <input>
+Input: [flag] <command> [flag]
+---------------------------------------------------------------------------------------
 
 -------------------------------------- Commands ---------------------------------------
-Command          | Info                                                                
+Command          | Info
 ---------------------------------------------------------------------------------------
-Compare          | Compare installed to selected software                              
-Connect          | Link this tool to a server installation                             
-Eula             | Agree to the Minecraft EULA                                         
-Exit             | Exit interactive mode                                               
-Find             | Find anything                                                       
-Help             | Show usage help                                                     
-Install          | Install plugins and server software                                 
-Link             | Link any jar archive path to the plugins directory                  
-List             | List plugins, categories, servers and server software               
-Run              | Run installed server software                                       
-Status           | View installation status                                            
-Uninstall        | Uninstall plugins, server software and files                        
-Update           | Update plugins and software                                         
+exit             | Exit interactive mode
+help             | Show usage help
+test             | Used for unit tests.
+---------------------------------------------------------------------------------------
+compare          | Compare installed to selected software
+connect          | Link this tool to a server installation
+eula             | Agree to the Minecraft EULA
+find             | Find anything
+install          | Install plugins and server software
+link             | Link any jar archive path to the plugins directory
+list             | List plugins, categories, servers and server software
+run              | Run installed server software
+status           | View installation status
+uninstall        | Uninstall plugins, server software and files
+update           | Update plugins and software
+---------------------------------------------------------------------------------------
 
 --------------------------------------- Flags -----------------------------------------
-Flag             | Info                             | Usage                            
+Flag             | Info                             | Usage
 ---------------------------------------------------------------------------------------
--a --All         | Select all                       |                                  
--c --Category    | Specify categor(y/ies)           | -s []:all | [categories]         
--C --Command     | Filter by commands               |                                  
--d --Debug       | Debug console output             |                                  
--x --Execute     | Run the command after the flag   |                                  
--e --Error       | Detailed error output            |                                  
--f --Flag        | Filter by flags                  |                                  
--h --Help        | Show command help                |                                  
--I --Installed   | Select installed                 |                                  
--i --Interactive | Enter command prompt mode        |                                  
--n --Normal      | Normal console output            |                                  
--p --Plugin      | Specify plugins(s)               | -p []:all | [plugins]            
--q --Quiet       | Reduced console output           |                                  
--s --Server      | Specify server(s)                | -s []:all | [servers]            
--S --Software    | Specify server software          | -S []:all | [software]           
--v --Verbose     | Detailed console output          |                                  
+-c --command     | Filter by commands               | -c
+-x --execute     | Run the command after the flag   | -x
+-e --error       | Detailed error output            | -e
+-f --flag        | Filter by flags                  | -f
+-h --help        | Show command help                | -h
+-i --interactive | Enter command prompt mode        | -i
+-n --normal      | Normal console output            | -n
+-q --quiet       | Reduced console output           | -q
+-v --verbose     | Detailed console output          | -v
+-y --yes         | Skip confirmation prompts        | -y
+-t --test        | Used for unit tests.             | -t
+---------------------------------------------------------------------------------------
+-A --all         | Select all                       | -A
+-C --category    | Specify categor(y/ies)           | -s []:all | [categories]
+-I --installed   | Select installed                 | -I
+-P --plugin      | Specify plugins(s)               | -p []:all | [plugins]
+-S --server      | Specify server(s)                | -s []:all | [servers]
+-Z --software    | Specify server software          | -S []:all | [software]
+---------------------------------------------------------------------------------------
 ```
 
 ### Dependencies

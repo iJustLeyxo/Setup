@@ -207,15 +207,14 @@ public enum Software implements Installable {
     //= Cosmetics ==
 
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Software.values().length == 0) {
             SYSIO.requested(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software available\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, Software.values().length +
-                " software available", 4, 21, (Object[]) Software.values());
+                " software available", 4, false, (Object[]) Software.values());
     }
 
     public static boolean listSelected() {
@@ -223,7 +222,7 @@ public enum Software implements Installable {
         if (selected.isEmpty()) return false;
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, selected.size() +
-                " software selected", 4, 21, selected.toArray());
+                " software selected", 4, false, selected.toArray());
         return true;
     }
 
@@ -232,20 +231,19 @@ public enum Software implements Installable {
         if (software.isEmpty()) return false;
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, software.size() +
-                " software installed", 4, 21, software.toArray());
+                " software installed", 4, false, software.toArray());
         return true;
     }
 
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Software.installed().isEmpty()) {
             SYSIO.requested(CustomStyle.SOFTWARE.toString() + Code.BOLD + "No software installed\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.SOFTWARE, Software.installed().size() +
-                " software installed", 4, 21, Software.installed().toArray());
+                " software installed", 4, false, Software.installed().toArray());
     }
 
     public static boolean listUnknown() {
@@ -253,7 +251,7 @@ public enum Software implements Installable {
         if (unknown.isEmpty()) return false;
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.UNKNOWN, unknown.size() +
-                " software unknown", 4, 21, unknown.toArray());
+                " software unknown", 4, false, unknown.toArray());
         return true;
     }
 

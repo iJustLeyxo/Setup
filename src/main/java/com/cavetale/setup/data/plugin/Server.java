@@ -36,7 +36,6 @@ public enum Server implements Provider {
     private final @NotNull Category[] categories;
     private final @NotNull Plugin[] plugins;
 
-    // TODO: Custom printing
     private @Nullable Sel sel = null;
     private @Nullable Boolean inst = null;
 
@@ -197,15 +196,14 @@ public enum Server implements Provider {
     //= Cosmetics ==
 
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Server.values().length == 0) {
             SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers available\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.values().length +
-                " server(s) available", 4, 21, (Object[]) Server.values());
+                " server(s) available", 4, false, (Object[]) Server.values());
     }
 
     public static void listSelected() {
@@ -217,19 +215,18 @@ public enum Server implements Provider {
 
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.selected().size() +
-                " server(s) selected", 4, 21, Server.selected().toArray());
+                " server(s) selected", 4, false, Server.selected().toArray());
     }
 
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Server.installed().isEmpty()) {
             SYSIO.requested(CustomStyle.SERVER.toString() + Code.BOLD + "No servers installed\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.SERVER, Server.installed().size() +
-                " server(s) installed", 4, 21, Server.installed().toArray());
+                " server(s) installed", 4, false, Server.installed().toArray());
     }
 
     public static void details() {

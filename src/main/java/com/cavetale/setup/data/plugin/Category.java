@@ -280,15 +280,14 @@ public enum Category implements Provider {
 
     /** List all categories. */
     public static void requestAll() {
-        SYSIO.separate();
-
         if (Category.values().length == 0) {
             SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories available\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.values().length +
-                " categor(y/ies) available", 4, 21, (Object[]) Category.values());
+                " categor(y/ies) available", 4, false, (Object[]) Category.values());
     }
 
     /** List selected categories. */
@@ -301,20 +300,19 @@ public enum Category implements Provider {
 
         SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.selected().size() +
-                " categor(y/ies) selected", 4, 21, Category.selected().toArray());
+                " categor(y/ies) selected", 4, false, Category.selected().toArray());
     }
 
     /** List installed categories. */
     public static void requestInstalled() {
-        SYSIO.separate();
-
         if (Category.installed().isEmpty()) {
             SYSIO.requested(CustomStyle.CATEGORY.toString() + Code.BOLD + "No categories installed\n");
             return;
         }
 
+        SYSIO.separate();
         SYSIO.list(Type.REQUESTED, CustomStyle.CATEGORY, Category.installed().size() +
-                " categor(y/ies) installed", 4, 21, Category.installed().toArray());
+                " categor(y/ies) installed", 4, false, Category.installed().toArray());
     }
 
     /** List categories with additional information. */
