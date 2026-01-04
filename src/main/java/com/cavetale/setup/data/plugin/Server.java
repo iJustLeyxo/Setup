@@ -19,14 +19,28 @@ import static link.l_pf.cmdlib.shell.Shell.STDIO;
  * Servers, used to group plugins by installed server
  */
 public enum Server implements Provider {
-    BUILD("Plugins for build servers", BASE, SURVIVAL, Category.BUILD, Category.HOME),
+    BUILD("Plugins for build servers", BASE, SURVIVAL, Category.BUILD,
+        Category.HOME
+    ),
+
     CLASSIC("Plugins for classic servers", BASE, SURVIVAL, Category.BUILD),
-    CREATIVE("Plugins for creative servers", BASE, Category.CREATIVE, Category.BUILD,
-            Plugin.ENEMY, Plugin.FESTIVAL, Plugin.PICTIONARY, Plugin.RACE, Plugin.RESIDENT),
+
+    CREATIVE("Plugins for creative servers", BASE, Category.CREATIVE,
+        Category.BUILD, Plugin.ENEMY, Plugin.FESTIVAL, Plugin.PICTIONARY,
+        Plugin.RACE, Plugin.RESIDENT
+    ),
+
     EVENT("Plugins for event servers", BASE, Plugin.WORLDS),
-    HUB("Plugins for hub servers", BASE, SURVIVAL, Category.BUILD, Category.HUB,
-            Plugin.STRUCTURE, Plugin.EXTREME_GRASS_GROWING, Plugin.KING_OF_THE_LADDER, Plugin.RED_GREEN_LIGHT),
-    MINE("Plugins for mine servers", BASE, SURVIVAL, Category.BUILD, Category.MINE),
+
+    HUB("Plugins for hub servers", BASE, SURVIVAL, Category.BUILD,
+        Category.HUB, Plugin.STRUCTURE, Plugin.EXTREME_GRASS_GROWING,
+        Plugin.KING_OF_THE_LADDER, Plugin.RED_GREEN_LIGHT
+    ),
+
+    MINE("Plugins for mine servers", BASE, SURVIVAL, Category.BUILD,
+        Category.MINE
+    ),
+
     VOID("Plugins for void servers", BASE);
 
     private final @NotNull String name;

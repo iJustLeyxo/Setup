@@ -21,44 +21,61 @@ import static link.l_pf.cmdlib.shell.Shell.STDIO;
 /** Plugin categories, used to group plugins by purpose or usage. */
 public enum Category implements Provider {
     /** General plugins for all servers. */
-    GLOBAL("Global plugins", A_F_K, ANTI_POPUP, AREA, ARMOR_STAND_EDITOR, AUCTION, BANS, BLOCK_CLIP,
-            BLOCK_TRIGGER, COUNTDOWN, EDITOR, FAM, FLY, Plugin.HOME, HOT_SWAP, INVENTORY, ITEM_STORE,
-            KIT, MAGIC_MAP, MAIL, MEMBER_LIST, MENU, OPEN_INV, PLAYER_INFO, PLUG_INFO, PROTECT,
-            RESOURCE_PACK, RULES, SERVER, SHUTDOWN, SPAWN, SPIKE, STAR_BOOK, STOP_RAIN, STREAMER,
-            TELEVATOR, TICKET, TINFOIL, T_P_A, TUTOR, VOTE, WALL, WARDROBE, WARP, WORLD_EDIT, WORLDS),
+    GLOBAL("Global plugins", A_F_K, ANTI_POPUP, AREA, ARMOR_STAND_EDITOR,
+        AUCTION, BANS, BLOCK_CLIP, BLOCK_TRIGGER, COUNTDOWN, EDITOR, FAM, FLY,
+        Plugin.HOME, HOT_SWAP, INVENTORY, ITEM_STORE, KIT, MAGIC_MAP, MAIL,
+        MEMBER_LIST, MENU, OPEN_INV, PLAYER_INFO, PLUG_INFO, PROTECT, QUEST,
+        RESOURCE_PACK, RULES, SERVER, SHUTDOWN, SPAWN, SPIKE, STAR_BOOK,
+        STOP_RAIN, STREAMER, TELEVATOR, TICKET, TINFOIL, T_P_A, TUTOR, VOTE,
+        WALL, WARDROBE, WARP, WORLD_EDIT, WORLDS
+    ),
 
     /** Plugins for build servers. */
-    BUILD("Plugins for build servers", CHAIR, FREE_HAT, MERCHANT, PHOTOS, RANDOM_PLAYER_HEAD, SIGN_SPY,
-            TOO_MANY_ENTITIES, TREES, WATCHMAN, WIN_TAG),
+    BUILD("Plugins for build servers", CHAIR, FREE_HAT, MERCHANT, PHOTOS,
+        RANDOM_PLAYER_HEAD, SIGN_SPY, TOO_MANY_ENTITIES, TREES, WATCHMAN,
+        WIN_TAG
+    ),
 
     /** Core plugins. */
-    CORE("Essential plugins", CHAT, CONNECT, Plugin.CORE, MONEY, MYTEMS, PERM, PLAYER_CACHE, SIDEBAR,
-            S_Q_L, TITLE, VOID_GENERATOR, WORLD_MARKER),
+    CORE("Essential plugins", CHAT, CONNECT, Plugin.CORE, MONEY, MYTEMS,
+        PERM, PLAYER_CACHE, SIDEBAR, S_Q_L, TITLE, VOID_GENERATOR, WORLD_MARKER
+    ),
 
     /** Plugins for creative servers. */
-    CREATIVE("Plugins for creative servers", Plugin.CREATIVE, FLAT_GENERATOR, VOID_GENERATOR),
+    CREATIVE("Plugins for creative servers", Plugin.CREATIVE,
+        FLAT_GENERATOR, VOID_GENERATOR
+    ),
 
     /** Plugins for home servers. */
     HOME("Plugins for home servers", CULL_MOB),
 
     /** Plugins for hub servers. */
-    HUB("Plugins for hub servers", CHESS, EXTREME_GRASS_GROWING, KING_OF_THE_LADDER, RED_GREEN_LIGHT),
+    HUB("Plugins for hub servers", CHESS, EXTREME_GRASS_GROWING,
+        FREE_FOOD, KING_OF_THE_LADDER, RED_GREEN_LIGHT
+    ),
 
     /** Plugins for mining servers. */
-    MINE("Plugins for mining servers", DUNGEONS),
+    MINE("Plugins for mining servers", DUNGEONS, HIVE),
 
     /** Event plugins. */
-    EVENT("Plugins for events", BINGO, CAPTURE_THE_FLAG, COLORFALL, ENDERBALL, EXTREME_GRASS_GROWING,
-            HIDE_AND_SEEK, KING_OF_THE_LADDER, MOB_ARENA, OVERBOARD, PICTIONARY, P_V_P_ARENA, QUIDDITCH, RACE, RED_GREEN_LIGHT,
-            SPLEEF, SURVIVAL_GAMES, TETRIS, VERTIGO, WINDICATOR),
+    EVENT("Plugins for events", BINGO, BUILD_MY_THING, CAPTURE_THE_FLAG,
+        COLORFALL, ENDER_BALL, ENDER_GOLF, EXTREME_GRASS_GROWING, HIDE_AND_SEEK,
+        KING_OF_THE_LADDER, MOB_ARENA, OVERBOARD, PICTIONARY, P_V_P_ARENA,
+        QUIDDITCH, RACE, RED_GREEN_LIGHT, SPLEEF, SURVIVAL_GAMES, TETRIS,
+        VERTIGO, WINDICATOR
+    ),
 
     /** Seasonal plugins. */
-    SEASONAL("Plugins for seasonal events", EASTER, FESTIVAL, MAYPOLE, X_MAS),
+    SEASONAL("Plugins for seasonal events", EASTER, FESTIVAL, MAYPOLE,
+        BAR_CRAWL, X_MAS
+    ),
 
     /** Plugins for survival servers. */
-    SURVIVAL("Plugins for survival servers", DUSK, ELECTION, ENEMY, EXPLOITS, FAST_LEAF_DECAY,
-            GOLDEN_TICKET, HOPPER_FILTER, KEEP_INVENTORY, MASS_STORAGE, POCKET_MOB, POSTER, RESIDENT,
-            RESOURCE, SHOP, SKILLS, STRUCTURE),
+    SURVIVAL("Plugins for survival servers", DUSK, ELECTION, ENEMY,
+        EXPLOITS, FAST_LEAF_DECAY, GOLDEN_TICKET, HOPPER_FILTER, KEEP_INVENTORY,
+        MASS_STORAGE, POCKET_MOB, POSTER, RESIDENT, RESOURCE, SHOP, SKILLS,
+        STRUCTURE
+    ),
 
     /** Utility plugins. */
     UTIL("Optional utility plugins", MAP_LOAD, MINIVERSE, PROTOCOL_LIB),

@@ -20,7 +20,7 @@ import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
 /** Server software, used to register downloadable server software. */
 public enum Software implements Installable {
-    PAPER(new Source("https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/121/downloads/paper-1.21.4-121.jar", "1.21.4-122"), "PaperMC"); // TODO: Download newest version using Paper API
+    PAPER(new Source("https://fill-data.papermc.io/v1/objects/d297b7380966f6ba53f7827d7615e8af337e968bb9f3835d05bb523f3a3f4730/paper-1.21.11-76.jar", "1.21.11-76"), "PAPR", "PaperMC"); // TODO: Download newest version using Paper API
 
     private final @NotNull String[] refs;
     private final @NotNull Source source;
