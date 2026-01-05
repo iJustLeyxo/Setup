@@ -4,126 +4,137 @@ import com.cavetale.setup.data.Installable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** Jenkins download metadata. Used for temporary storage and modification of said data. */
-public final class Jenkins {
-    /** Default Jenkins server address. */
-    public static final @NotNull String DEFAULT_SERVER = "cavetale.com/jenkins/";
+public record Jenkins(
+        @Nullable String server,
+        @Nullable String job,
+        @Nullable String group,
+        @Nullable String groupParent,
+        @Nullable String groupArtifact,
+        @Nullable String artifact,
+        @Nullable String version
+) {
+    private static final @NotNull String DEFAULT_SERVER = "cavetale.com/jenkins/";
+    private static final @NotNull String DEFAULT_PARENT = "com.cavetale";
+    private static final @NotNull String DEFAULT_VERSION = "0.1-SNAPSHOT";
 
-    /** Default Maven group id parent (not the full group id, only the consistent part). */
-    public static final @NotNull String DEFAULT_PARENT = "com.cavetale";
-
-    /** Default maven artifact version. */
-    public static final @NotNull String DEFAULT_VERSION = "0.1-SNAPSHOT";
-
-    /** The installable metadata. */
-    private final @NotNull Installable installable;
-
-    /** The Jenkins download reference metadata. */
-    private @NotNull String server, job, group, artifact, version;
-
-    /**
-     * Creates a new Jenkins default download metadata.
-     * @param installable The installable to create the metadata from.
-     */
-    public Jenkins(@NotNull Installable installable) {
-        this(installable, null);
+    private Jenkins() {
+        this(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
-    /**
-     * Creates a new Jenkins default download metadata.
-     * @param installable The installable to create the metadata from.
-     * @param mod The modification to apply to the metadata.
-     */
-    public Jenkins(@NotNull Installable installable, @Nullable Mod mod) {
-        this.installable = installable;
-
-        this.server = DEFAULT_SERVER;
-        this.job = installable.displayName();
-        this.group = DEFAULT_PARENT + "." + installable.displayName().toLowerCase();
-        this.artifact = installable.displayName().toLowerCase();
-        this.version = DEFAULT_VERSION;
-
-        if (mod != null) mod.modify(this);
+    /** Create a new jenkins modification. */
+    public static @NotNull Jenkins jenkins() {
+        return new Jenkins();
     }
 
-    /**
-     * Converts the Jenkins metadata to a download source, which is then further used for download handling.
-     * @return The download source.
-     */
-    public @NotNull Source toSource() {
-        return new Source(Link.of(
-                "https://" + this.server + "job/" + this.job + "/lastSuccessfulBuild/" + this.group + "$" + this.artifact + "/artifact/" + this.group + "/" + this.artifact + "/" + this.version + "/" + this.artifact + "-" + this.version + ".jar"
-        ), this.version);
+    /** Modify the Jenkins parent. */
+    public @NotNull Jenkins parent(@NotNull String parent) {
+        if (group != null || groupParent != null)
+            throw new IllegalStateException("Jenkins parent was already modified");
+
+        return new Jenkins(
+                server,
+                job,
+                null,
+                parent,
+                groupArtifact,
+                artifact,
+                version
+        );
     }
 
-    /** Jenkins metadata modification information. */
-    public interface Mod {
-        /**
-         * Modifies the provided Jenkins metadata.
-         * @param jenkins The Jenkins metadata to modify.
-         */
-        void modify(@NotNull Jenkins jenkins);
+    /** Modify the Jenkins version. */
+    public @NotNull Jenkins version(@NotNull String version) {
+        if (this.version != null)
+            throw new IllegalStateException("Jenkins version was already modified");
 
-        /**
-         * Modifies the artifact group id parent.
-         * @param parent The new parent to set.
-         */
-        record Parent(@NotNull String parent) implements Mod {
-            @Override
-            public void modify(@NotNull Jenkins jenkins) {
-                jenkins.group = this.parent() + "." + jenkins.installable.displayName().toLowerCase();
-            }
-        }
+        return new Jenkins(
+                server,
+                job,
+                group,
+                groupParent,
+                groupArtifact,
+                artifact,
+                version
+        );
+    }
 
-        /**
-         * Modifies the artifact version.
-         * @param version The new version to set.
-         */
-        record Version(@NotNull String version) implements Mod {
-            @Override
-            public void modify(@NotNull Jenkins jenkins) {
-                jenkins.version = this.version();
-            }
-        }
+    /** Modify the Jenkins group. */
+    public @NotNull Jenkins group(@NotNull String group) {
+        if (this.group != null || groupParent != null)
+            throw new IllegalStateException("Jenkins group was already modified");
 
-        /**
-         * Modifies the artifact parent and version.
-         * @param parent The new parent to set.
-         * @param version The new version to set.
-         */
-        record ParentVersion(@NotNull String parent, @NotNull String version) implements Mod {
-            @Override
-            public void modify(@NotNull Jenkins jenkins) {
-                jenkins.group = this.parent() + "." + jenkins.installable.displayName().toLowerCase();
-                jenkins.version = this.version();
-            }
-        }
+        return new Jenkins(
+                server,
+                job,
+                group,
+                null,
+                null,
+                artifact,
+                version
+        );
+    }
 
-        /**
-         * Modifies the Jenkins job and artifact id.
-         * @param ref The new reference to set.
-         */
-        record Artifact(@NotNull String ref) implements Mod {
-            @Override
-            public void modify(@NotNull Jenkins jenkins) {
-                jenkins.group = DEFAULT_PARENT + "." + this.ref();
-                jenkins.artifact = this.ref();
-            }
-        }
+    /** Modify the Jenkins artifact. */
+    public @NotNull Jenkins artifact(@NotNull String artifact) {
+        if (groupArtifact != null || this.artifact != null)
+            throw new IllegalStateException("Jenkins artifact was already modified");
 
-        /**
-         * Modifies the artifact id and the group id.
-         * @param group The new group id to set.
-         * @param artifact The new artifact id to set.
-         */
-        record GroupArtifact(@NotNull String group, @NotNull String artifact) implements Mod {
-            @Override
-            public void modify(@NotNull Jenkins jenkins) {
-                jenkins.group = this.group();
-                jenkins.artifact = this.artifact();
-            }
-        }
+        return new Jenkins(
+                server,
+                job,
+                group,
+                groupParent,
+                group == null ? artifact : null,
+                artifact,
+                version
+        );
+    }
 
-        // TODO: Find a better way of applying individual modifications instead of merging them to the required combinations.
+    /*
+     * Finalization:
+     * Combine the requested modifications with default settings and
+     * settings of the installable.
+     */
+
+    private record Final(
+            @NotNull String server,
+            @NotNull String job,
+            @NotNull String group,
+            @NotNull String artifact,
+            @NotNull String version
+    ) {
+    }
+
+    private @NotNull Final finalize(@NotNull Installable installable) {
+        return new Final(
+                server == null ? DEFAULT_SERVER : server,
+                job == null ? installable.displayName() : job,
+                group == null ? // Group info is compacted
+                        (groupParent == null ? DEFAULT_PARENT : groupParent) + "." +
+                                (groupArtifact == null ? installable.displayName().toLowerCase() : groupArtifact) :
+                        group,
+                artifact == null ? installable.displayName().toLowerCase() : artifact,
+                version == null ? DEFAULT_VERSION : version
+        );
+    }
+
+    /** Convert the Jenkins modifications to a download source. */
+    public @NotNull Source source(@NotNull Installable installable) {
+        Final fin = finalize(installable);
+
+        return Source.link(
+                "https://" + fin.server + "job/" + fin.job + "/lastSuccessfulBuild/" +
+                        fin.group + "$" + fin.artifact + "/artifact/" +
+                        fin.group + "/" + fin.artifact + "/" + fin.version + "/" +
+                        fin.artifact + "-" + fin.version + ".jar",
+                fin.version);
     }
 }

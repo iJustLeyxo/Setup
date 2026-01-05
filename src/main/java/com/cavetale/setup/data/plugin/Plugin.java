@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.cavetale.setup.download.Jenkins.Mod.*;
+import static com.cavetale.setup.download.Jenkins.jenkins;
 import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
 import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
@@ -26,13 +26,13 @@ import static link.l_pf.cmdlib.shell.Shell.STDIO;
  */
 public enum Plugin implements Provider, Installable {
     ADVENTURE, // TODO: Status?
-    ADVICE_ANIMALS(new Parent("com.winthier")), // TODO: Status?
+    ADVICE_ANIMALS(jenkins().parent("com.winthier")), // TODO: Status?
     A_F_K,
-    ANTI_POPUP(new Source("https://github.com/KaspianDev/AntiPopup/releases/download/38def2a/AntiPopup-12.3.jar", "12.3")),
+    ANTI_POPUP(Source.link("https://github.com/KaspianDev/AntiPopup/releases/download/38def2a/AntiPopup-12.3.jar", "12.3")),
     AREA,
-    ARMOR_STAND_EDITOR(new ParentVersion("io.github.rypofalem", "1.17-25")),
+    ARMOR_STAND_EDITOR(jenkins().parent("io.github.rypofalem").version("1.17-25")),
     AUCTION,
-    BANS(new Parent("com.winthier")),
+    BANS(jenkins().parent("com.winthier")),
     BAR_CRAWL,
     BINGO,
     BLOCK_CLIP,
@@ -41,31 +41,31 @@ public enum Plugin implements Provider, Installable {
     CAPTURE_THE_FLAG,
     CAVES,
     CHAIR,
-    CHAT(new Parent("com.winthier")),
+    CHAT(jenkins().parent("com.winthier")),
     CHESS,
     CHRISTMAS, // TODO: Status?
-    COLORFALL(new Parent("io.github.feydk")),
-    CONNECT(new Parent("com.winthier")),
+    COLORFALL(jenkins().parent("io.github.feydk")),
+    CONNECT(jenkins().parent("com.winthier")),
     // TODO: ConnectCore Status?
     CORE,
-    COUNTDOWN(new ParentVersion("com.winthier", "0.1")),
+    COUNTDOWN(jenkins().parent("com.winthier").version("0.1")),
     @Deprecated
-    CRAFT_BAY(new ParentVersion("com.winthier", "2.26-SNAPSHOT")), // TODO: Status?
-    CREATIVE(new Parent("com.winthier")),
+    CRAFT_BAY(jenkins().parent("com.winthier").version("2.26-SNAPSHOT")), // TODO: Status?
+    CREATIVE(jenkins().parent("com.winthier")),
     CULL_MOB,
-    DECORATOR(new Parent("com.winthier")),
+    DECORATOR(jenkins().parent("com.winthier")),
     DUNGEONS,
-    DUSK(new ParentVersion("com.winthier", "0.1")),
+    DUSK(jenkins().parent("com.winthier").version("0.1")),
     EASTER,
     EDITOR,
     ELECTION,
     ENDER_BALL,
     ENDER_GOLF,
     ENEMY,
-    EXPLOITS(new Parent("com.winthier")),
+    EXPLOITS(jenkins().parent("com.winthier")),
     EXTREME_GRASS_GROWING("EGG"),
     FAM,
-    FAST_LEAF_DECAY(new Version("1.0-SNAPSHOT")),
+    FAST_LEAF_DECAY(jenkins().version("1.0-SNAPSHOT")),
     FESTIVAL,
     FLAT_GENERATOR,
     FLY,
@@ -77,23 +77,23 @@ public enum Plugin implements Provider, Installable {
     HIDE_AND_SEEK,
     HIVE,
     HOME,
-    HOPPER_FILTER(new Parent("com.winthier")),
+    HOPPER_FILTER(jenkins().parent("com.winthier")),
     HOT_SWAP,
     INVENTORY,
     @Deprecated
     INVISIBLE_ITEM_FRAMES,
-    ITEM_STORE(new Parent("com.winthier")),
-    KEEP_INVENTORY(new Parent("com.winthier")),
-    KING_OF_THE_LADDER(new Artifact("kotl"), "KOTL"),
+    ITEM_STORE(jenkins().parent("com.winthier")),
+    KEEP_INVENTORY(jenkins().parent("com.winthier")),
+    KING_OF_THE_LADDER(jenkins().artifact("kotl"), "KOTL"),
     // TODO: KingOfTheRing Status?
-    KIT(new ParentVersion("com.winthier", "0.1")),
+    KIT(jenkins().parent("com.winthier").version("0.1")),
     @Deprecated
-    LINK_PORTAL(new Parent("com.winthier")),
+    LINK_PORTAL(jenkins().parent("com.winthier")),
     MAGIC_MAP,
-    MAIL(new Parent("com.winthier")),
+    MAIL(jenkins().parent("com.winthier")),
     MAP_LOAD,
     MASS_STORAGE,
-    MAYPOLE(new ParentVersion("com.winthier", "0.1")),
+    MAYPOLE(jenkins().parent("com.winthier").version("0.1")),
     MEMBER_LIST,
     MENU,
     MERCHANT,
@@ -101,71 +101,71 @@ public enum Plugin implements Provider, Installable {
     MOB_ARENA,
     MONEY,
     MYTEMS,
-    OPEN_INV(new Source("https://github.com/Jikoo/OpenInv/releases/download/5.2.0/OpenInv.jar", "5.2.0")),
+    OPEN_INV(Source.link("https://github.com/Jikoo/OpenInv/releases/download/5.2.0/OpenInv.jar", "5.2.0")),
     OVERBOARD,
-    PERM(new Parent("com.winthier")),
-    PHOTOS(new Parent("com.winthier")),
+    PERM(jenkins().parent("com.winthier")),
+    PHOTOS(jenkins().parent("com.winthier")),
     PICTIONARY("CavePaint"),
-    PLAYER_CACHE(new Parent("com.winthier")),
-    PLAYER_INFO(new Parent("com.winthier")),
+    PLAYER_CACHE(jenkins().parent("com.winthier")),
+    PLAYER_INFO(jenkins().parent("com.winthier")),
     PLUG_INFO,
     POCKET_MOB,
     POSTER,
-    PROTECT(new Parent("com.winthier")),
-    PROTOCOL_LIB(new Source("https://github.com/dmulloy2/ProtocolLib/releases/download/5.4.0/ProtocolLib.jar", "5.4.0")),
+    PROTECT(jenkins().parent("com.winthier")),
+    PROTOCOL_LIB(Source.link("https://github.com/dmulloy2/ProtocolLib/releases/download/5.4.0/ProtocolLib.jar", "5.4.0")),
     P_V_P_ARENA,
     QUEST,
     QUIDDITCH,
     @Deprecated
-    QUIZ(new Parent("com.winthier")),
+    QUIZ(jenkins().parent("com.winthier")),
     RACE,
     @Deprecated
     RAID,
-    RANDOM_PLAYER_HEAD(new GroupArtifact("com.winthier.rph", "random-player-head"), "RPH"),
+    RANDOM_PLAYER_HEAD(jenkins().group("com.winthier.rph").artifact("random-player-head"), "RPH"),
     RED_GREEN_LIGHT("RedLightGreenLight", "RGL", "RLGL"),
     RESIDENT,
-    RESOURCE(new ParentVersion("com.winthier", "0.1")),
+    RESOURCE(jenkins().parent("com.winthier").version("0.1")),
     RESOURCE_PACK,
-    RULES(new Parent("com.winthier")),
+    RULES(jenkins().parent("com.winthier")),
     SERVER,
     @Deprecated
     SERVER_STATUS,
-    SHOP(new Parent("com.winthier")),
-    SHUTDOWN(new Parent("com.winthier")),
+    SHOP(jenkins().parent("com.winthier")),
+    SHUTDOWN(jenkins().parent("com.winthier")),
     SIDEBAR,
     SIGN_SPY,
     SKILLS,
     SKYBLOCK,
-    SPAWN(new Parent("com.winthier")),
+    SPAWN(jenkins().parent("com.winthier")),
     SPIKE,
-    SPLEEF(new Parent("com.winthier")),
-    S_Q_L(new Parent("com.winthier")),
-    STAR_BOOK(new Parent("com.winthier")),
-    STOP_RAIN(new Parent("com.winthier")),
+    SPLEEF(jenkins().parent("com.winthier")),
+    S_Q_L(jenkins().parent("com.winthier")),
+    STAR_BOOK(jenkins().parent("com.winthier")),
+    STOP_RAIN(jenkins().parent("com.winthier")),
     STREAMER,
     STRUCTURE,
     SURVIVAL_GAMES,
     TELEVATOR,
     TETRIS,
-    TICKET(new Parent("com.winthier")),
-    TINFOIL(new ParentVersion("com.winthier", "0.1")),
-    TITLE(new Parent("com.winthier")),
-    TOO_MANY_ENTITIES(new ParentVersion("com.winthier", "0.1")),
+    TICKET(jenkins().parent("com.winthier")),
+    TINFOIL(jenkins().parent("com.winthier").version("0.1")),
+    TITLE(jenkins().parent("com.winthier")),
+    TOO_MANY_ENTITIES(jenkins().parent("com.winthier").version("0.1")),
     T_P_A,
     TREES,
     TUTOR,
-    VERTIGO(new Parent("io.github.feydk")),
+    VERTIGO(jenkins().parent("io.github.feydk")),
     VOID_GENERATOR,
     VOTE,
-    WALL(new Parent("com.winthier")),
+    WALL(jenkins().parent("com.winthier")),
     WARDROBE,
     WARP,
     WATCHMAN,
     WINDICATOR,
     WIN_TAG,
-    WORLD_EDIT(new Source("https://mediafilez.forgecdn.net/files/7372/36/worldedit-bukkit-7.3.18.jar", "7.3.18")),
+    WORLD_EDIT(Source.link("https://mediafilez.forgecdn.net/files/7372/36/worldedit-bukkit-7.3.18.jar", "7.3.18")),
     WORLD_MARKER,
-    WORLDS(new Parent("com.winthier")),
+    WORLDS(jenkins().parent("com.winthier")),
     X_MAS;
 
     /** Plugin references. */
@@ -194,22 +194,22 @@ public enum Plugin implements Provider, Installable {
         this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
-        this.source = new Jenkins(this).toSource();
+        this.source = jenkins().source(this);
         this.plugins = new Plugin[]{this};
     }
 
     /**
      * Creates a new plugin.
-     * @param mod The jenkins source modifications.
+     * @param jenkins Jenkins modifications.
      * @param aliases The plugin aliases.
      */
-    Plugin(@NotNull Jenkins.Mod mod, @NotNull String @NotNull ... aliases) {
+    Plugin(@NotNull Jenkins jenkins, @NotNull String @NotNull ... aliases) {
         // Gather and format all references
         this.refs = new String[aliases.length + 1];
         this.refs[0] = Util.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
-        this.source = new Jenkins(this, mod).toSource();
+        this.source = jenkins.source(this);
         this.plugins = new Plugin[]{this};
     }
 
