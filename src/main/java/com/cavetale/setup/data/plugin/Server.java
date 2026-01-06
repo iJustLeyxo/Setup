@@ -8,7 +8,10 @@ import com.cavetale.setup.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import static com.cavetale.setup.data.plugin.Category.BASE;
 import static com.cavetale.setup.data.plugin.Category.SURVIVAL;

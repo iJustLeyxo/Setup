@@ -1,15 +1,12 @@
 package com.cavetale.setup.data.plugin;
 
 import com.cavetale.setup.console.CustomFlag;
-import com.cavetale.setup.console.CustomStyle;
 import com.cavetale.setup.console.container.CategoryContents;
 import com.cavetale.setup.data.Sel;
 import com.cavetale.setup.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
