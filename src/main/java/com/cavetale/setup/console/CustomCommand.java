@@ -25,7 +25,7 @@ import static link.l_pf.cmdlib.shell.Shell.STDIO;
 /** Custom console commands. */
 public enum CustomCommand implements Command {
     /** Compares installed and selected software. */
-    COMPARE("Compare software", "-P | -C | -S | -Z", "VERIFY", "CHECK"){
+    COMPARE("Compare software", "-PCSZIA", "VERIFY", "CHECK"){
         @Override
         public void onRun(@NotNull Parser.Result result) {
             boolean out = false;
@@ -119,7 +119,7 @@ public enum CustomCommand implements Command {
     },
 
     /** Finds anything */
-    FIND("Find anything", "-c | -f | -P | -C | -S | -Z", "Search") {
+    FIND("Find anything", "-cfPCSZIA", "Search") {
         private static final double MIN_SIMILARITY = 0.33;
 
         @Override
@@ -206,7 +206,7 @@ public enum CustomCommand implements Command {
     },
 
     /** Installs plugins and server software */
-    INSTALL("Install software", "-P | -C | -S | -Z", "ADD") {
+    INSTALL("Install software", "-PCSZIA", "ADD") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
@@ -272,7 +272,7 @@ public enum CustomCommand implements Command {
     },
 
     /** Lists plugins, categories, servers and server software. */
-    LIST("List software", "-P | -C | -S | -Z", "SHOW", "RESOLVE") {
+    LIST("List software", "-PCSZIA", "SHOW", "RESOLVE") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             if (CustomFlag.INSTALLED.isSelected()) {
@@ -395,7 +395,7 @@ public enum CustomCommand implements Command {
     },
 
     /** Uninstalls plugins, server software and other files. */
-    UNINSTALL("Uninstall software", "-P | -C | -S | -Z", "Remove", "Delete") {
+    UNINSTALL("Uninstall software", "-PCSZIA", "Remove", "Delete") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
@@ -414,7 +414,7 @@ public enum CustomCommand implements Command {
     },
 
     /** Updates plugins and server software. */
-    UPDATE("Update software", "-P | -C | -S | -Z", "Upgrade") {
+    UPDATE("Update software", "-PCSZIA", "Upgrade") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
