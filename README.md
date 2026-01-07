@@ -19,16 +19,16 @@ exit             | Exit interactive mode   |
 help             | Show usage help         |
 test             | For unit testing        |
 ---------------------------------------------------------------------
-compare          | Compare software
-eula             | Agree to the EULA
-find             | Find anything
-install          | Install software
-link             | Link jar as plugin
-list             | List software
-run              | Run server
-status           | Installation status
-uninstall        | Uninstall software
-update           | Update software
+compare          | Compare software        | -PCSZIA
+eula             | Agree to the EULA       |
+find             | Find anything           | -cfPCSZIA
+install          | Install software        | -PCSZIA
+link             | Link jar as plugin      | [path]:files
+list             | List software           | -PCSZIA
+run              | Run server              | :only | -Z
+status           | Installation status     |
+uninstall        | Uninstall software      | -PCSZIA
+update           | Update software         | -PCSZIA
 ---------------------------------------------------------------------
 
 ------------------------------- Flags -------------------------------
