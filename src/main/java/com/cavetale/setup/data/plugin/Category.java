@@ -300,7 +300,7 @@ public enum Category implements Provider {
         }
 
         STDIO.list(CATEGORY, Category.values().length +
-                " categor(y/ies) available", (Object) Category.values());
+                " categor(y/ies) available", (Object[]) Category.values());
     }
 
     /** List selected categories. */
