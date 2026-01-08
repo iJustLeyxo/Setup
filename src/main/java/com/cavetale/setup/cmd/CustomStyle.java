@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static link.l_pf.cmdlib.shell.Code.Std.*;
 
-/** Custom console output styles. */
+/** Custom output styles. */
 public enum CustomStyle implements Style {
     SELECT(LIGHT_BLUE_FG),
     COMMAND(LIGHT_CYAN_FG),
@@ -23,13 +23,10 @@ public enum CustomStyle implements Style {
     SERVER(LIGHT_MAGENTA_FG),
     SOFTWARE(LIGHT_YELLOW_FG);
 
-    /** Escape code string */
+    // Package as per library specifications
+
     public final @NotNull String code;
 
-    /**
-     * Creates a new console output style.
-     * @param codes The escape codes.
-     */
     CustomStyle(@NotNull Code @NotNull ... codes) {
         StringBuilder s = new StringBuilder();
         for (Code c : codes) {

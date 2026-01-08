@@ -21,10 +21,9 @@ import java.util.Map;
 import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
 import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
-/** Custom console commands. */
+/** Custom commands. */
 public enum CustomCommand implements Command {
-    /** Compares installed and selected software. */
-    COMPARE("Compare software", "-PCSZIA", "VERIFY", "CHECK"){
+    COMPARE("Compare selected", "-PCSZIA", "VERIFY", "CHECK"){
         @Override
         public void onRun(@NotNull Parser.Result result) {
             boolean out = false;
@@ -75,7 +74,6 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Accepts the Minecraft EULA. */
     EULA("Agree to the EULA", "") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -117,8 +115,7 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Finds anything */
-    FIND("Find anything", "-cfPCSZIA", "Search") {
+    FIND("Find anything", "[string]", "Search") {
         private static final double MIN_SIMILARITY = 0.33;
 
         @Override
@@ -247,8 +244,7 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Installs plugins and server software */
-    INSTALL("Install software", "-PCSZIA", "ADD") {
+    INSTALL("Install selected", "-PCSZIA", "ADD") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
@@ -265,7 +261,6 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Links any jar archive to the plugin directory. */
     LINK("Link jar as plugin", "[path]:files") {
         @Override
         public @NotNull Contents<?> init() {
@@ -313,8 +308,7 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Lists plugins, categories, servers and server software. */
-    LIST("List software", "-PCSZIA", "SHOW", "RESOLVE") {
+    LIST("List selected", "-PCSZIA", "SHOW", "RESOLVE") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             if (CustomFlag.INSTALLED.isSelected()) {
@@ -366,7 +360,6 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Runs the installed server software. */
     RUN("Run server", ":only | -Z") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -420,7 +413,6 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Prints installation status. */
     STATUS("Installation status", "", "STATE", "INFO") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
@@ -436,8 +428,7 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Uninstalls plugins, server software and other files. */
-    UNINSTALL("Uninstall software", "-PCSZIA", "Remove", "Delete") {
+    UNINSTALL("Uninstall selected", "-PCSZIA", "Remove", "Delete") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
@@ -455,8 +446,7 @@ public enum CustomCommand implements Command {
         }
     },
 
-    /** Updates plugins and server software. */
-    UPDATE("Update software", "-PCSZIA", "Upgrade") {
+    UPDATE("Update selected", ":-I | -PCSZA", "Upgrade") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
@@ -478,14 +468,10 @@ public enum CustomCommand implements Command {
         }
     };
 
-    /** Command data container, for each command. */
+    // Package data into container from lib
+
     private final @NotNull Data data;
 
-    /**
-     * Creates a new command.
-     * @param info The description of the command.
-     * @param refs All other references of the command.
-     */
     CustomCommand(@NotNull String info, @NotNull String usage, @NotNull String @NotNull ... refs) {
         this.data = new Data(this, this.name(), info, usage, refs);
     }
