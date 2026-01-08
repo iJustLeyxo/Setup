@@ -1,11 +1,11 @@
 package com.cavetale.setup;
 
-import com.cavetale.setup.console.CustomCommand;
-import com.cavetale.setup.console.CustomFlag;
-import com.cavetale.setup.data.plugin.Category;
-import com.cavetale.setup.data.plugin.Plugin;
-import com.cavetale.setup.data.plugin.Server;
-import com.cavetale.setup.data.server.Software;
+import com.cavetale.setup.cmd.CustomCommand;
+import com.cavetale.setup.cmd.CustomFlag;
+import com.cavetale.setup.data.PluginCategory;
+import com.cavetale.setup.data.Plugin;
+import com.cavetale.setup.data.PluginServer;
+import com.cavetale.setup.data.ServerSoftware;
 import link.l_pf.cmdlib.app.App;
 import link.l_pf.cmdlib.app.event.type.PreCmdEvent;
 import org.jetbrains.annotations.NotNull;
@@ -32,9 +32,9 @@ public final class Setup {
      * @param e The event to reset on.
      */
     private static void reset(@NotNull PreCmdEvent e) {
-        Category.reset();
+        PluginCategory.reset();
         Plugin.reset();
-        Server.reset();
-        Software.reset();
+        PluginServer.reset();
+        ServerSoftware.reset();
     }
 }

@@ -1,14 +1,10 @@
-package com.cavetale.setup.data.plugin;
+package com.cavetale.setup.data;
 
-import com.cavetale.setup.console.CustomFlag;
-import com.cavetale.setup.console.CustomStyle;
-import com.cavetale.setup.console.container.PluginContents;
-import com.cavetale.setup.data.DataException;
-import com.cavetale.setup.data.Installable;
-import com.cavetale.setup.data.Sel;
+import com.cavetale.setup.cmd.CustomFlag;
+import com.cavetale.setup.cmd.CustomStyle;
+import com.cavetale.setup.cmd.PluginContents;
 import com.cavetale.setup.download.Jenkins;
 import com.cavetale.setup.download.Source;
-import com.cavetale.setup.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +20,7 @@ import static link.l_pf.cmdlib.shell.Shell.STDIO;
 /**
  * List of available plugins
  */
-public enum Plugin implements Provider, Installable {
+public enum Plugin implements Provider, Installable, Data {
     ADVENTURE, // TODO: Status?
     ADVICE_ANIMALS(jenkins().parent("com.winthier")), // TODO: Status?
     A_F_K,
@@ -191,7 +187,7 @@ public enum Plugin implements Provider, Installable {
     Plugin(@NotNull String @NotNull ... aliases) {
         // Gather and format all references
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = Util.capsToCamel(this.name());
+        this.refs[0] = Data.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
         this.source = jenkins().source(this);
@@ -206,7 +202,7 @@ public enum Plugin implements Provider, Installable {
     Plugin(@NotNull Jenkins jenkins, @NotNull String @NotNull ... aliases) {
         // Gather and format all references
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = Util.capsToCamel(this.name());
+        this.refs[0] = Data.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
         this.source = jenkins.source(this);
@@ -221,7 +217,7 @@ public enum Plugin implements Provider, Installable {
     Plugin(@NotNull Source source, @NotNull String @NotNull ... aliases) {
         // Gather and format all references
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = Util.capsToCamel(this.name());
+        this.refs[0] = Data.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
         this.source = source;
@@ -373,9 +369,9 @@ public enum Plugin implements Provider, Installable {
             STDIO.debug("Selecting plugins ", plugins.contents());
             for (Plugin p : plugins.contents()) p.target(); // Select by plugin
 
-            for (Category c : Category.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.select(); // Select by category
+            for (PluginCategory c : PluginCategory.values()) if (c.isSelected()) for (Plugin p : c.plugins()) p.select(); // Select by category
 
-            for (Server s : Server.values()) if (s.isSelected()) for (Plugin p : s.plugins()) p.select(); // Select by server
+            for (PluginServer s : PluginServer.values()) if (s.isSelected()) for (Plugin p : s.plugins()) p.select(); // Select by server
         }
 
         for (Plugin p : Plugin.values()) if (p.isSelected()) Plugin.selected.add(p); // Update selection

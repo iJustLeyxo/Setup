@@ -1,10 +1,9 @@
-package com.cavetale.setup.console;
+package com.cavetale.setup.cmd;
 
-import com.cavetale.setup.data.plugin.Category;
-import com.cavetale.setup.data.plugin.Plugin;
-import com.cavetale.setup.data.plugin.Server;
-import com.cavetale.setup.data.server.Software;
-import com.cavetale.setup.util.Util;
+import com.cavetale.setup.data.PluginCategory;
+import com.cavetale.setup.data.Plugin;
+import com.cavetale.setup.data.PluginServer;
+import com.cavetale.setup.data.ServerSoftware;
 import link.l_pf.cmdlib.app.Command;
 import link.l_pf.cmdlib.app.Flag;
 import link.l_pf.cmdlib.app.Parser;
@@ -50,20 +49,20 @@ public enum CustomCommand implements Command {
                 }
             }
 
-            if (Software.listSelected()) {
+            if (ServerSoftware.listSelected()) {
                 out = true;
 
-                List<Software> selected = Software.get(true, true);
+                List<ServerSoftware> selected = ServerSoftware.get(true, true);
                 if (!selected.isEmpty()) {
                     STDIO.list(CustomStyle.INSTALL, selected.size() +
                             " software installed", selected.toArray());
                 }
-                selected = Software.get(true, false);
+                selected = ServerSoftware.get(true, false);
                 if (!selected.isEmpty()) {
                     STDIO.list(CustomStyle.SUPERFLUOUS, selected.size() +
                             " software superfluous", selected.toArray());
                 }
-                selected = Software.get(false, true);
+                selected = ServerSoftware.get(false, true);
                 if (!selected.isEmpty()) {
                     STDIO.list(CustomStyle.MISSING, selected.size() +
                             " software missing", selected.toArray());
@@ -149,7 +148,7 @@ public enum CustomCommand implements Command {
 
             for (CustomCommand command : CustomCommand.values()) {
                 double similarity = 0;
-                for (String ref : command.references()) similarity = Math.max(Util.similarity(arg, ref.toLowerCase()), similarity);
+                for (String ref : command.references()) similarity = Math.max(similarity(arg, ref.toLowerCase()), similarity);
                 commands.put(command, similarity);
             }
 
@@ -161,7 +160,7 @@ public enum CustomCommand implements Command {
 
         private boolean flags(@NotNull String arg) {
             HashMap<CustomFlag, Double> flags = new HashMap<>();
-            for (CustomFlag flag : CustomFlag.values()) flags.put(flag, Util.similarity(arg, flag.reference()));
+            for (CustomFlag flag : CustomFlag.values()) flags.put(flag, similarity(arg, flag.reference()));
             List<CustomFlag> result = flags.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             STDIO.list(CustomStyle.FLAG, "Flags", result.toArray());
@@ -170,7 +169,7 @@ public enum CustomCommand implements Command {
 
         private boolean plugins(@NotNull String arg) {
             HashMap<Plugin, Double> plugins = new HashMap<>();
-            for (Plugin plugin : Plugin.values()) plugins.put(plugin, Util.similarity(arg, plugin.displayName().toLowerCase()));
+            for (Plugin plugin : Plugin.values()) plugins.put(plugin, similarity(arg, plugin.displayName().toLowerCase()));
             List<Plugin> result = plugins.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             STDIO.list(CustomStyle.PLUGIN, "Plugins", result.toArray());
@@ -178,30 +177,73 @@ public enum CustomCommand implements Command {
         }
 
         private boolean categories(@NotNull String arg) {
-            HashMap<Category, Double> categories = new HashMap<>();
-            for (Category category : Category.values()) categories.put(category, Util.similarity(arg, category.displayName().toLowerCase()));
-            List<Category> result = categories.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
+            HashMap<PluginCategory, Double> categories = new HashMap<>();
+            for (PluginCategory category : PluginCategory.values()) categories.put(category, similarity(arg, category.displayName().toLowerCase()));
+            List<PluginCategory> result = categories.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             STDIO.list(CustomStyle.CATEGORY, "Categories", result.toArray());
             return true;
         }
 
         private boolean servers(@NotNull String arg) {
-            HashMap<Server, Double> servers = new HashMap<>();
-            for (Server server : Server.values()) servers.put(server, Util.similarity(arg, server.displayName().toLowerCase()));
-            List<Server> result = servers.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
+            HashMap<PluginServer, Double> servers = new HashMap<>();
+            for (PluginServer server : PluginServer.values()) servers.put(server, similarity(arg, server.displayName().toLowerCase()));
+            List<PluginServer> result = servers.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             STDIO.list(CustomStyle.SERVER, "Servers", result.toArray());
             return true;
         }
 
         private boolean software(@NotNull String arg) {
-            HashMap<Software, Double> software = new HashMap<>();
-            for (Software soft : Software.values()) software.put(soft, Util.similarity(arg, soft.displayName().toLowerCase()));
-            List<Software> result = software.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
+            HashMap<ServerSoftware, Double> software = new HashMap<>();
+            for (ServerSoftware soft : ServerSoftware.values()) software.put(soft, similarity(arg, soft.displayName().toLowerCase()));
+            List<ServerSoftware> result = software.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
             if (result.isEmpty()) return false;
             STDIO.list(CustomStyle.SOFTWARE, "Software", result.toArray());
             return true;
+        }
+
+        private static double similarity(@NotNull String s1, @NotNull String s2) {
+            String longer = s1, shorter = s2;
+            if (s1.length() < s2.length()) {
+                longer = s2;
+                shorter = s1;
+            }
+
+            int longerLength = longer.length();
+            if (longerLength == 0) {
+                return 1.0; // Both strings are empty
+            }
+
+            return (longerLength - editDistance(longer, shorter)) / (double) longerLength;
+        }
+
+        private static int editDistance(String s1, String s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+
+            int[] costs = new int[s2.length() + 1];
+            for (int i = 0; i <= s1.length(); i++) {
+                int lastValue = i;
+                for (int j = 0; j <= s2.length(); j++) {
+                    if (i == 0) {
+                        costs[j] = j;
+                    } else {
+                        if (j > 0) {
+                            int newValue = costs[j - 1];
+                            if (s1.charAt(i - 1) != s2.charAt(j - 1)) {
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            }
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0) {
+                    costs[s2.length()] = lastValue;
+                }
+            }
+            return costs[s2.length()];
         }
     },
 
@@ -210,7 +252,7 @@ public enum CustomCommand implements Command {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
-            List<Software> software = Software.selected();
+            List<ServerSoftware> software = ServerSoftware.selected();
             if (plugins.isEmpty() && software.isEmpty()) {
                 STDIO.warn("Nothing selected");
                 return;
@@ -219,7 +261,7 @@ public enum CustomCommand implements Command {
             STDIO.log(CustomStyle.INSTALL, plugins.size(), " plugin(s) and ", software.size(), " software to install");
             if (!STDIO.getConfirmation("Continue installation")) return;
             for (Plugin p : plugins) p.install();
-            for (Software s : software) s.install();
+            for (ServerSoftware s : software) s.install();
         }
     },
 
@@ -278,9 +320,9 @@ public enum CustomCommand implements Command {
             if (CustomFlag.INSTALLED.isSelected()) {
                 if (CustomFlag.ALL.isSelected()) {
                     Plugin.requestInstalled();
-                    Category.requestInstalled();
-                    Server.requestInstalled();
-                    Software.requestInstalled();
+                    PluginCategory.requestInstalled();
+                    PluginServer.requestInstalled();
+                    ServerSoftware.requestInstalled();
                 } else {
                     boolean selected = false;
                     if (CustomFlag.PLUGIN.isSelected()) {
@@ -288,15 +330,15 @@ public enum CustomCommand implements Command {
                         selected = true;
                     }
                     if (CustomFlag.CATEGORY.isSelected()) {
-                        Category.requestInstalled();
+                        PluginCategory.requestInstalled();
                         selected = true;
                     }
                     if (CustomFlag.SERVER.isSelected()) {
-                        Server.requestInstalled();
+                        PluginServer.requestInstalled();
                         selected = true;
                     }
                     if (CustomFlag.SOFTWARE.isSelected()) {
-                        Software.requestInstalled();
+                        ServerSoftware.requestInstalled();
                         selected = true;
                     }
                     if (!selected) Plugin.requestInstalled();
@@ -304,21 +346,21 @@ public enum CustomCommand implements Command {
             } else {
                 if (CustomFlag.ALL.isSelected() || (!CustomFlag.PLUGIN.isSelected() && !CustomFlag.CATEGORY.isSelected() && !CustomFlag.SERVER.isSelected() && !CustomFlag.SOFTWARE.isSelected())) {
                     Plugin.requestAll();
-                    Category.requestAll();
-                    Server.requestAll();
-                    Software.requestAll();
-                } else if (Plugin.selected().isEmpty() && Category.selected().isEmpty() && Server.selected().isEmpty() && Software.selected().isEmpty()) {
+                    PluginCategory.requestAll();
+                    PluginServer.requestAll();
+                    ServerSoftware.requestAll();
+                } else if (Plugin.selected().isEmpty() && PluginCategory.selected().isEmpty() && PluginServer.selected().isEmpty() && ServerSoftware.selected().isEmpty()) {
                     if (CustomFlag.PLUGIN.isSelected()) Plugin.requestAll();
-                    if (CustomFlag.CATEGORY.isSelected()) Category.requestAll();
-                    if (CustomFlag.SERVER.isSelected()) Server.requestAll();
-                    if (CustomFlag.SOFTWARE.isSelected()) Software.requestAll();
+                    if (CustomFlag.CATEGORY.isSelected()) PluginCategory.requestAll();
+                    if (CustomFlag.SERVER.isSelected()) PluginServer.requestAll();
+                    if (CustomFlag.SOFTWARE.isSelected()) ServerSoftware.requestAll();
                 } else {
                     if (CustomFlag.PLUGIN.isSelected() || CustomFlag.CATEGORY.isSelected() || CustomFlag.SERVER.isSelected()) {
                         Plugin.listSelected();
-                        if (CustomFlag.CATEGORY.isSelected()) Category.listSelected();
-                        if (CustomFlag.SERVER.isSelected()) Server.listSelected();
+                        if (CustomFlag.CATEGORY.isSelected()) PluginCategory.listSelected();
+                        if (CustomFlag.SERVER.isSelected()) PluginServer.listSelected();
                     }
-                    if (CustomFlag.SOFTWARE.isSelected()) Software.listSelected();
+                    if (CustomFlag.SOFTWARE.isSelected()) ServerSoftware.listSelected();
                 }
             }
         }
@@ -328,11 +370,11 @@ public enum CustomCommand implements Command {
     RUN("Run server", ":only | -Z") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            List<Software> selected = Software.selected();
-            Software software;
+            List<ServerSoftware> selected = ServerSoftware.selected();
+            ServerSoftware software;
 
             if (selected.isEmpty()) {
-                List<Software> installed = Software.installed();
+                List<ServerSoftware> installed = ServerSoftware.installed();
                 if (installed.isEmpty()) {
                     STDIO.err("No software installed");
                     return;
@@ -369,7 +411,7 @@ public enum CustomCommand implements Command {
 
             try {
                 ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
-                builder.directory(Software.FOLDER);
+                builder.directory(ServerSoftware.FOLDER);
                 Process process = builder.start();
                 STDIO.link(process, software.displayName());
             } catch (IOException e) {
@@ -385,8 +427,8 @@ public enum CustomCommand implements Command {
             boolean out = Plugin.listInstalled();
             out = Plugin.listLinked() || out;
             out = Plugin.listUnknown() || out;
-            out = Software.listInstalled() || out;
-            out = Software.listUnknown() || out;
+            out = ServerSoftware.listInstalled() || out;
+            out = ServerSoftware.listUnknown() || out;
 
             if (!out) {
                 STDIO.warn(CustomStyle.SOFTWARE.toString(), BOLD, "Nothing installed to show");
@@ -399,7 +441,7 @@ public enum CustomCommand implements Command {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
-            List<Software> software = Software.selected();
+            List<ServerSoftware> software = ServerSoftware.selected();
 
             if (plugins.isEmpty() && software.isEmpty()) {
                 STDIO.warn("Nothing selected");
@@ -409,7 +451,7 @@ public enum CustomCommand implements Command {
             STDIO.log(CustomStyle.UNINSTALL, plugins.size(), " plugin(s) and ", software.size(), " software to uninstall");
             if (!STDIO.getConfirmation("Continue removal")) return;
             for (Plugin p : plugins) p.uninstall();
-            for (Software s : software) s.uninstall();
+            for (ServerSoftware s : software) s.uninstall();
         }
     },
 
@@ -418,10 +460,10 @@ public enum CustomCommand implements Command {
         @Override
         public void onRun(@NotNull Parser.Result result) {
             List<Plugin> plugins = Plugin.selected();
-            List<Software> software = Software.selected();
+            List<ServerSoftware> software = ServerSoftware.selected();
             if (plugins.isEmpty() && software.isEmpty()) { // Auto select installed if nothing specified
                 plugins = Plugin.installed();
-                software = Software.installed();
+                software = ServerSoftware.installed();
             }
 
             if (plugins.isEmpty() && software.isEmpty()) {
@@ -432,7 +474,7 @@ public enum CustomCommand implements Command {
             STDIO.log(CustomStyle.UPDATE, plugins.size(), " plugin(s) and ", software.size(), " software to update");
             if (!STDIO.getConfirmation("Continue update")) return;
             for (Plugin p : plugins) p.update();
-            for (Software s  : software) s.update();
+            for (ServerSoftware s  : software) s.update();
         }
     };
 

@@ -1,9 +1,5 @@
-package com.cavetale.setup.console;
+package com.cavetale.setup.cmd;
 
-import com.cavetale.setup.console.container.CategoryContents;
-import com.cavetale.setup.console.container.PluginContents;
-import com.cavetale.setup.console.container.ServerContents;
-import com.cavetale.setup.console.container.SoftwareContents;
 import link.l_pf.cmdlib.app.Flag;
 import link.l_pf.cmdlib.app.container.Contents;
 import org.jetbrains.annotations.NotNull;

@@ -1,13 +1,9 @@
-package com.cavetale.setup.data.server;
+package com.cavetale.setup.data;
 
-import com.cavetale.setup.console.CustomFlag;
-import com.cavetale.setup.console.CustomStyle;
-import com.cavetale.setup.console.container.SoftwareContents;
-import com.cavetale.setup.data.DataException;
-import com.cavetale.setup.data.Installable;
-import com.cavetale.setup.data.Sel;
+import com.cavetale.setup.cmd.CustomFlag;
+import com.cavetale.setup.cmd.CustomStyle;
+import com.cavetale.setup.cmd.SoftwareContents;
 import com.cavetale.setup.download.Source;
-import com.cavetale.setup.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +15,7 @@ import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
 import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
 /** Server software, used to register downloadable server software. */
-public enum Software implements Installable {
+public enum ServerSoftware implements Installable {
     PAPER(Source.link("https://fill-data.papermc.io/v1/objects/5be84d9fc43181a72d5fdee7e3167824d9667bfc97b1bf9721713f9a971481ca/paper-1.21.11-88.jar", "1.21.11-88"), "PAPR", "PaperMC");
 
     private final @NotNull String[] refs;
@@ -28,9 +24,9 @@ public enum Software implements Installable {
     private @Nullable Sel sel = null;
     private @Nullable List<String> inst = null;
 
-    Software(@NotNull Source source, @NotNull String @NotNull ... aliases) {
+    ServerSoftware(@NotNull Source source, @NotNull String @NotNull ... aliases) {
         this.refs = new String[aliases.length + 1];
-        this.refs[0] = Util.capsToCamel(this.name());
+        this.refs[0] = Data.capsToCamel(this.name());
         System.arraycopy(aliases, 0, this.refs, 1, aliases.length);
 
         this.source = source;
@@ -48,7 +44,7 @@ public enum Software implements Installable {
 
     @Override
     public @NotNull File downloads() {
-        return Software.FOLDER;
+        return ServerSoftware.FOLDER;
     }
 
     @Override
@@ -82,7 +78,7 @@ public enum Software implements Installable {
     //= Installation ==
 
     public @NotNull List<String> installations() {
-        if (this.inst == null) Software.installed();
+        if (this.inst == null) ServerSoftware.installed();
         return this.inst;
     }
 
@@ -92,12 +88,12 @@ public enum Software implements Installable {
 
     //= Finder ==
 
-    public static @NotNull Software get(@NotNull String ref) throws NotFoundException {
-        for (Software s : Software.values()) for (String r : s.refs) if (r.equalsIgnoreCase(ref)) return s;
+    public static @NotNull ServerSoftware get(@NotNull String ref) throws NotFoundException {
+        for (ServerSoftware s : ServerSoftware.values()) for (String r : s.refs) if (r.equalsIgnoreCase(ref)) return s;
         throw new NotFoundException(ref);
     }
 
-    public static @NotNull Software get(@NotNull File file) throws NotASoftwareException, NotFoundException {
+    public static @NotNull ServerSoftware get(@NotNull File file) throws NotASoftwareException, NotFoundException {
         String ref = file.getName().toLowerCase();
         if (!file.isFile() || !ref.endsWith(".jar")) throw new NotASoftwareException(file);
         int verStart = ref.indexOf("-");
@@ -106,7 +102,7 @@ public enum Software implements Installable {
         if (extStart < 0) extStart = ref.length() - 1;
         int endStart = Math.min(verStart, extStart);
         ref = ref.substring(0, endStart);
-        for (Software s : Software.values()) for (String r : s.refs) if (ref.equalsIgnoreCase(r)) return s;
+        for (ServerSoftware s : ServerSoftware.values()) for (String r : s.refs) if (ref.equalsIgnoreCase(r)) return s;
         throw new NotFoundException(ref);
     }
 
@@ -114,87 +110,87 @@ public enum Software implements Installable {
 
     public static final @NotNull File FOLDER = new File("./");
 
-    private static @Nullable List<Software> selected = null;
-    private static @Nullable List<Software> installed = null;
+    private static @Nullable List<ServerSoftware> selected = null;
+    private static @Nullable List<ServerSoftware> installed = null;
     private static @Nullable List<String> unknown = null;
 
-    public static @NotNull List<Software> selected() {
-        if (Software.selected != null) return Software.selected; // Update not necessary
+    public static @NotNull List<ServerSoftware> selected() {
+        if (ServerSoftware.selected != null) return ServerSoftware.selected; // Update not necessary
 
         // Update selected
         STDIO.debug("Reloading selected software");
-        for (Software s : Software.values()) s.deselect();
-        Software.selected = new LinkedList<>();
+        for (ServerSoftware s : ServerSoftware.values()) s.deselect();
+        ServerSoftware.selected = new LinkedList<>();
 
         SoftwareContents softwares = (SoftwareContents) CustomFlag.SOFTWARE.container();
         if (CustomFlag.INSTALLED.isSelected()) {
             STDIO.debug("Selecting installed software");
-            for (Software s : Software.installed()) s.target();
+            for (ServerSoftware s : ServerSoftware.installed()) s.target();
         } else if (CustomFlag.ALL.isSelected() || (CustomFlag.SOFTWARE.isSelected() && softwares.isEmpty())) { // Select all
             STDIO.debug("Selecting all software");
-            for (Software s : Software.values()) s.target();
+            for (ServerSoftware s : ServerSoftware.values()) s.target();
         } else {
             STDIO.debug("Selecting servers ", softwares.contents());
-            for (Software s : softwares.contents()) s.target(); // Select by software
+            for (ServerSoftware s : softwares.contents()) s.target(); // Select by software
         }
 
-        for (Software s : Software.values()) if (s.isSelected()) Software.selected.add(s); // Update selection
-        return Software.selected;
+        for (ServerSoftware s : ServerSoftware.values()) if (s.isSelected()) ServerSoftware.selected.add(s); // Update selection
+        return ServerSoftware.selected;
     }
 
-    public static @NotNull List<Software> installed() {
-        if (Software.installed != null) return Software.installed; // Update not necessary
+    public static @NotNull List<ServerSoftware> installed() {
+        if (ServerSoftware.installed != null) return ServerSoftware.installed; // Update not necessary
 
         // Update installed
-        Software.loadInstalled();
-        assert Software.installed != null;
-        return Software.installed;
+        ServerSoftware.loadInstalled();
+        assert ServerSoftware.installed != null;
+        return ServerSoftware.installed;
     }
 
     public static @NotNull List<String> unknown() {
-        if (Software.unknown != null) return Software.unknown; // Update not necessary
+        if (ServerSoftware.unknown != null) return ServerSoftware.unknown; // Update not necessary
 
         // Update unknown
-        Software.loadInstalled();
-        assert Software.unknown != null;
-        return Software.unknown;
+        ServerSoftware.loadInstalled();
+        assert ServerSoftware.unknown != null;
+        return ServerSoftware.unknown;
     }
 
     private static void loadInstalled() {
         // Update installed
         STDIO.debug("Reloading installed software");
-        for (Software s : Software.values()) s.inst = new LinkedList<>(); // Reset installations
-        Software.installed = new LinkedList<>();
-        Software.unknown = new LinkedList<>();
+        for (ServerSoftware s : ServerSoftware.values()) s.inst = new LinkedList<>(); // Reset installations
+        ServerSoftware.installed = new LinkedList<>();
+        ServerSoftware.unknown = new LinkedList<>();
         // Scan installations
-        File[] files = Software.FOLDER.listFiles();
+        File[] files = ServerSoftware.FOLDER.listFiles();
         if (files == null) return;
         for (File f : files) {
             if (f.getName().startsWith("Setup")) continue;
-            Software s = null;
+            ServerSoftware s = null;
             try {
-                s = Software.get(f);
-            } catch (Software.NotASoftwareException e) {
+                s = ServerSoftware.get(f);
+            } catch (ServerSoftware.NotASoftwareException e) {
                 continue;
             } catch (NotFoundException ignored) {}
             if (s != null) s.installations().add(f.getName());
-            else Software.unknown.add(f.getName());
+            else ServerSoftware.unknown.add(f.getName());
         }
 
-        for (Software s : Software.values()) if (s.isInstalled()) Software.installed.add(s); // Update installations
+        for (ServerSoftware s : ServerSoftware.values()) if (s.isInstalled()) ServerSoftware.installed.add(s); // Update installations
     }
 
     public static void reset() {
         STDIO.debug("Resetting software");
-        for (Software s : Software.values()) s.revert();
-        Software.selected = null;
-        Software.installed = null;
-        Software.unknown = null;
+        for (ServerSoftware s : ServerSoftware.values()) s.revert();
+        ServerSoftware.selected = null;
+        ServerSoftware.installed = null;
+        ServerSoftware.unknown = null;
     }
 
-    public static @NotNull List<Software> get(@Nullable Boolean installed, @Nullable Boolean selected) {
-        List<Software> software = new LinkedList<>();
-        for (Software s : Software.values()) {
+    public static @NotNull List<ServerSoftware> get(@Nullable Boolean installed, @Nullable Boolean selected) {
+        List<ServerSoftware> software = new LinkedList<>();
+        for (ServerSoftware s : ServerSoftware.values()) {
             if ((installed == null || installed == s.isInstalled()) &&
                     (selected == null || selected == s.isSelected())) {
                 software.add(s);
@@ -206,17 +202,17 @@ public enum Software implements Installable {
     //= Cosmetics ==
 
     public static void requestAll() {
-        if (Software.values().length == 0) {
+        if (ServerSoftware.values().length == 0) {
             STDIO.log(CustomStyle.SOFTWARE, BOLD + "No software available");
             return;
         }
 
-        STDIO.list(CustomStyle.SOFTWARE, Software.values().length +
-                " software available", (Object[]) Software.values());
+        STDIO.list(CustomStyle.SOFTWARE, ServerSoftware.values().length +
+                " software available", (Object[]) ServerSoftware.values());
     }
 
     public static boolean listSelected() {
-        List<Software> selected = Software.selected();
+        List<ServerSoftware> selected = ServerSoftware.selected();
         if (selected.isEmpty()) return false;
         STDIO.list(CustomStyle.SOFTWARE, selected.size() +
                 " software selected", selected.toArray());
@@ -224,7 +220,7 @@ public enum Software implements Installable {
     }
 
     public static boolean listInstalled() {
-        List<Software> software = Software.installed();
+        List<ServerSoftware> software = ServerSoftware.installed();
         if (software.isEmpty()) return false;
         STDIO.list(CustomStyle.SOFTWARE, software.size() +
                 " software installed", software.toArray());
@@ -232,17 +228,17 @@ public enum Software implements Installable {
     }
 
     public static void requestInstalled() {
-        if (Software.installed().isEmpty()) {
+        if (ServerSoftware.installed().isEmpty()) {
             STDIO.log(CustomStyle.SOFTWARE, BOLD + "No software installed");
             return;
         }
 
-        STDIO.list(CustomStyle.SOFTWARE, Software.installed().size() +
-                " software installed", Software.installed().toArray());
+        STDIO.list(CustomStyle.SOFTWARE, ServerSoftware.installed().size() +
+                " software installed", ServerSoftware.installed().toArray());
     }
 
     public static boolean listUnknown() {
-        List<String> unknown = Software.unknown();
+        List<String> unknown = ServerSoftware.unknown();
         if (unknown.isEmpty()) return false;
         STDIO.list(CustomStyle.UNKNOWN, unknown.size() +
                 " software unknown", unknown.toArray());

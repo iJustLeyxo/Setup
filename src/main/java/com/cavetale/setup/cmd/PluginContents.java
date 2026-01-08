@@ -1,6 +1,6 @@
-package com.cavetale.setup.console.container;
+package com.cavetale.setup.cmd;
 
-import com.cavetale.setup.data.plugin.Plugin;
+import com.cavetale.setup.data.Plugin;
 import link.l_pf.cmdlib.app.container.SetContents;
 import org.jetbrains.annotations.NotNull;
 

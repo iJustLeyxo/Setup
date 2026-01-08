@@ -1,4 +1,4 @@
-package com.cavetale.setup.console;
+package com.cavetale.setup.cmd;
 
 import link.l_pf.cmdlib.shell.Code;
 import link.l_pf.cmdlib.shell.Style;
