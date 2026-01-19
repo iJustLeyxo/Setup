@@ -1,0 +1,70 @@
+[{ "ref": "Base",
+    "plugin_categories": [
+        "Core",
+        "Global"
+    ]
+}, { "ref": "Classic",
+    "plugin_categories": [
+        "Core",
+        "Global",
+        "Build",
+        "Survival"
+    ]
+}, { "ref": "Creative",
+    "plugin_categories": [
+        "Core",
+        "Global",
+        "Build"
+    ], "plugins": [
+        "Creative",
+        "Enemy",
+        "Festival",
+        "FlatGenerator",
+        "Pictionary",
+        "Race",
+        "Resident",
+        "VoidGenerator"
+    ]
+}, { "ref": "Minigame", "aliases": [ "Event" ],
+    "plugin_categories": [
+        "Core",
+        "Global"
+    ]
+}, { "ref": "Home",
+    "plugin_categories": [
+        "Core",
+        "Global",
+        "Build",
+        "Survival"
+    ], "plugins": [
+        "CullMob"
+    ]
+}, { "ref": "Hub",
+    "plugin_categories": [
+        "Core",
+        "Global",
+        "Build",
+        "Survival"
+    ], "plugins": [
+        "Chess",
+        "ExtremeGrassGrowing",
+        "FreeFood",
+        "KingOfTheLadder",
+        "RedGreenLight"
+    ]
+}, { "ref": "Mine",
+    "plugin_categories": [
+        "Core",
+        "Global",
+        "Build",
+        "Survival"
+    ], "plugins": [
+        "Dungeons",
+        "Hive"
+    ]
+}, { "ref": "Void",
+    "plugin_categories": [
+        "Core",
+        "Global"
+    ]
+}]
