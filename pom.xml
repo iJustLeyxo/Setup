@@ -77,9 +77,20 @@
         <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.18.2</version>
+    </dependency>
+    <dependency>
       <groupId>link.l-pf</groupId>
       <artifactId>cmdlib</artifactId>
-      <version>1.1</version>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>6.0.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

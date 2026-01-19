@@ -1,92 +1,63 @@
 package com.cavetale.setup.cmd;
 
-import com.cavetale.setup.data.PluginCategory;
-import com.cavetale.setup.data.Plugin;
-import com.cavetale.setup.data.PluginServer;
-import com.cavetale.setup.data.ServerSoftware;
+import com.cavetale.setup.data.*;
 import link.l_pf.cmdlib.app.Command;
-import link.l_pf.cmdlib.app.Flag;
 import link.l_pf.cmdlib.app.Parser;
 import link.l_pf.cmdlib.app.container.Contents;
 import link.l_pf.cmdlib.app.container.FileListContents;
 import link.l_pf.cmdlib.app.container.StringListContents;
+import link.l_pf.cmdlib.shell.Style;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import static link.l_pf.cmdlib.shell.Code.Std.BOLD;
+import static com.cavetale.setup.cmd.CustomStyle.*;
 import static link.l_pf.cmdlib.shell.Shell.STDIO;
 
-/** Custom commands. */
+/** Custom commands for the command line app. */
 public enum CustomCommand implements Command {
-    COMPARE("Compare selected", "-PCSZIA", "VERIFY", "CHECK"){
+    COMPARE("Compare selected", "-PCSZA:select", "VERIFY", "CHECK"){
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            boolean out = false;
-
-            if (Plugin.listSelected()) {
-                out = true;
-
-                List<Plugin> selected = Plugin.get(true, true);
-                if (!selected.isEmpty()) {
-                    STDIO.list(CustomStyle.INSTALL, selected.size() +
-                            " plugin(s) installed", selected.toArray());
-                }
-                selected = Plugin.get(true, false);
-                if (!selected.isEmpty()) {
-                    STDIO.list(CustomStyle.SUPERFLUOUS, selected.size() +
-                            " plugin(s) superfluous", selected.toArray());
-                }
-                selected = Plugin.get(false, true);
-                if (!selected.isEmpty()) {
-                    STDIO.list(CustomStyle.MISSING, selected.size() +
-                            " plugin(s) missing", selected.toArray());
-                }
-            }
-
-            if (ServerSoftware.listSelected()) {
-                out = true;
-
-                List<ServerSoftware> selected = ServerSoftware.get(true, true);
-                if (!selected.isEmpty()) {
-                    STDIO.list(CustomStyle.INSTALL, selected.size() +
-                            " software installed", selected.toArray());
-                }
-                selected = ServerSoftware.get(true, false);
-                if (!selected.isEmpty()) {
-                    STDIO.list(CustomStyle.SUPERFLUOUS, selected.size() +
-                            " software superfluous", selected.toArray());
-                }
-                selected = ServerSoftware.get(false, true);
-                if (!selected.isEmpty()) {
-                    STDIO.list(CustomStyle.MISSING, selected.size() +
-                            " software missing", selected.toArray());
-                }
-            }
-
-            if (!out) {
+            if (Plugin.selected().isEmpty() && ServerSoftware.selected().isEmpty()) {
                 STDIO.warn("Nothing selected for comparison");
+                return;
             }
+
+            listCounted(SELECT, " plugin(s) installed", Plugin.matching().toArray());
+            listCounted(SUPERFLUOUS, " plugin(s) superfluous", Plugin.superfluous().toArray());
+            listCounted(MISSING, " plugin(s) missing", Plugin.missing().toArray());
+            listCounted(CustomStyle.LINK, "unknown linked plugin(s)", Plugin.unknown().linked().toArray());
+            listCounted(UNKNOWN, "unknown plugin(s)", Plugin.unknown().unknown().toArray());
+
+            listCounted(SELECT, " server software installed", ServerSoftware.matching().toArray());
+            listCounted(SUPERFLUOUS, " server software superfluous", ServerSoftware.superfluous().toArray());
+            listCounted(MISSING, " server software missing", ServerSoftware.missing().toArray());
+            listCounted(CustomStyle.LINK, "unknown linked server software", ServerSoftware.unknown().linked().toArray());
+            listCounted(UNKNOWN, "unknown server software", ServerSoftware.unknown().unknown().toArray());
         }
     },
 
-    EULA("Agree to the EULA", "") {
+    EULA("Agree to the EULA", "-y:auto") {
+        private static final @NotNull File EULA = new File("eula.txt");
+
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            File eula = new File("eula.txt");
-            if (!eula.exists()) {
-                STDIO.err(eula.getName(), " does not exist. You may need to run the server first.");
+            if (!EULA.exists()) {
+                STDIO.err(EULA, " does not exist. You may need to run the server first.");
                 return;
             }
 
             if (!STDIO.getConfirmation("Agree to the Minecraft EULA")) return;
 
-            StringBuilder builder = new StringBuilder(); // Read eula
-            try (FileInputStream in = new FileInputStream(eula)) {
+            // Read eula and set to true
+            StringBuilder builder = new StringBuilder();
+            try (FileInputStream in = new FileInputStream(EULA)) {
                 StringBuilder lineBuilder = new StringBuilder();
                 byte[] bytes = in.readAllBytes();
                 in.close();
@@ -106,7 +77,11 @@ public enum CustomCommand implements Command {
                 return;
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(eula)))) { // Write eula
+            // Write edited eula
+            try (BufferedWriter writer =
+                         new BufferedWriter(
+                                 new OutputStreamWriter(
+                                         new FileOutputStream(EULA)))) {
                 writer.write(builder.toString());
                 writer.flush();
             } catch (IOException e) {
@@ -115,153 +90,32 @@ public enum CustomCommand implements Command {
         }
     },
 
-    FIND("Find anything", "[string]", "Search") {
-        private static final double MIN_SIMILARITY = 0.33;
-
-        @Override
-        public @NotNull Contents<?> init() {
-            return new StringListContents();
-        }
-
+    INSTALL("Install selected", "-PCSZA:select", "ADD") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            String arg = String.join(" ", (List<String>) this.contents()).toLowerCase();
+            Set<Plugin> plugins = Plugin.missing();
+            Set<ServerSoftware> software = ServerSoftware.missing();
 
-            boolean all = CustomFlag.ALL.isSelected() || (!Flag.Std.COMMAND.isSelected() && !Flag.Std.FLAG.isSelected() && !CustomFlag.PLUGIN.isSelected() && !CustomFlag.CATEGORY.isSelected() && !CustomFlag.SERVER.isSelected() && !CustomFlag.SOFTWARE.isSelected());
-            boolean found = false;
+            int missing = plugins.size() + software.size();
+            int selected = Plugin.selected().size() + ServerSoftware.selected().size();
 
-            if (all || Flag.Std.COMMAND.isSelected()) found = commands(arg);
-            if (all || Flag.Std.FLAG.isSelected()) found = flags(arg);
-            if (all || CustomFlag.PLUGIN.isSelected()) found = plugins(arg) || found;
-            if (all || CustomFlag.CATEGORY.isSelected()) found = categories(arg) || found;
-            if (all || CustomFlag.SERVER.isSelected()) found = servers(arg) || found;
-            if (all || CustomFlag.SOFTWARE.isSelected()) found = software(arg) || found;
-
-            if (!found) STDIO.warn("Nothing found to match \"", arg, "\"\n");
-        }
-
-        private boolean commands(@NotNull String arg) {
-            HashMap<CustomCommand, Double> commands = new HashMap<>();
-
-            for (CustomCommand command : CustomCommand.values()) {
-                double similarity = 0;
-                for (String ref : command.references()) similarity = Math.max(similarity(arg, ref.toLowerCase()), similarity);
-                commands.put(command, similarity);
-            }
-
-            List<CustomCommand> result = commands.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
-            if (result.isEmpty()) return false;
-            STDIO.list(CustomStyle.COMMAND, "Commands", result.toArray());
-            return true;
-        }
-
-        private boolean flags(@NotNull String arg) {
-            HashMap<CustomFlag, Double> flags = new HashMap<>();
-            for (CustomFlag flag : CustomFlag.values()) flags.put(flag, similarity(arg, flag.reference()));
-            List<CustomFlag> result = flags.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
-            if (result.isEmpty()) return false;
-            STDIO.list(CustomStyle.FLAG, "Flags", result.toArray());
-            return true;
-        }
-
-        private boolean plugins(@NotNull String arg) {
-            HashMap<Plugin, Double> plugins = new HashMap<>();
-            for (Plugin plugin : Plugin.values()) plugins.put(plugin, similarity(arg, plugin.displayName().toLowerCase()));
-            List<Plugin> result = plugins.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
-            if (result.isEmpty()) return false;
-            STDIO.list(CustomStyle.PLUGIN, "Plugins", result.toArray());
-            return true;
-        }
-
-        private boolean categories(@NotNull String arg) {
-            HashMap<PluginCategory, Double> categories = new HashMap<>();
-            for (PluginCategory category : PluginCategory.values()) categories.put(category, similarity(arg, category.displayName().toLowerCase()));
-            List<PluginCategory> result = categories.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
-            if (result.isEmpty()) return false;
-            STDIO.list(CustomStyle.CATEGORY, "Categories", result.toArray());
-            return true;
-        }
-
-        private boolean servers(@NotNull String arg) {
-            HashMap<PluginServer, Double> servers = new HashMap<>();
-            for (PluginServer server : PluginServer.values()) servers.put(server, similarity(arg, server.displayName().toLowerCase()));
-            List<PluginServer> result = servers.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
-            if (result.isEmpty()) return false;
-            STDIO.list(CustomStyle.SERVER, "Servers", result.toArray());
-            return true;
-        }
-
-        private boolean software(@NotNull String arg) {
-            HashMap<ServerSoftware, Double> software = new HashMap<>();
-            for (ServerSoftware soft : ServerSoftware.values()) software.put(soft, similarity(arg, soft.displayName().toLowerCase()));
-            List<ServerSoftware> result = software.entrySet().stream().filter(e -> MIN_SIMILARITY <= e.getValue()).map(Map.Entry::getKey).toList();
-            if (result.isEmpty()) return false;
-            STDIO.list(CustomStyle.SOFTWARE, "Software", result.toArray());
-            return true;
-        }
-
-        private static double similarity(@NotNull String s1, @NotNull String s2) {
-            String longer = s1, shorter = s2;
-            if (s1.length() < s2.length()) {
-                longer = s2;
-                shorter = s1;
-            }
-
-            int longerLength = longer.length();
-            if (longerLength == 0) {
-                return 1.0; // Both strings are empty
-            }
-
-            return (longerLength - editDistance(longer, shorter)) / (double) longerLength;
-        }
-
-        private static int editDistance(String s1, String s2) {
-            s1 = s1.toLowerCase();
-            s2 = s2.toLowerCase();
-
-            int[] costs = new int[s2.length() + 1];
-            for (int i = 0; i <= s1.length(); i++) {
-                int lastValue = i;
-                for (int j = 0; j <= s2.length(); j++) {
-                    if (i == 0) {
-                        costs[j] = j;
-                    } else {
-                        if (j > 0) {
-                            int newValue = costs[j - 1];
-                            if (s1.charAt(i - 1) != s2.charAt(j - 1)) {
-                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                            }
-                            costs[j - 1] = lastValue;
-                            lastValue = newValue;
-                        }
-                    }
-                }
-                if (i > 0) {
-                    costs[s2.length()] = lastValue;
-                }
-            }
-            return costs[s2.length()];
-        }
-    },
-
-    INSTALL("Install selected", "-PCSZIA", "ADD") {
-        @Override
-        public void onRun(@NotNull Parser.Result result) {
-            List<Plugin> plugins = Plugin.selected();
-            List<ServerSoftware> software = ServerSoftware.selected();
-            if (plugins.isEmpty() && software.isEmpty()) {
-                STDIO.warn("Nothing selected");
+            if (selected == 0) {
+                STDIO.warn("Nothing selected for installation");
                 return;
             }
 
-            STDIO.log(CustomStyle.INSTALL, plugins.size(), " plugin(s) and ", software.size(), " software to install");
-            if (!STDIO.getConfirmation("Continue installation")) return;
-            for (Plugin p : plugins) p.install();
-            for (ServerSoftware s : software) s.install();
+            if (missing == 0) {
+                STDIO.warn("Everything selected is already installed");
+                return;
+            }
+
+            STDIO.log(CustomStyle.INSTALLED, "(", missing, '/', selected, ") will be installed");
+            if (!STDIO.getConfirmation("Confirm installation")) return;
+            Source.install(plugins, software);
         }
     },
 
-    LINK("Link jar as plugin", "[path]:files") {
+    LINK("Link files as plugins", "[path]:files") {
         @Override
         public @NotNull Contents<?> init() {
             return new FileListContents();
@@ -269,37 +123,56 @@ public enum CustomCommand implements Command {
 
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            List<File> files = (List<File>) this.contents();
+            Set<File> files = new HashSet<>((List<File>) contents());
 
             if (files.isEmpty()) {
-                STDIO.warn("No path(s) specified");
+                STDIO.warn("Nothing selected to link");
                 return;
             }
 
-            for (File origin : files) {
-                try {
-                    Plugin.get(origin);
-                } catch (Plugin.NotAPluginException e) {
-                    STDIO.warn(e.getMessage());
-                } catch (Plugin.NotFoundException e) {
-                    STDIO.warn("Unknown plugin ", origin.getName());
-                }
+            STDIO.log(CustomStyle.LINK, files.size(), " file(s) selected to link");
+            if (!STDIO.getConfirmation("Confirm linking")) return;
+
+            File folder = Plugin.PLUGINS_DIR;
+            boolean _ = folder.mkdirs();
+
+            if (!folder.isDirectory()) {
+                STDIO.err("Failed to init dirs");
+                return;
             }
 
-            STDIO.log(CustomStyle.LINK, files.size(), " file(s) will be linked");
-            if (!STDIO.getConfirmation("Continue linking")) return;
+            for (File f : files) {
+                try {
+                    Plugin.get(f);
+                } catch (Source.UntrackedException e) {
+                    STDIO.warn("Untracked file \"", f, '"');
+                    if (!STDIO.getConfirmation("Link anyway")) continue;
+                } catch (Entry.UnknownException e) {
+                    STDIO.warn("Unknown reference \"", f.getName(), '"');
+                    if (!STDIO.getConfirmation("Link anyway")) continue;
+                }
 
-            for (File origin : files) {
-                STDIO.openInfo("Linking ", origin.getName());
-                File folder = Plugin.FOLDER;
-                folder.mkdirs();
-                File link = new File(folder, origin.getName());
-                if (link.exists()) {
-                    STDIO.closeErr("failed (already exists)");
+                STDIO.openInfo("Linking ", f);
+
+                if (!f.exists()) {
+                    STDIO.err("failed (" + f + " does not exist)");
                     continue;
                 }
+
+                if (!f.isFile()) {
+                    STDIO.err("failed (" + f + " must be a file)");
+                    continue;
+                }
+
+                File link = new File(folder, f.getName());
+
+                if (link.exists()) {
+                    STDIO.closeErr("failed (link target already exists)");
+                    continue;
+                }
+
                 try {
-                    Files.createSymbolicLink(link.getAbsoluteFile().toPath(), origin.getAbsoluteFile().toPath());
+                    Files.createSymbolicLink(link.getAbsoluteFile().toPath(), f.getAbsoluteFile().toPath());
                     STDIO.closeInfoDone();
                 } catch (IOException e) {
                     STDIO.closeErr(e, "failed");
@@ -308,87 +181,47 @@ public enum CustomCommand implements Command {
         }
     },
 
-    LIST("List selected", "-PCSZIA", "SHOW", "RESOLVE") {
+    LIST("List selected", "-PCSZIA:select", "SHOW", "RESOLVE", "GET") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            if (CustomFlag.INSTALLED.isSelected()) {
-                if (CustomFlag.ALL.isSelected()) {
-                    Plugin.requestInstalled();
-                    PluginCategory.requestInstalled();
-                    PluginServer.requestInstalled();
-                    ServerSoftware.requestInstalled();
-                } else {
-                    boolean selected = false;
-                    if (CustomFlag.PLUGIN.isSelected()) {
-                        Plugin.requestInstalled();
-                        selected = true;
-                    }
-                    if (CustomFlag.CATEGORY.isSelected()) {
-                        PluginCategory.requestInstalled();
-                        selected = true;
-                    }
-                    if (CustomFlag.SERVER.isSelected()) {
-                        PluginServer.requestInstalled();
-                        selected = true;
-                    }
-                    if (CustomFlag.SOFTWARE.isSelected()) {
-                        ServerSoftware.requestInstalled();
-                        selected = true;
-                    }
-                    if (!selected) Plugin.requestInstalled();
-                }
-            } else {
-                if (CustomFlag.ALL.isSelected() || (!CustomFlag.PLUGIN.isSelected() && !CustomFlag.CATEGORY.isSelected() && !CustomFlag.SERVER.isSelected() && !CustomFlag.SOFTWARE.isSelected())) {
-                    Plugin.requestAll();
-                    PluginCategory.requestAll();
-                    PluginServer.requestAll();
-                    ServerSoftware.requestAll();
-                } else if (Plugin.selected().isEmpty() && PluginCategory.selected().isEmpty() && PluginServer.selected().isEmpty() && ServerSoftware.selected().isEmpty()) {
-                    if (CustomFlag.PLUGIN.isSelected()) Plugin.requestAll();
-                    if (CustomFlag.CATEGORY.isSelected()) PluginCategory.requestAll();
-                    if (CustomFlag.SERVER.isSelected()) PluginServer.requestAll();
-                    if (CustomFlag.SOFTWARE.isSelected()) ServerSoftware.requestAll();
-                } else {
-                    if (CustomFlag.PLUGIN.isSelected() || CustomFlag.CATEGORY.isSelected() || CustomFlag.SERVER.isSelected()) {
-                        Plugin.listSelected();
-                        if (CustomFlag.CATEGORY.isSelected()) PluginCategory.listSelected();
-                        if (CustomFlag.SERVER.isSelected()) PluginServer.listSelected();
-                    }
-                    if (CustomFlag.SOFTWARE.isSelected()) ServerSoftware.listSelected();
-                }
-            }
+            boolean s;
+            s = listCounted(PLUGIN, " plugin(s) selected", Plugin.selected().toArray());
+            s = listCounted(CATEGORY, " plugin categor(y/ies) selected", PluginCategory.selected().toArray()) || s;
+            s = listCounted(SERVER, " server preset(s) selected", ServerPreset.selected().toArray()) || s;
+            s = listCounted(SOFTWARE, " server software selected", ServerSoftware.selected().toArray()) || s;
+            if (!s) STDIO.warn("Nothing selected");
         }
     },
 
-    RUN("Run server", ":only | -Z") {
+    RUN("Run server", ":unique! | -Z:select") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            List<ServerSoftware> selected = ServerSoftware.selected();
+            Set<ServerSoftware> selected = ServerSoftware.selected();
             ServerSoftware software;
 
             if (selected.isEmpty()) {
-                List<ServerSoftware> installed = ServerSoftware.installed();
+                Set<ServerSoftware> installed = ServerSoftware.installed();
                 if (installed.isEmpty()) {
                     STDIO.err("No software installed");
                     return;
                 }
 
                 if (installed.size() > 1) {
-                    STDIO.err("Specify the software to run");
+                    STDIO.err("Select the software to run (multiple installed)");
                     return;
                 }
 
-                software = installed.getFirst();
+                software = installed.iterator().next();
             } else {
                 if (selected.size() > 1) {
-                    STDIO.err("Multiple software selected");
+                    STDIO.err("Select only one software (multiple selected)");
                     return;
                 }
 
-                software = selected.getFirst();
+                software = selected.iterator().next();
             }
 
-            List<String> installations = software.installations();
+            List<Source.Install> installations = software.installations();
 
             if (installations.isEmpty()) {
                 STDIO.err("Selected is not installed");
@@ -396,79 +229,110 @@ public enum CustomCommand implements Command {
             }
 
             if (installations.size() > 1) {
-                STDIO.err(software.displayName(), " has multiple installations");
+                STDIO.err(software.ref, " has multiple installations");
                 return;
             }
 
-            String installation = installations.getFirst();
+            String installation = installations.getFirst().name();
 
             try {
-                ProcessBuilder builder = new ProcessBuilder("java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui");
-                builder.directory(ServerSoftware.FOLDER);
+                ProcessBuilder builder = new ProcessBuilder(
+                    "java", "-XX:+UseG1GC", "-Xmx2g", "-jar", installation, "nogui"
+                );
+                builder.directory(ServerSoftware.SERVER_DIR);
                 Process process = builder.start();
-                STDIO.link(process, software.displayName());
+                STDIO.link(process, software.ref);
             } catch (IOException e) {
                 STDIO.err(e, "Failed to run ", installation);
             }
         }
     },
 
-    STATUS("Installation status", "", "STATE", "INFO") {
+    SEARCH("Search refs", "[string]", "Find") {
+        @Override
+        public @NotNull Contents<?> init() {
+            return new StringListContents();
+        }
+
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            boolean out = Plugin.listInstalled();
-            out = Plugin.listLinked() || out;
-            out = Plugin.listUnknown() || out;
-            out = ServerSoftware.listInstalled() || out;
-            out = ServerSoftware.listUnknown() || out;
-
-            if (!out) {
-                STDIO.warn(CustomStyle.SOFTWARE.toString(), BOLD, "Nothing installed to show");
-            }
+            String search = String.join(" ", (List<String>) contents()).toLowerCase();
+            boolean s;
+            s = listCounted(PLUGIN, " plugin(s) found", Plugin.search(search).toArray());
+            s = listCounted(CATEGORY, " plugin categor(y/ies) found", PluginCategory.search(search).toArray()) || s;
+            s = listCounted(SERVER, " server preset(s) found", ServerPreset.search(search).toArray()) || s;
+            s = listCounted(SOFTWARE, " server software found", ServerSoftware.search(search).toArray()) || s;
+            if (!s) STDIO.warn("Nothing found");
         }
     },
 
-    UNINSTALL("Uninstall selected", "-PCSZIA", "Remove", "Delete") {
+    STATUS("Installation status", "= list -I") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            List<Plugin> plugins = Plugin.selected();
-            List<ServerSoftware> software = ServerSoftware.selected();
-
-            if (plugins.isEmpty() && software.isEmpty()) {
-                STDIO.warn("Nothing selected");
-                return;
-            }
-
-            STDIO.log(CustomStyle.UNINSTALL, plugins.size(), " plugin(s) and ", software.size(), " software to uninstall");
-            if (!STDIO.getConfirmation("Continue removal")) return;
-            for (Plugin p : plugins) p.uninstall();
-            for (ServerSoftware s : software) s.uninstall();
+            boolean i;
+            i = listCounted(PLUGIN, " plugin(s) installed", Plugin.installed().toArray());
+            i = listCounted(CATEGORY, " plugin categor(y/ies) installed", PluginCategory.installed().toArray()) || i;
+            i = listCounted(SERVER, " server preset(s) installed", ServerPreset.installed().toArray()) || i;
+            i = listCounted(CustomStyle.LINK, "unknown linked plugin(s)", Plugin.unknown().linked().toArray()) || i;
+            i = listCounted(UNKNOWN, "unknown plugin(s)", Plugin.unknown().unknown().toArray()) || i;
+            i = listCounted(SOFTWARE, " server software installed", ServerSoftware.installed().toArray()) || i;
+            i = listCounted(CustomStyle.LINK, "unknown linked server software", ServerSoftware.unknown().linked().toArray()) || i;
+            i = listCounted(UNKNOWN, "unknown server software", ServerSoftware.unknown().unknown().toArray()) || i;
+            if (!i) STDIO.warn("Nothing installed");
         }
     },
 
-    UPDATE("Update selected", ":-I | -PCSZA", "Upgrade") {
+    UNINSTALL("Uninstall selected", "-PCSZIA:select", "Remove", "Delete") {
         @Override
         public void onRun(@NotNull Parser.Result result) {
-            List<Plugin> plugins = Plugin.selected();
-            List<ServerSoftware> software = ServerSoftware.selected();
-            if (plugins.isEmpty() && software.isEmpty()) { // Auto select installed if nothing specified
-                plugins = Plugin.installed();
-                software = ServerSoftware.installed();
-            }
+            Set<Plugin> plugins = Plugin.matching();
+            Set<ServerSoftware> software = ServerSoftware.matching();
 
-            if (plugins.isEmpty() && software.isEmpty()) {
-                STDIO.warn("Nothing selected");
+            int matching = plugins.size() + software.size();
+            int selected = Plugin.selected().size() + ServerSoftware.selected().size();
+
+            if (selected == 0) {
+                STDIO.warn("Nothing selected for removal");
                 return;
             }
 
-            STDIO.log(CustomStyle.UPDATE, plugins.size(), " plugin(s) and ", software.size(), " software to update");
-            if (!STDIO.getConfirmation("Continue update")) return;
-            for (Plugin p : plugins) p.update();
-            for (ServerSoftware s  : software) s.update();
+            if (matching == 0) {
+                STDIO.warn("Nothing selected is installed");
+                return;
+            }
+
+            STDIO.log(CustomStyle.UNINSTALL, "(", matching, '/', selected, ") will be removed");
+            if (!STDIO.getConfirmation("Confirm removal")) return;
+            Source.uninstall(plugins, software);
+        }
+    },
+
+    UPDATE("Update selected", "-PCSZIA:select", "Upgrade") {
+        @Override
+        public void onRun(@NotNull Parser.Result result) {
+            Set<Plugin> plugins = Plugin.matching();
+            Set<ServerSoftware> software = ServerSoftware.matching();
+
+            int matching = plugins.size() + software.size();
+            int selected = Plugin.selected().size() + ServerSoftware.selected().size();
+
+            if (selected == 0) {
+                STDIO.warn("Nothing selected for update");
+                return;
+            }
+
+            if (matching == 0) {
+                STDIO.warn("Nothing selected is installed");
+                return;
+            }
+
+            STDIO.log(CustomStyle.UPDATE, "(", matching, '/', selected, ") will be updated");
+            if (!STDIO.getConfirmation("Confirm update")) return;
+            Source.update(plugins, software);
         }
     };
 
-    // Package data into container from lib
+    // As per library specifications...
 
     private final @NotNull Data data;
 
@@ -479,5 +343,18 @@ public enum CustomCommand implements Command {
     @Override
     public @NotNull Data data() {
         return this.data;
+    }
+
+    // Utils
+
+    /**  Writes objects to console as table if not empty. */
+    private static boolean listCounted(
+        @NotNull Style style,
+        @NotNull String header,
+        @Nullable Object @NotNull [] objects
+    ) {
+        if (objects.length == 0) return false;
+        STDIO.list(style, objects.length + header, objects);
+        return true;
     }
 }

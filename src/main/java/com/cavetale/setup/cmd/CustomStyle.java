@@ -6,12 +6,12 @@ import org.jetbrains.annotations.NotNull;
 
 import static link.l_pf.cmdlib.shell.Code.Std.*;
 
-/** Custom output styles. */
+/** Custom styles for the command line app. */
 public enum CustomStyle implements Style {
     SELECT(LIGHT_BLUE_FG),
     COMMAND(LIGHT_CYAN_FG),
     FLAG(DARK_YELLOW_FG),
-    INSTALL(LIGHT_GREEN_FG),
+    INSTALLED(LIGHT_GREEN_FG),
     UPDATE(LIGHT_GREEN_FG),
     UNINSTALL(LIGHT_RED_FG),
     LINK(LIGHT_MAGENTA_FG),
@@ -23,15 +23,13 @@ public enum CustomStyle implements Style {
     SERVER(LIGHT_MAGENTA_FG),
     SOFTWARE(LIGHT_YELLOW_FG);
 
-    // Package as per library specifications
+    // As per library specifications...
 
     public final @NotNull String code;
 
     CustomStyle(@NotNull Code @NotNull ... codes) {
         StringBuilder s = new StringBuilder();
-        for (Code c : codes) {
-            s.append(c);
-        }
+        for (Code c : codes) s.append(c);
         this.code = s.toString();
     }
 
