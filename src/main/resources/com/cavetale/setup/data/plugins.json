@@ -1,7 +1,7 @@
 [{ "ref": "Adventure"},
 { "ref": "AdviceAnimals", "parent": "com.winthier" },
 { "ref": "AFK" },
-{ "ref": "AntiPopup", "ver": "12.4", "uri": "https://github.com/KaspianDev/AntiPopup/releases/download/13650a6/AntiPopup-12.4.jar" },
+{ "ref": "AntiPopup", "deprecated": true, "ver": "12.4", "uri": "https://github.com/KaspianDev/AntiPopup/releases/download/13650a6/AntiPopup-12.4.jar" },
 { "ref": "Area" },
 { "ref": "ArmorStandEditor", "ver": "1.17-25", "parent": "io.github.rypofalem" },
 { "ref": "Auction" },

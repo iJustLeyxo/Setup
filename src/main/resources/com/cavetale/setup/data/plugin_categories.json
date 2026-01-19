@@ -46,7 +46,6 @@
     "Windicator"
 ]}, { "ref": "Global", "plugins": [
     "AFK",
-    "AntiPopup",
     "Area",
     "ArmorStandEditor",
     "Auction",
